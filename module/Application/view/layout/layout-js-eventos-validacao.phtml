@@ -1,0 +1,98 @@
+<?php
+
+use Application\Controller\Helper\Constantes;
+use Zend\Session\Container;
+
+$sessao = new Container(Constantes::$NOME_APLICACAO);
+
+$titulo = '';
+$texto = '';
+$mostrar = false;
+
+if ($sessao->tipoMensagem) {
+    $mostrar = true;
+
+    $traducaoCelula = $this->translate(Constantes::$TRADUCAO_CELULA_);
+    $traducaoCulto = $this->translate(Constantes::$TRADUCAO_CULTO_);
+    $traducaoRevisao = $this->translate(Constantes::$TRADUCAO_REVISAO);
+
+    $traducaoCadastrado = $this->translate(Constantes::$TRADUCAO_CADASTRADO);
+    $traducaoAlterado = $this->translate(Constantes::$TRADUCAO_ALTERADO);
+    $traducaoExcluido = $this->translate(Constantes::$TRADUCAO_EXCLUIDO);
+
+    $traducaoHost = $this->translate(Constantes::$TRADUCAO_CELULA_TEXTO);
+    $traducaoNomeCulto = $this->translate(Constantes::$TRADUCAO_CULTO_TEXTO);
+    switch ($sessao->tipoMensagem) {
+        case 1:
+            $titulo = $traducaoCelula . $traducaoCadastrado;
+            $texto = $traducaoHost . $sessao->textoMensagem;
+            break;
+        case 2:
+            $titulo = $traducaoCelula . $traducaoAlterado;
+            $texto = $traducaoHost . $sessao->textoMensagem;
+            break;
+        case 3:
+            $titulo = $traducaoCelula . $traducaoExcluido;
+            $texto = $traducaoHost . $sessao->textoMensagem;
+            break;
+        case 4:
+            $titulo = $traducaoCulto . $traducaoCadastrado;
+            $texto = $traducaoNomeCulto . $sessao->textoMensagem;
+            break;
+        case 5:
+            $titulo = $traducaoCulto . $traducaoAlterado;
+            $texto = $traducaoNomeCulto . $sessao->textoMensagem;
+            break;
+        case 6:
+            $titulo = $traducaoCulto . $traducaoExcluido;
+            $texto = $traducaoNomeCulto . $sessao->textoMensagem;
+            break;
+        case 7:
+            $titulo = $traducaoRevisao . $traducaoCadastrado;
+            $texto = $traducaoNomeCulto . $sessao->textoMensagem;
+    }
+    $sessao->tipoMensagem = '';
+    $sessao->textoMensagem = '';
+
+    $titulo = $this->translate($titulo);
+    $texto = $this->translate($texto);
+}
+?>
+<script type="text/javascript">
+    var stack_bar_bottom = {
+        "dir1": "up",
+        "dir2": "right",
+        "spacing1": 0,
+        "spacing2": 0
+    };
+
+    var noteStyle = 'success';
+    var noteShadow = true;
+    var noteOpacity = 1;
+    var addClass = 'stack_bar_bottom';
+    var width = '70%';
+    var titulo = '<?php echo $titulo; ?>';
+    var texto = '<?php echo $texto; ?>';
+
+<?php
+if ($mostrar) {
+    echo 'window.onload = initPage;';
+}
+?>
+
+    function initPage() {
+
+        new PNotify({
+            title: titulo,
+            text: texto,
+            shadow: noteShadow,
+            opacity: noteOpacity,
+            addclass: addClass,
+            type: noteStyle,
+            stack: stack_bar_bottom,
+            width: width,
+            delay: 10000
+        });
+
+    }
+</script>

@@ -1,0 +1,336 @@
+<?php
+
+use Application\Controller\Helper\Constantes;
+use Zend\Session\Container;
+
+$versao = '?v=1.1.4';
+
+echo $this
+        ->headScript()
+        ->prependFile($this->basePath() . '/vendor/plugins/pnotify/pnotify.js')
+;
+echo $this->inlineScript();
+
+$mensagemPNotify = '';
+$nomePessoa = '';
+$sessao = new Container(Constantes::$NOME_APLICACAO);
+$mostrarNotificacao = false;
+if ($sessao->mostrarNotificacao) {
+    $mostrarNotificacao = true;
+    $mensagemPNotify = $this->translate(Constantes::$TRADUCAO_PESSOA_CADASTRADA);
+    if ($sessao->exclusao) {
+        $mensagemPNotify = $this->translate(Constantes::$TRADUCAO_PESSOA_INATIVADA_LANCAMENTO);
+    }
+    if ($sessao->emailEnviado) {
+        $mensagemPNotify = 'Email(s) reenviado(s)';
+    }
+    if ($sessao->nomePessoa) {
+        $nomePessoa = $sessao->nomePessoa;
+    }
+    $sessao->jaMostreiANotificacao = true;
+}
+?>
+<script type = "text/javascript">
+<?php if ($mostrarNotificacao) { ?>
+        window.onload = modalPNotify;
+<?php } ?>
+
+    function modalPNotify() {
+        var stack_bar_bottom = {
+            "dir1": "up",
+            "dir2": "right",
+            "spacing1": 0,
+            "spacing2": 0
+        }
+
+        var noteStyle = 'success';
+        var noteShadow = true;
+        var noteOpacity = 1;
+        new PNotify({
+            title: '<?php echo $mensagemPNotify; ?>!',
+            text: '<?php echo $nomePessoa; ?>',
+            shadow: noteShadow,
+            opacity: noteOpacity,
+            addclass: 'stack_bar_bottom',
+            type: noteStyle,
+            stack: stack_bar_bottom,
+            width: '70%',
+            delay: 10000
+        });
+    }
+
+    function mostrarModalClasse() {
+        $.magnificPopup.open({
+            removalDelay: 500, //delay removal by X to allow out-animation,
+            items: {
+                src: "#modalClassificacao"
+            },
+            modal: true,
+            callbacks: {
+                beforeOpen: function (e) {
+                    var Animation = "mfp-zoomIn";
+                    this.st.mainClass = Animation;
+                }
+            },
+            midClick: true // allow opening popup on middle mouse click. Always set it to true if you don't provide alternative source.
+        });
+    }
+    function mostrarModalInformativo(tipo) {
+        var textoMetaCultoEDomingo = 'Meta 3 pessoas, você, seu co-líder e seu líder em treinamento, caso casado dobrado!';
+        var textoMetaArena = 'Meta 6 pessoas, você, seu co-líder e seu líder em treinamento levando mais 1, caso casado dobrado!';
+        var textoMetaMembresia = 'Meta Eu + 6, caso casado dobrado!';
+        var spanModalInformativo = $('#spanModalInformativo');
+        var texto = '';
+        switch (tipo) {
+            case 1:
+                texto = textoMetaCultoEDomingo;
+                break;
+            case 2:
+                texto = textoMetaArena;
+                break;
+            case 3:
+                texto = textoMetaMembresia;
+                break;
+        }
+        spanModalInformativo.text(texto);
+        $.magnificPopup.open({
+            removalDelay: 500, //delay removal by X to allow out-animation,
+            items: {
+                src: "#modalInformativo"
+            },
+            modal: true,
+            callbacks: {
+                beforeOpen: function (e) {
+                    var Animation = "mfp-zoomIn";
+                    this.st.mainClass = Animation;
+                }
+            },
+            midClick: true // allow opening popup on middle mouse click. Always set it to true if you don't provide alternative source.
+        });
+    }
+    var opts = {
+        angle: -0.25,
+        lineWidth: 0.2,
+        radiusScale: 0.9,
+        pointer: {
+            length: 0.6,
+            strokeWidth: 0.05,
+            color: '#000000'
+        },
+        limitMax: false,
+        limitMin: false,
+        highDpiSupport: true
+    };
+    function valorAcimaDaMeta(meta) {
+        meta = parseInt(meta);
+        var resposta = 0;
+        if (meta === 3) {
+            resposta = 4;
+        }
+        if (meta === 6) {
+            resposta = 8;
+        }
+        if (meta === 7) {
+            resposta = 9;
+        }
+        if (meta === 12) {
+            resposta = 16;
+        }
+        if (meta === 14) {
+            resposta = 18.5;
+        }
+        return resposta;
+    }
+    function ajustaOpcoesGaugePorValor(opts, meta, valorAlcancado) {
+        meta = parseInt(meta);
+        valorAlcancado = parseFloat(valorAlcancado);
+        var valoresLabels;
+        var coresZones;
+        var corVermelha = '#E63F24';
+        var corAmarela = '#F5B025';
+        var corVerde = '#5BC24C';
+        var corAzul = '#27A2CF';
+        if (meta === 3) {
+            valoresLabels = [1, 2, 3, 4];
+        }
+        if (meta === 6) {
+            valoresLabels = [2, 4, 6, 8];
+        }
+        if (meta === 7) {
+            valoresLabels = [2.4, 4.8, 7, 9.4];
+        }
+        if (meta === 12) {
+            valoresLabels = [4, 8, 12, 16];
+        }
+        if (meta === 14) {
+            valoresLabels = [5, 9, 14, 19];
+        }
+        if (valorAlcancado > valoresLabels[3]) {
+            valoresLabels[3] = parseInt(valorAlcancado);
+        }
+        coresZones = [
+            {strokeStyle: corVermelha, min: 0, max: valoresLabels[0]},
+            {strokeStyle: corAmarela, min: valoresLabels[0], max: valoresLabels[1]},
+            {strokeStyle: corVerde, min: valoresLabels[1], max: valoresLabels[2]},
+            {strokeStyle: corAzul, min: valoresLabels[2], max: valoresLabels[3]}
+        ]
+
+        opts['staticLabels'] = {
+            font: "10px sans-serif",
+            labels: valoresLabels,
+            fractionDigits: 0
+        };
+        opts['staticZones'] = coresZones;
+        return opts;
+    }
+    var rodarApenasUmaVezOsGaugesMembresia = 1;
+    var rodarApenasUmaVezOsGaugesCelula = 1;
+    var tipoMembresia = 1;
+    var tipoCelula = 2;
+    function criarGauges(tipo) {
+        var valoresGraficos = [3, 6, 3, 7];
+        var eCasal = document.getElementById('eCasal').value;
+        if (parseInt(eCasal) === 1) {
+            valoresGraficos = [6, 12, 6, 14];
+        }
+        var valorMax = 0;
+        if (tipo === tipoMembresia && rodarApenasUmaVezOsGaugesMembresia === 1) {
+            /* Culto */
+            var valorCulto = $('#valorCulto').val()
+            valorMax = valorAcimaDaMeta(valoresGraficos[0]);
+            if (valorCulto > valorMax) {
+                valorMax = valorCulto;
+            }
+            var target = document.getElementById('gaugeCulto'); // your canvas element
+            opts = ajustaOpcoesGaugePorValor(opts, valoresGraficos[0], valorCulto);
+            var gauge = new Gauge(target).setOptions(opts); // create sexy gauge!
+            gauge.maxValue = valorMax; // set max gauge value
+            gauge.setMinValue(0); // Prefer setter over gauge.minValue = 0
+            gauge.animationSpeed = 128; // set animation speed (32 is default value)
+            gauge.set(valorCulto); // set actual value
+            gauge.width = '250px';
+            $('#labelValorCulto').html(valorCulto);
+            $('#spanMetaCulto').html(valoresGraficos[0]);
+            /* Arena */
+            var valorArena = $('#valorArena').val();
+            valorMax = valorAcimaDaMeta(valoresGraficos[1]);
+            if (valorArena > valorMax) {
+                valorMax = valorCulto;
+            }
+            var target = document.getElementById('gaugeArena'); // your canvas element
+            opts = ajustaOpcoesGaugePorValor(opts, valoresGraficos[1], valorArena);
+            var gauge = new Gauge(target).setOptions(opts); // create sexy gauge!
+            gauge.maxValue = valorMax; // set max gauge value
+            gauge.setMinValue(0); // Prefer setter over gauge.minValue = 0
+            gauge.animationSpeed = 128; // set animation speed (32 is default value)
+            gauge.set(valorArena); // set actual value
+            $('#labelValorArena').html(valorArena);
+            $('#spanMetaArena').html(valoresGraficos[1]);
+            /* Domingo */
+            var valorDomingo = $('#valorDomingo').val();
+            valorMax = valorAcimaDaMeta(valoresGraficos[2]);
+            if (valorDomingo > valorMax) {
+                valorMax = valorDomingo;
+            }
+            var target = document.getElementById('gaugeDomingo'); // your canvas element
+            opts = ajustaOpcoesGaugePorValor(opts, valoresGraficos[2], valorDomingo);
+            var gauge = new Gauge(target).setOptions(opts); // create sexy gauge!
+            gauge.maxValue = valorMax; // set max gauge value
+            gauge.setMinValue(0); // Prefer setter over gauge.minValue = 0
+            gauge.animationSpeed = 128; // set animation speed (32 is default value)
+            gauge.set(valorDomingo); // set actual value
+            $('#labelValorDomingo').html(valorDomingo);
+            $('#spanMetaDomingo').html(valoresGraficos[2]);
+            /* Membresia */
+            var valorMembresia = $('#valorMembresia').val();
+            valorMax = valorAcimaDaMeta(valoresGraficos[3]);
+            if (valorMembresia > valorMax) {
+                valorMax = valorMembresia;
+            }
+            var target = document.getElementById('gaugeMembresia'); // your canvas element
+            opts = ajustaOpcoesGaugePorValor(opts, valoresGraficos[3], valorMembresia);
+            var gauge = new Gauge(target).setOptions(opts); // create sexy gauge!
+            gauge.maxValue = valorMax; // set max gauge value
+            gauge.setMinValue(0); // Prefer setter over gauge.minValue = 0
+            gauge.animationSpeed = 128; // set animation speed (32 is default value)
+            gauge.set(valorMembresia); // set actual value
+            $('#labelValorMembresia').html(valorMembresia);
+            $('#spanMetaMembresia').html(valoresGraficos[3]);
+            rodarApenasUmaVezOsGaugesMembresia += 1;
+
+            gerarGraficoLinhas();
+        }
+
+        if (tipo === tipoCelula && rodarApenasUmaVezOsGaugesCelula === 1) {
+            var valorCelula = $('#valorCelula').val()
+            valorMax = valorAcimaDaMeta(valoresGraficos[3]);
+            if (valorCelula > valorMax) {
+                valorMax = valorCelula;
+            }
+            var target = document.getElementById('gaugeCelula'); // your canvas element
+            opts = ajustaOpcoesGaugePorValor(opts, valoresGraficos[3], valorCelula);
+            var gauge = new Gauge(target).setOptions(opts); // create sexy gauge!
+            gauge.maxValue = valorMax; // set max gauge value
+            gauge.setMinValue(0); // Prefer setter over gauge.minValue = 0
+            gauge.animationSpeed = 128; // set animation speed (32 is default value)
+            gauge.set(valorCelula); // set actual value
+            gauge.width = '250px';
+            $('#labelValorCelula').html(valorCelula);
+            $('#spanMetaCelula').html(valoresGraficos[3]);
+            rodarApenasUmaVezOsGaugesCelula += 1;
+        }
+    }
+
+    var highColors = ['#E63F24', '#27A2CF', '#5BC24C'];
+
+    function gerarGraficoLinhas() {
+        var ecomChart = $('#ecommerce_chart1');
+        ecomChart.highcharts({
+            credits: false,
+            colors: highColors,
+            chart: {
+                backgroundColor: 'transparent',
+                className: '',
+                type: 'line',
+                zoomType: 'x',
+                panning: true,
+                panKey: 'shift',
+                marginTop: 45,
+                marginRight: 1,
+            },
+            title: {
+                text: null
+            },
+            xAxis: {
+                gridLineColor: '#EEE',
+                lineColor: '#EEE',
+                tickColor: '#EEE',
+                categories: categorias
+            },
+            yAxis: {
+                min: 0,
+                tickInterval: 5,
+                gridLineColor: '#EEE',
+                title: {
+                    text: null,
+                }
+            },
+            plotOptions: {
+                spline: {
+                    lineWidth: 3,
+                },
+                area: {
+                    fillOpacity: 0.2
+                }
+            },
+            legend: {
+                enabled: true,
+                floating: false,
+                align: 'right',
+                verticalAlign: 'top',
+                x: -15
+            },
+            series: seriesData
+        });
+    }
+</script>

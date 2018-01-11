@@ -1,0 +1,7 @@
+<?php
+$versao = '?v=1.1';
+echo $this
+        ->headScript()
+        ->prependFile($this->basePath() . '/js/circuito_da_visao/qrcode.js' . $versao)
+;
+echo $this->inlineScript();

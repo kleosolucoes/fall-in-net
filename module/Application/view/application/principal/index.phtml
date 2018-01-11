@@ -1,0 +1,366 @@
+<?php
+
+use Application\Controller\Helper\Funcoes;
+use Application\Controller\RelatorioController;
+?>
+<!-- Begin: Content -->
+<section id="content" class="table-layout animated fadeIn">
+    <?php
+    echo '<input type="hidden" id="eCasal" value="' . $this->eCasal . '" />';
+    echo '<input type="hidden" id="valorCulto" value="' . $this->relatorio['membresiaCulto'] . '" />';
+    echo '<input type="hidden" id="valorArena" value="' . $this->relatorio['membresiaArena'] . '" />';
+    echo '<input type="hidden" id="valorDomingo" value="' . $this->relatorio['membresiaDomingo'] . '" />';
+    echo '<input type="hidden" id="valorMembresia" value="' . RelatorioController::formataNumeroRelatorio($this->relatorio['membresia']) . '" />';
+    echo '<input type="hidden" id="valorCelula" value="' . $this->relatorio['celula'] . '" />';
+    ?>
+    <!-- begin: .tray-center -->
+    <div class="tray tray-center">
+        <?php echo $this->dadosPrincipal($this->relatorioMedio); ?>
+        <div class="admin-panels fade-onload">
+            <!--ranking-->
+            <div class="row alert alert-default">
+                <div class="bg-info col-xs-6 col-sm-6 col-md-6 col-lg-6 text-center p10">
+                    <h2>Ranking<br />Membresia</h2>
+                    <h1 style="font-size: 36px;">#<?php echo $this->grupo->getFatoRanking()->getRanking_membresia(); ?></h1>
+                </div>
+                <div class="bg-info col-xs-6 col-sm-6 col-md-6 col-lg-6 text-center p10">
+                    <h2>Ranking<br />Célula</h2>
+                    <h1 style="font-size: 36px;">#<?php echo $this->grupo->getFatoRanking()->getRanking_celula(); ?></h1>
+                </div>
+                <table class="table footable">
+                    <thead>
+                        <tr>
+                            <th>Grupo id</th>
+                            <th>Ranking</th>
+                            <th>Membresia</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        foreach ($this->rankingsMembresia as $fatoRanking) {
+                            echo "<tr>";
+                            echo "<td>{$fatoRanking->getGrupo()->getId()}</td>";
+                            echo "<td>{$fatoRanking->getRanking_membresia()}</td>";
+                            echo "<td>{$fatoRanking->getMembresia()}</td>";
+                            echo "</tr>";
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+            <!--robo membresia-->
+            <div class="row alert alert-default">
+                <div class="col-xs-12 col-md-12 col-lg-12">
+                    <!--<p class=" well bg-<?php echo $this->relatorio['membresiaPerformanceClass']; ?> text-center"><?php echo $this->relatorio['membresiaPerformanceFrase']; ?></p>-->
+                    <p class=" well bg-default text-<?php echo $this->relatorio['membresiaPerformanceClass']; ?> text-center"><?php echo $this->relatorio['membresiaPerformanceFrase']; ?></p>
+                    <?php
+                    echo $this->barraDeProgressoBonita(
+                            'Membresia Pessoal <span class="badge">?</span>', $this->relatorio['membresiaPerformanceClass'], $this->relatorio['membresiaPerformance'], 'm0', true, $this->relatorio['membresiaMeta'], $this->relatorio['membresia'], 'onclick="$(\'#divGaugesMembresia\').toggleClass(\'hidden\'); criarGauges(1);"');
+                    ?>
+                </div>
+                <!--Gauges membresia-->
+                <div class="col-xs-12 col-md-12 col-lg-12">
+                    <div id="divGaugesMembresia" class="row p10 hidden">
+                        <div class="panel">
+                            <div class="panel-body">
+                                <?php
+                                $perfomance = array();
+                                $perfomance['culto'] = $this->relatorio['membresiaCulto'] / $this->relatorio['membresiaMeta'] * 100;
+                                $perfomance['arena'] = $this->relatorio['membresiaArena'] / $this->relatorio['membresiaMeta'] * 100;
+                                $perfomance['domingo'] = $this->relatorio['membresiaDomingo'] / $this->relatorio['membresiaMeta'] * 100;
+                                ?>
+                                <!--row gauges-->
+                                <div class="row">
+                                    <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 text-center">
+                                        <div class="panel panel-tile text-center br-a br-grey">
+                                            <div class="panel-body">
+                                                <h3>Meta do Culto</h3>
+                                                <h4><span id="spanMetaCulto"></span> pessoas <span onclick="mostrarModalInformativo(1);" class="badge">?</span></h4>
+                                                <canvas id="gaugeCulto" style="width:100%;" class="canvas-preview" ></canvas>
+                                                <h4><span id="labelValorCulto"></span> pessoas</h4>
+                                            </div>
+                                            <div class="panel-footer br-t p12">
+                                                <span class="fs11">
+
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 text-center">
+                                        <div class="panel panel-tile text-center br-a br-grey">
+                                            <div class="panel-body">
+                                                <h3>Meta do Arena</h3>
+                                                <h4><span id="spanMetaArena"></span> pessoas <span onclick="mostrarModalInformativo(2);" class="badge">?</span></h4>
+                                                <canvas id="gaugeArena" id="gaugeCulto" style="width:100%;" class="canvas-preview"></canvas>
+                                                <h4><span id="labelValorArena"></span> pessoas</h4>
+                                            </div>                                               
+                                            <div class="panel-footer br-t p12">
+                                                <span class="fs11">
+
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 text-center">
+                                        <div class="panel panel-tile text-center br-a br-grey">
+                                            <div class="panel-body">
+                                                <h3>Meta do Domingo</h3>
+                                                <h4><span id="spanMetaDomingo"></span> pessoas <span onclick="mostrarModalInformativo(1);" class="badge">?</span></h4>
+                                                <canvas id="gaugeDomingo" id="gaugeCulto" style="width:100%;" class="canvas-preview"></canvas>
+                                                <h4><span id="labelValorDomingo"></span> pessoas</h4>
+                                            </div>
+                                            <div class="panel-footer br-t p12">
+                                                <span class="fs11">
+
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 text-center">
+                                        <div class="panel panel-tile text-center br-a br-grey">
+                                            <div class="panel-body">
+                                                <h3>Meta da Membresia</h3>
+                                                <h4><span id="spanMetaMembresia"></span> membresia <span onclick="mostrarModalInformativo(3);" class="badge">?</span></h4>
+                                                <canvas id="gaugeMembresia" id="gaugeCulto" style="width:100%;" class="canvas-preview"></canvas>
+                                                <h4><span id="labelValorMembresia"></span> membresia</h4>
+                                            </div>
+                                            <div class="panel-footer br-t p12">
+                                                <span class="fs11">
+
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--row chart lines-->
+                                <div class="row m25">
+                                    <!-- Chart Column -->
+                                    <div class="col-md-12 pln br-r mvn15">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>                    
+                </div>
+            </div>
+            <!--robo celula-->
+            <div class="row alert alert-default">
+                <div class="col-xs-12 col-md-12 col-lg-12">
+                    <!--<p class=" well bg-<?php echo $this->relatorio['celulaPerformanceClass']; ?> text-center"><?php echo $this->relatorio['celulaPerformanceFrase']; ?></p>-->
+                    <p class=" well bg-default text-<?php echo $this->relatorio['celulaPerformanceClass']; ?> text-center"><?php echo $this->relatorio['celulaPerformanceFrase']; ?></p>
+                    <?php
+                    echo $this->barraDeProgressoBonita(
+                            'Célula Pessoal <span class="badge">?</span>', $this->relatorio['celulaPerformanceClass'], $this->relatorio['celulaPerformance'], 'm0', true, $this->relatorio['membresiaMeta'], $this->relatorio['celula'], 'onclick="$(\'#divGaugesCelula\').toggleClass(\'hidden\'); criarGauges(2);"');
+                    ?>
+                </div>
+                <!--Gauges celulas-->
+                <div class="col-xs-12 col-md-12 col-lg-12">
+                    <div id="divGaugesCelula" class="row p10 hidden">
+                        <div class="panel">
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 text-center">
+                                        <div class="panel panel-tile text-center br-a br-grey">
+                                            <div class="panel-body">
+                                                <h3>Meta do Célula</h3>
+                                                <h4><span id="spanMetaCelula"></span> pessoas <span onclick="mostrarModalInformativo(3);" class="badge">?</span></h4>
+                                                <canvas id="gaugeCelula" style="width:100%;" class="canvas-preview" ></canvas>
+                                                <h4><span id="labelValorCelula"></span> pessoas</h4>
+                                            </div>
+                                            <div class="panel-footer br-t p12">
+                                                <span class="fs11">
+                                                    <i class="fa fa-arrow-<?php echo $this->relatorio['diferencaCelulaSeta']; ?> pr5"></i> <?php echo RelatorioController::formataNumeroRelatorio($this->relatorio['diferencaCelula']); ?>% <?php echo $this->relatorio['diferencaCelulaFrase']; ?>
+                                                    <b>1 SEMANA ATRÁS</b>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--robo proximoNivel-->
+            <div class="row alert alert-default">
+                <div class="col-xs-12 col-md-12 col-lg-12">
+                    <?php echo $this->dadosProximoNivel($this->relatorioEquipe); ?>
+                </div>
+            </div>
+            <!--modalInformativo-->
+            <div id="modalInformativo" class="popup-basic p25 mfp-with-anim mfp-hide">
+                <div class="mt20"><span id="spanModalInformativo"></span></div>
+                <button tittle="Close (Esc)" type="button" class="mfp-close bg-dark">x</button>
+            </div>
+        </div>
+        <h1 class="text-center">Antigo Relatório embaixo <i class="fa fa-arrow-down pr5"></i></h1>
+    </div>  
+</section>
+
+<div class="mw800 center-block">
+    <div class="panel">
+        <div class="panel-heading text-center">
+            <span class="panel-title"><b>Supervis&atilde;o - <?php echo $this->periodoExtenso; ?></b></span>
+        </div>
+        <div class="panel-body pn">
+            <table class="table mbn tc-med-1 tc-bold-last">
+                <?php
+                if ($this->discipulos) {
+                    $html = '';
+                    $totalDeCelulasNaoRealizadas = 0;
+                    foreach ($this->discipulos as $gpFilho) {
+                        $grupoFilho = $gpFilho->getGrupoPaiFilhoFilho();
+                        $nomeLideres = $grupoFilho->getNomeLideresAtivos();
+                        $relatorioDiscipulo = $this->discipulosRelatorio[$grupoFilho->getId()];
+                        $relatorioDiscipuloPessoal = $this->discipulosRelatorioPessoal[$grupoFilho->getId()];
+                        $diferenca = $relatorioDiscipulo['celulaQuantidade'] - $relatorioDiscipulo['celulaRealizadas'];
+                        $diferencaPessoal = $relatorioDiscipuloPessoal['celulaQuantidade'] - $relatorioDiscipuloPessoal['celulaRealizadas'];
+                        $html .= '<tr class="dark">';
+                        $html .= '<td>EQUIPE - ' . $nomeLideres . '</td>';
+                        $html .= '<td></td>';
+                        $html .= '</tr>';
+                        if ($diferencaPessoal > 0) {
+                            $html .= '<tr>';
+                            $html .= '<td class="text-right">' . $nomeLideres . '</td>';
+                            $html .= '<td>' . $diferencaPessoal . '</td>';
+                            $html .= '</tr>';
+                        }
+                        $grupoPaiFilhoFilhos144 = $grupoFilho->getGrupoPaiFilhoFilhosAtivos(-1);
+                        if ($grupoPaiFilhoFilhos144) {
+                            foreach ($grupoPaiFilhoFilhos144 as $gpFilho144) {
+                                $grupoFilho144 = $gpFilho144->getGrupoPaiFilhoFilho();
+                                $nomeLideres144 = $grupoFilho144->getNomeLideresAtivos();
+                                $relatorioDiscipulo144 = $this->discipulosRelatorio[$grupoFilho144->getId()];
+                                if ($relatorioDiscipulo144) {
+                                    $diferenca144 = $relatorioDiscipulo144['celulaQuantidade'] - $relatorioDiscipulo144['celulaRealizadas'];
+                                    $html .= '<tr>';
+                                    $html .= '<td class="text-right">' . $nomeLideres144 . '</td>';
+                                    $html .= '<td>' . $diferenca144 . '</td>';
+                                    $html .= '</tr>';
+                                }
+                            }
+                        }
+                        $html .= '<tr class="">';
+                        $html .= '<td class="text-right">TOTAL</td>';
+                        $html .= '<td>' . $diferenca . '</td>';
+                        $html .= '</tr>';
+                        $html .= '<tr>';
+                        $html .= '<td colspan="2"></td>';
+                        $html .= '</tr>';
+                        $totalDeCelulasNaoRealizadas += $diferenca;
+                    }
+                    echo '<tr>';
+                    echo '<td colspan="3" class="text-center">Celulas <b>N&atilde;o</b> Realizadas: ' . $totalDeCelulasNaoRealizadas . '</td>';
+                    echo '</tr>';
+                    echo $html;
+                }
+                ?>
+            </table>
+        </div>
+    </div>
+    <div class="panel">
+        <div class="panel-heading">
+            <span class="panel-title">Pessoal</span>
+        </div>
+        <div class="panel-body pn">
+            <table class="table mbn tc-med-1 tc-bold-last">
+                <tr>
+                    <td></td>
+                    <td>Meta</td>
+                    <td>Valor</td>
+                    <td>Perf.%</td>
+                </tr>
+                <tr class="<?php echo $this->relatorio['membresiaPerformanceClass']; ?>">
+                    <td>Membresia</td>
+                    <td><?php echo $this->relatorio['membresiaMeta']; ?></td>
+                    <td><?php echo RelatorioController::formataNumeroRelatorio($this->relatorio['membresia']); ?></td>
+                    <td><?php echo RelatorioController::formataNumeroRelatorio($this->relatorio['membresiaPerformance']); ?>%</td>
+                </tr>
+                <tr class="<?php echo $this->relatorio['celulaPerformanceClass']; ?>">
+                    <td>Célula</td>
+                    <td><?php echo $this->relatorio['membresiaMeta']; ?></td>
+                    <td><?php echo $this->relatorio['celula']; ?></td>
+                    <td><?php echo RelatorioController::formataNumeroRelatorio($this->relatorio['celulaPerformance']); ?>%</td>
+                </tr>
+                <tr class="<?php echo $this->relatorio['celulaRealizadasPerformanceClass']; ?>">
+                    <td>Cél. Realizadas</td>
+                    <td><?php echo $this->relatorio['celulaQuantidade']; ?></td>
+                    <td><?php echo $this->relatorio['celulaRealizadas']; ?></td>
+                    <td><?php echo RelatorioController::formataNumeroRelatorio($this->relatorio['celulaRealizadasPerformance']); ?>%</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="panel">
+        <div class="panel-heading">
+            <span class="panel-title">Equipe</span>
+        </div>
+        <div class="panel-body pn">
+            <table class="table mbn tc-med-1 tc-bold-last">
+                <tr>
+                    <td></td>
+                    <td>Meta</td>
+                    <td>Valor</td>
+                    <td>Perf.%</td>
+                </tr>
+                <tr class="<?php echo $this->relatorioEquipe['membresiaPerformanceClass']; ?>">
+                    <td>Membresia</td>
+                    <td><?php echo $this->relatorioEquipe['membresiaMeta']; ?></td>
+                    <td><?php echo RelatorioController::formataNumeroRelatorio($this->relatorioEquipe['membresia']); ?></td>
+                    <td><?php echo RelatorioController::formataNumeroRelatorio($this->relatorioEquipe['membresiaPerformance']); ?>%</td>
+                </tr>
+                <tr class="<?php echo $this->relatorioEquipe['celulaPerformanceClass']; ?>">
+                    <td>Célula</td>
+                    <td><?php echo $this->relatorioEquipe['membresiaMeta']; ?></td>
+                    <td><?php echo $this->relatorioEquipe['celula']; ?></td>
+                    <td><?php echo RelatorioController::formataNumeroRelatorio($this->relatorioEquipe['celulaPerformance']); ?>%</td>
+                </tr>
+                <tr class="<?php echo $this->relatorioEquipe['celulaRealizadasPerformanceClass']; ?>">
+                    <td>Cél. Realizadas</td>
+                    <td><?php echo $this->relatorioEquipe['celulaQuantidade']; ?></td>
+                    <td><?php echo $this->relatorioEquipe['celulaRealizadas']; ?></td>
+                    <td><?php echo RelatorioController::formataNumeroRelatorio($this->relatorioEquipe['celulaRealizadasPerformance']); ?>%</td>
+                </tr>
+            </table>
+        </div>
+    </div>        
+</div>
+<script type="text/javascript">
+
+    // Chart data
+    var seriesData = [{
+            name: 'Meta',
+            data: [<?php
+                for ($i = (-1 * $this->quantidadeDeCiclosPassados); $i <= -1; $i++) {
+                    echo $this->relatorio['membresiasPassadas'][$i]['meta'];
+                    if ($i < ($this->quantidadeDeCiclosPassados - 1)) {
+                        echo ',';
+                    }
+                }
+                ?>]
+        }, {
+            name: 'Meu',
+            data: [<?php
+                for ($i = (-1 * $this->quantidadeDeCiclosPassados); $i <= -1; $i++) {
+                    echo $this->relatorio['membresiasPassadas'][$i]['membresia'];
+                    if ($i < ($this->quantidadeDeCiclosPassados - 1)) {
+                        echo ',';
+                    }
+                }
+                ?>]
+        }
+    ];
+
+    var categorias = [<?php
+                for ($i = (-1 * $this->quantidadeDeCiclosPassados); $i <= -1; $i++) {
+                    $arrayPeriodo = Funcoes::montaPeriodo($i);
+                    echo '"' . $arrayPeriodo[0] . '"';
+                    if ($i < ($this->quantidadeDeCiclosPassados - 1)) {
+                        echo ',';
+                    }
+                }
+                ?>];
+</script>
+<?php
+echo $this->layoutJSPrincipal;

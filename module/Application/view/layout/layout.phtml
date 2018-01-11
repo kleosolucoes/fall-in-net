@@ -1,0 +1,194 @@
+<?php
+echo $this->doctype();
+$versao = '?v=1.4.99';
+
+use Application\Controller\Helper\Constantes;
+?>
+<html lang="pt-BR">
+    <head>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+        <!-- Title Head -->
+        <?php
+        $NAME_APPLICATION = $this->translate(Constantes::$TRADUCAO_NOME_APLICACAO);
+        echo $this
+                ->headTitle($NAME_APPLICATION)
+                ->setSeparator(' - ')
+                ->setAutoEscape(false)
+        ;
+        ?>
+
+        <!-- Meta Head -->
+        <?php
+        echo $this
+                ->headMeta()
+                ->appendName('viewport', 'width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no')
+                ->appendName('theme-color', '#3498db')
+                ->appendName('google-site-verification', 'b4wOHXCDC8BakDzVfow_NeYwAGGBAEv-sCdKLsDAQUs')
+                ->appendHttpEquiv('X-UA-Compatible', 'IE=edge')
+        ;
+        ?>
+
+        <!-- Styles -->
+        <?php
+        echo $this
+                ->headLink(array('rel' => 'shortcut icon', 'type' => 'image/vnd.microsoft.icon', 'href' => $this->basePath() . '/img/favicon.png'))
+                ->headLink(array('rel' => 'apple-touch-icon', 'href' => $this->basePath() . '/img/icons/touch-icon-ipad.png'))
+                ->headLink(array('rel' => 'apple-touch-icon', 'sizes' => '76x76', 'href' => $this->basePath() . '/img/icons/touch-icon-ipad.png'))
+                ->headLink(array('rel' => 'apple-touch-icon', 'sizes' => '120x120', 'href' => $this->basePath() . '/img/icons/touch-icon-iphone-retina.png'))
+                ->headLink(array('rel' => 'apple-touch-icon', 'sizes' => '152x152', 'href' => $this->basePath() . '/img/icons/touch-icon-ipad-retina.png'))
+                ->headLink(array('rel' => 'apple-touch-icon', 'sizes' => '256x256', 'href' => $this->basePath() . '/img/icons/touch-icon-iphone.png'))
+                ->prependStylesheet($this->basePath() . '/css/estilos-circuito/splash.css' . $versao)
+                ->prependStylesheet($this->basePath() . '/vendor/plugins/footable/css/footable.core.min.css')
+                ->prependStylesheet($this->basePath() . '/vendor/plugins/fancytree/skin-win8/ui.fancytree.min.css')
+                ->prependStylesheet($this->basePath() . '/vendor/plugins/ladda/ladda.min.css')
+                ->prependStylesheet($this->basePath() . '/vendor/plugins/magnific/magnific-popup.css')
+                ->prependStylesheet($this->basePath() . '/vendor/plugins/animate/animate.min.css')
+                ->prependStylesheet($this->basePath() . '/css/estilos-circuito/cv-cadastro/estilos-cadastro.css' . $versao)
+                ->prependStylesheet($this->basePath() . '/css/estilos-circuito/cv-lancamentos/estilos-lancamentos.css' . $versao)
+                ->prependStylesheet($this->basePath() . '/css/estilos-circuito/cv-login/estilos-login.css' . $versao)
+                ->prependStylesheet($this->basePath() . '/assets/admin-forms.min.css')
+                ->prependStylesheet($this->basePath() . '/assets/skin/default_skin/css/theme.min.css')
+                ->prependStylesheet('https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700')
+        ;
+        ?>       
+    </head>
+    <body class="external-page external-alt sb-l-c sb-r-c">
+        <?php echo $this->modalLoader(); ?>
+        <!-- Start: Main -->
+        <div id="main">
+            <?php
+            if ($this->pessoa) {
+                if ($this->mostrarMenu !== 0) {
+                    echo $this->menu();
+                }
+            }
+            ?> 
+            <section id="content_wrapper" style="margin-top: 50px;">
+                <div id="content">
+                    <?php echo $this->content; ?>
+                </div>
+            </section>
+        </div>
+        <!-- End: Main -->
+
+        <!-- BEGIN: PAGE SCRIPTS -->
+        <?php
+        echo $this
+                ->headScript()
+                ->prependFile($this->basePath() . '/js/circuito_da_visao/gauge.min.js')
+                ->prependFile($this->basePath() . '/js/circuito_da_visao/modal-selecionar-perfil.js' . $versao)
+                ->prependFile($this->basePath() . '/js/circuito_da_visao/funcao-circuito.js' . $versao)
+                ->prependFile($this->basePath() . '/js/circuito_da_visao/funcao-cadastro.js' . $versao)
+                ->prependFile($this->basePath() . '/js/circuito_da_visao/analyticstracking.js')
+                ->prependFile($this->basePath() . '/assets/js/main.js')
+                ->prependFile($this->basePath() . '/assets/js/utility/utility.js')
+                ->prependFile('https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js', 'text/javascript', array('conditional' => 'lt IE 9',))
+                ->prependFile('https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js', 'text/javascript', array('conditional' => 'lt IE 9',))
+                ->prependFile($this->basePath() . '/vendor/plugins/highcharts/highcharts.js')
+                ->prependFile($this->basePath() . '/vendor/plugins/footable/js/footable.filter.min.js')
+                ->prependFile($this->basePath() . '/vendor/plugins/footable/js/footable.all.min.js')
+                ->prependFile($this->basePath() . '/vendor/plugins/fancytree/extensions/jquery.fancytree.childcounter.js')
+                ->prependFile($this->basePath() . '/vendor/plugins/fancytree/jquery.fancytree-all.min.js')
+                ->prependFile($this->basePath() . '/vendor/plugins/fancytree/skin-win8/ui.fancytree.min.css')
+                ->prependFile($this->basePath() . '/vendor/plugins/ladda/ladda.min.js')
+                ->prependFile($this->basePath() . '/vendor/plugins/magnific/jquery.magnific-popup.js')
+                ->prependFile($this->basePath() . '/vendor/jquery/jquery_ui/jquery-ui.min.js')
+                ->prependFile($this->basePath() . '/vendor/jquery/jquery-1.11.1.min.js')
+        ;
+        echo $this->inlineScript();
+        ?>
+        <script type="text/javascript">
+
+            // request permission on page load
+            document.addEventListener('DOMContentLoaded', function () {
+                if (!Notification) {
+                    alert('Desktop notifications not available in your browser. Try Chromium.');
+                    return;
+                }
+                if (Notification.permission !== "granted")
+                    Notification.requestPermission();
+            });
+
+//            setTimeout(function () {
+//                if (Notification.permission !== "granted")
+//                    Notification.requestPermission();
+//                else {
+//                    var notification = new Notification('Notification title', {
+//                        icon: 'http://cdn.sstatic.net/stackexchange/img/logos/so/so-icon.png',
+//                        body: "Hey there! You've been notified!",
+//                    });
+//
+//                    notification.onclick = function () {
+//                        window.open("http://stackoverflow.com/a/13328397/1269037");
+//                    };
+//
+//                }
+//            }, 5000);
+
+            $('.discipulo12')
+                    .css("border-left", "4px solid #4a89dc")
+                    .css("pointer-events", "none");
+
+            $('.discipulo144')
+                    .css("border-left", "4px solid #967adc")
+                    .css("pointer-events", "none");
+
+            $('.discipulo1728')
+                    .css("border-left", "4px solid #FFFFFF")
+                    .css("pointer-events", "none");
+
+            jQuery(document).ready(function () {
+
+                "use strict";
+
+                // Init Theme Core
+                Core.init();
+
+                // Init Ladda Plugin on buttons
+                Ladda.bind('.ladda-button', {
+                    timeout: 3000
+                });
+
+//                localStorage.clear();
+
+                // Init FooTable Examples
+                $('.footable').footable();
+
+                $('.admin-panels').adminpanel({
+                    grid: '.admin-grid',
+                    draggable: true,
+                    preserveGrid: true,
+                    // mobile: true,
+                    onStart: function () {
+                        // Do something before AdminPanels runs
+                    },
+                    onFinish: function () {
+                        $('.admin-panels').addClass('animated fadeIn').removeClass('fade-onload');
+                    },
+                    onSave: function () {
+                        $(window).trigger('resize');
+                    }
+                });
+
+            });
+
+            $(window).bind("load", function () {
+                // Remove splash screen after load
+                $('.splash').css('display', 'none');
+
+                var url = window.location.href;
+                var splitUrl = url.split('/');
+                if (splitUrl[3].includes('principal')
+                        || splitUrl[3].includes('cadastro')
+                        || splitUrl[3].includes('lancamento')
+                        || splitUrl[3].includes('relatorio')) {
+
+                    $('body')
+                            .removeClass('external-page')
+                            .removeClass('external-alt');
+                }
+            });
+        </script>
+        <!-- END: PAGE SCRIPTS -->
+    </body>
+</html>
