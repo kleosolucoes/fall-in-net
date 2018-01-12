@@ -3,21 +3,26 @@
 /**
  * Nome: doctrine.local.php
  * @author Leonardo Pereira Magalhães <falecomleonardopereira@gmail.com>
- * Descricao: Arquivo com as configurações de acesso ao banco de dados postgre com doctrine
+ * Descricao: Arquivo com as configurações de acesso ao banco de dados mysql com doctrine
  */
 return array(
     'doctrine' => array(
         'connection' => array(
             'orm_default' => array(
-                'driverClass' => 'Doctrine\DBAL\Driver\PDOPgSql\Driver',
+                'driverClass' => 'Doctrine\DBAL\Driver\PDOMySql\Driver',
                 'params' => array(
-//                    'host' => 'localhost',
-                    'host' => '172.17.0.2',
-                    'port' => '5432',
-                    'user' => 'postgres',
-                    'password' => 'qwaszx159753',
-                    'dbname' => 'postgres',
-                    'encoding' => 'utf8',
+//                     'host' => 'localhost',
+//                     'port' => '3306',
+//                     'user' => 'zapma087_novo',
+//                     'password' => 'zP7KQbV[7G97',
+//                     'dbname' => 'zapma087_zap',
+//                     'encoding' => 'utf8',
+                   'host' => 'localhost',
+                   'port' => '3306',
+                   'user' => 'root',
+                   'password' => '',
+                   'dbname' => 'mysql',
+                   'encoding' => 'utf8',
                 )
             )
         ),

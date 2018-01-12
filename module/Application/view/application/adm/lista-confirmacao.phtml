@@ -1,0 +1,36 @@
+<!-- MAIN CONTENT SECTION -->
+<section class="mainContent clearfix signUp">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2 col-xs-12">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3>Confirmação Nova Lista</h3>
+          </div>
+          <div class="panel-body">              
+            <?php            
+            echo 'Nome: ' . $this->lista->getNome();
+            echo '<br />';
+            if($this->lista->getDescricao()){
+              echo 'Descrição: ' . $this->lista->getDescricao();
+            }else{
+              echo 'Sem Descrição';
+            }
+            echo '<br /><br />Total da Lista: ' . count($this->lista->getContato());
+            if($this->numerosDuplicados){
+              echo '<br />Números Duplicados: ' . count($this->numerosDuplicados);                 
+            }
+            if($this->numerosInvalidos){
+              echo '<br />Formato Inválido: ' . $this->numerosInvalidos;                 
+            }
+            echo '<br /><br />Formato Válido: ' . (count($this->lista->getContato()) - count($this->numerosDuplicados) - $this->numerosInvalidos);
+            echo '<div>';
+            echo $this->botao('Confirmar', $this->funcaoOnClick('kleo("admlistaAtivacao", '.$this->lista->getId().')'));
+            echo '</div>';
+            ?>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

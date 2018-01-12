@@ -1,0 +1,46 @@
+<?php
+
+use Application\Form\KleoForm;
+
+$formulario = $this->formulario;
+$formulario->prepare();
+
+$formulario->setAttribute(KleoForm::stringAction, '/admlistaFinalizar');
+echo $this->form()->openTag($formulario);
+echo $this->formHidden($formulario->get(KleoForm::inputCSRF));
+echo $this->formHidden($formulario->get(KleoForm::inputId));
+?>
+
+<!-- MAIN CONTENT SECTION -->
+<section class="mainContent clearfix signUp">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2 col-xs-12">
+                <div class="admin-form theme-success mw1000 center-block" style="padding-bottom: 175px;">
+
+                    <div class="panel heading-border panel-success">  
+
+                        <div class="panel-body bg-light">
+
+                            <div class="section-divider mt20 mb40">
+                                <span> Nova Lista </span>
+                            </div>                                      
+                            <?php
+                            echo $this->inputFormulario(KleoForm::traducaoNome, $formulario->get(KleoForm::inputNome));
+
+                            echo $this->inputFormulario(KleoForm::traducaoDescricao, $formulario->get(KleoForm::inputDescricao));
+
+                            echo $this->inputFormulario(KleoForm::traducaoArquivoCSV, $formulario->get(KleoForm::inputUpload));                            
+
+                            echo $this->botao('Cadastrar', $this->funcaoOnClick('submeterFormulario(this.form)'));
+                            ?>                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<?php
+echo $this->form()->closeTag();

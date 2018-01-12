@@ -2,115 +2,113 @@
 
 namespace Application\View\Helper;
 
-use Cadastro\Form\ConstantesForm;
 use Zend\View\Helper\AbstractHelper;
+use Zend\Form\Element\Select;
+use Zend\Form\Element\Text;
+use Zend\Form\Element\Textarea;
+use Zend\Form\Element\Number;
+use Zend\Form\Element\Email;
+use Zend\Form\Element\File;
+use Zend\Form\Element\Password;
+use Zend\Form\Element\Checkbox;
+use Zend\Form\Element\Date;
 
 /**
  * Nome: InputFormulario.php
  * @author Leonardo Pereira Magalhães <falecomleonardopereira@gmail.com>
- * Descricao: Classe helper view para mostrar um input com labels
+ * Descricao: Classe helper view para input dos formulários
  */
 class InputFormulario extends AbstractHelper {
 
-    protected $traducao;
-    protected $form;
-    protected $idInput;
-    protected $icone;
-    protected $tipo;
-    protected $funcao;
+  private $label;
+  private $tamanhoGrid;
+  private $input;
 
-    public function __construct() {
-        
+  public function __construct() {
+
+  }
+
+  public function __invoke($label, $input, $tamanhoGrid = null) {
+    $this->setLabel($label);
+    $this->setTamanhoGrid($tamanhoGrid);
+    $this->setInput($input);
+    return $this->renderHtml();
+  }
+
+  public function renderHtml() {
+    $html = '';
+    $tamanhoGrid = 12;
+    if ($this->getTamanhoGrid()) {
+      $tamanhoGrid = $this->getTamanhoGrid();
     }
-
-    public function __invoke($traducao, $form, $idInput, $icone, $tipo = 0, $funcao = '') {
-        $this->setTraducao($traducao);
-        $this->setForm($form);
-        $this->setIdInput($idInput);
-        $this->setIcone($icone);
-        $this->setTipo($tipo);
-        $this->setFuncao($funcao);
-        return $this->renderHtml();
+    $html .= '<div class="form-group col-lg-' . $tamanhoGrid . ' col-md-' . $tamanhoGrid . '">';
+    $html .= '<label id="label'.$this->getInput()->getName().'" for="'.$this->getInput()->getName().'">' . $this->getLabel() . '</label>';
+    if ($this->getInput() instanceOf Text
+        || $this->getInput() instanceOf Tel
+        || $this->getInput() instanceOf Number
+        || $this->getInput() instanceOf Email) {
+      $html .= $this->view->formInput($this->getInput());
     }
-
-    public function renderHtml() {
-        $html = '';
-        $input = $this->getForm()->get($this->getIdInput());
-        if ($this->getTipo() == 2) {
-            $valor = '';
-            if (!empty($input->getValue())) {
-                $valor = $input->getValue();
-            }
-            $html .= '<input type="hidden" id="hidden' . $this->getIdInput() . '" name="hidden' . $this->getIdInput() . '" value="' . $valor . '"/>';
-        }
-//        if ($this->getIdInput() != ConstantesForm::$FORM_CPF) {
-//            $html .= '<label for=' . $this->getTraducao() . ' class="field-label">';
-//            $html .= $this->view->translate($this->getTraducao());
-//            if ($this->getIdInput() == ConstantesForm::$FORM_CEP_LOGRADOURO) {
-//                $html .= $this->view->translate(ConstantesForm::$TRADUCAO_CEP_LOGRADOURO_SITE_CORREIOS);
-//            }
-//            $html .= '</label>';
-//        }
-        $html .= '<label for="' . $this->getTraducao() . '" class="field prepend-icon">';
-
-        /* Desabilitar */
-        if ($this->getTipo() == 2) {
-            $input->setAttribute(ConstantesForm::$FORM_DISABLED, ConstantesForm::$FORM_DISABLED);
-        }
-        $html .= $this->view->formInput($input);
-        $html .= '<label for="' . $this->getTraducao() . '" class="field-icon">';
-        $html .= '<i class="fa ' . $this->getIcone() . '"></i>';
-        $html .= '</label>';
-
-        return $html;
+    if ($this->getInput() instanceOf Select) {
+      $html .= $this->view->formSelect($this->getInput());
+    }   
+    if ($this->getInput() instanceOf Textarea) {
+      $html .= $this->view->formTextarea($this->getInput());
     }
-
-    function getTraducao() {
-        return $this->traducao;
+    if ($this->getInput() instanceOf Password) {
+      $html .= $this->view->formPassword($this->getInput());
     }
-
-    function getForm() {
-        return $this->form;
+    if ($this->getInput() instanceOf Checkbox) {
+      $html .= $this->view->formCheckbox($this->getInput());
     }
-
-    function getIdInput() {
-        return $this->idInput;
+    if ($this->getInput() instanceOf Date) {
+      $html .= $this->view->formDate($this->getInput());
     }
+    $idDivMEnsagemDeErro = 'mensagemErro'.$this->getInput()->getName(); 
+    $html .= '<div id="'.$idDivMEnsagemDeErro.'"></div>';
+    $html .=  $this->view->formElementErrors()
+      ->setMessageOpenFormat('<div><p class="text-danger"><small>')
+      ->setMessageSeparatorString('</small></p><p class="text-danger"><small>')
+      ->setMessageCloseString('</small></p></div>')
+      ->render($this->getInput());
+    $html .= '</div>';
 
-    function getIcone() {
-        return $this->icone;
+    if ($this->getInput() instanceOf File) {
+      $html .= '<div class="col-lg-' . $tamanhoGrid . ' col-md-' . $tamanhoGrid . '">';
+      $html .= '<div class="section">';
+      $html .= '<label class="field file">';
+      $html .= $this->view->formFile($this->getInput());
+      $html .= '<span class="button btn-success">Escolher Arquivo</span>';
+      $html .= '<input type="text" class="gui-input" id="text_'.$this->getInput()->getName().'">';
+      $html .= '</label>';
+      $html .= '</div>';
+      $html .= '</div>';
     }
+    return $html;
+  }
 
-    function setTraducao($traducao) {
-        $this->traducao = $traducao;
-    }
+  function getLabel() {
+    return $this->label;
+  }
 
-    function setForm($form) {
-        $this->form = $form;
-    }
+  function setLabel($label) {
+    $this->label = $label;
+  }
 
-    function setIdInput($idInput) {
-        $this->idInput = $idInput;
-    }
+  function getInput() {
+    return $this->input;
+  }
 
-    function setIcone($icone) {
-        $this->icone = $icone;
-    }
+  function setInput($input) {
+    $this->input = $input;
+  }
 
-    function getTipo() {
-        return $this->tipo;
-    }
+  function getTamanhoGrid() {
+    return $this->tamanhoGrid;
+  }
 
-    function setTipo($tipo) {
-        $this->tipo = $tipo;
-    }
-
-    function getFuncao() {
-        return $this->funcao;
-    }
-
-    function setFuncao($funcao) {
-        $this->funcao = $funcao;
-    }
+  function setTamanhoGrid($tamanhoGrid) {
+    $this->tamanhoGrid = $tamanhoGrid;
+  }
 
 }

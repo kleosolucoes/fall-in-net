@@ -5,63 +5,64 @@ namespace Application\Model\Entity;
 /**
  * Nome: Situacao.php
  * @author Leonardo Pereira Magalhães <falecomleonardopereira@gmail.com>
- * Descricao: Entidade anotada da tabela situacao 
+ * Descricao: Entidade anotada base para o situacao
  */
-
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity 
  * @ORM\Table(name="situacao")
  */
-class Situacao extends CircuitoEntity {
+class Situacao extends KleoEntity {
 
-    const PENDENTE_DE_ACEITACAO = 2;
-    const ACEITO_AGENDADO = 3;
-    const RECUSAO = 4;
-    const CONCLUIDO = 5;
-
-    /**
-     * @ORM\OneToMany(targetEntity="AlunoSituacao", mappedBy="alunoSituacao") 
-     */
-    protected $alunoSituacao;
+    const primeiroContato = 1;
+    const ativo = 2;
+    const recusado = 3;
+    const agendada = 4;
+    const emExecucao = 5;
+    const enviada = 6;
+    const aprovada = 7; 
 
     /**
-     * @ORM\OneToMany(targetEntity="SolicitacaoSituacao", mappedBy="situacao") 
+     * @ORM\OneToMany(targetEntity="ResponsavelSituacao", mappedBy="responsavelSituacao") 
      */
-    protected $solicitacaoSituacao;
+    protected $responsavelSituacao;
+
+    /**
+     * @ORM\OneToMany(targetEntity="CampanhaSituacao", mappedBy="campanhaSituacao") 
+     */
+    protected $campanhaSituacao;
 
     public function __construct() {
-        $this->alunoSituacao = new ArrayCollection();
-        $this->solicitacaoSituacao = new ArrayCollection();
+        $this->responsavelSituacao = new ArrayCollection();
+        $this->campanhaSituacao = new ArrayCollection();
     }
 
     /** @ORM\Column(type="string") */
     protected $nome;
 
-    function getNome() {
-        return $this->nome;
-    }
-
     function setNome($nome) {
         $this->nome = $nome;
     }
 
-    function getAlunoSituacao() {
-        return $this->alunoSituacao;
+    function getNome() {
+        return $this->nome;
     }
 
-    function setAlunoSituacao($alunoSituacao) {
-        $this->alunoSituacao = $alunoSituacao;
+    function getResponsavelSituacao() {
+        return $this->responsavelSituacao;
     }
 
-    function getSolicitacaoSituacao() {
-        return $this->solicitacaoSituacao;
+    function setResponsavelSituacao($responsavelSituacao) {
+        $this->responsavelSituacao = $responsavelSituacao;
     }
 
-    function setSolicitacaoSituacao($solicitacaoSituacao) {
-        $this->solicitacaoSituacao = $solicitacaoSituacao;
+    function getCampanhaSituacao() {
+        return $this->campanhaSituacao;
+    }
+
+    function setCampanhaSituacao($campanhaSituacao) {
+        $this->campanhaSituacao = $campanhaSituacao;
     }
 
 }

@@ -1,9 +1,0 @@
-<?php
-$versao = '?v=2.2';
-
-echo $this
-        ->headScript()
-        ->prependFile($this->basePath() . '/js/circuito_da_visao/validar-recuperar-acesso.js' . $versao)
-        ->prependFile($this->basePath() . '/js/circuito_da_visao/opcoes-recuperar-senha.js' . $versao)
-;
-echo $this->inlineScript();
