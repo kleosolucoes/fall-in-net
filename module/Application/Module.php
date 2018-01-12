@@ -46,19 +46,19 @@ class Module {
 		AbstractValidator::setDefaultTranslator ( new Translator ( $translator ) );
 
 		//attach event here
-		$eventManager->attach('route', array($this, 'checkUserAuth'), 2);
+//		$eventManager->attach('route', array($this, 'checkUserAuth'), 2);
 		$viewModel = $e->getApplication()->getMvcEvent()->getViewModel();
-		$sessao = new Container(KleoController::nomeAplicacao);
-		if (empty($sessao->idResponsavel)) {
+//		$sessao = new Container(KleoController::nomeAplicacao);
+//		if (empty($sessao->idResponsavel)) {
 			$viewModel->mostrarMenu = 0;
-		}
-		if (!empty($sessao->idResponsavel)) {
-			$serviceManager = $e->getApplication()->getServiceManager();
-
-			$repositorioORM = new RepositorioORM($serviceManager->get('Doctrine\ORM\EntityManager'));
-			$responsavel = $repositorioORM->getResponsavelORM()->encontrarPorId($sessao->idResponsavel);
-			$viewModel->responsavel = $responsavel;
-		}
+//		}
+//		if (!empty($sessao->idResponsavel)) {
+//			$serviceManager = $e->getApplication()->getServiceManager();
+//
+//			$repositorioORM = new RepositorioORM($serviceManager->get('Doctrine\ORM\EntityManager'));
+//			$responsavel = $repositorioORM->getResponsavelORM()->encontrarPorId($sessao->idResponsavel);
+//			$viewModel->responsavel = $responsavel;
+//		}
 	}
 
 	public function checkUserAuth(MvcEvent $e) {
@@ -140,14 +140,14 @@ class Module {
 		Container::setDefaultManager($sessionManager);
 	}
 
-	public function getServiceConfig() {
-		return array(
-			'factories' => array(
-			'Zend\Authentication\AuthenticationService' => function($serviceManager) {
-			return $serviceManager->get('doctrine.authenticationservice.orm_default');
-		}
-		),
-		);
-	}
+//	public function getServiceConfig() {
+//		return array(
+//			'factories' => array(
+//			'Zend\Authentication\AuthenticationService' => function($serviceManager) {
+//			return $serviceManager->get('doctrine.authenticationservice.orm_default');
+//		}
+//		),
+//		);
+//	}
 
 }

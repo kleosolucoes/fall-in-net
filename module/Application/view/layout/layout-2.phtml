@@ -1,0 +1,102 @@
+<?php
+
+use Application\Controller\KleoController;
+
+echo $this->doctype();
+$versao = '?v=1.2.5';
+?>
+<html lang="pt-BR">
+    <head>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+        <!-- Title Head -->
+        <?php
+        $NAME_APPLICATION = $this->translate(KleoController::nomeAplicacao) . ' - ' . $this->translate(KleoController::nomeAplicacaoDescricao);
+        echo $this
+                ->headTitle($NAME_APPLICATION)
+                ->setSeparator(' - ')
+                ->setAutoEscape(false)
+        ;
+        ?>
+        <!-- Meta Head -->
+        <?php
+        echo $this
+                ->headMeta()
+                ->appendName('keywords', 'whatsapp, whatsapp marketing, whatsapp em massa')
+                ->appendName('author', KleoController::nomeAplicacao)
+                ->appendName('description', $NAME_APPLICATION)
+                ->appendName('viewport', 'width=device-width, initial-scale=1.0')
+                ->appendHttpEquiv('X-UA-Compatible', 'IE=edge')
+        ;
+        ?>
+
+        <!-- Styles -->
+        <?php
+        echo $this
+                ->headLink(array('rel' => 'shortcut icon', 'type' => 'image/vnd.microsoft.icon', 'href' => $this->basePath() . '/img/favicon.jpeg'))               
+                ->prependStylesheet($this->basePath() . '/global/fonts/brand-icons/brand-icons.min.css')
+                ->prependStylesheet($this->basePath() . '/global/fonts/web-icons/web-icons.min.css')
+                ->prependStylesheet($this->basePath() . '/global/vendor/flag-icon-css/flag-icon.css')
+                ->prependStylesheet($this->basePath() . '/global/vendor/slidepanel/slidePanel.css')
+                ->prependStylesheet($this->basePath() . '/global/vendor/switchery/switchery.css')
+                ->prependStylesheet($this->basePath() . '/global/vendor/asscrollable/asScrollable.css')
+                ->prependStylesheet($this->basePath() . '/global/vendor/animsition/animsition.css')
+                ->prependStylesheet($this->basePath() . '/assets/css/site.min.css')
+                ->prependStylesheet($this->basePath() . '/global/css/bootstrap-extend.min.css')
+                ->prependStylesheet($this->basePath() . '/global/css/bootstrap.min.css')
+                ->prependStylesheet('http://fonts.googleapis.com/css?family=Roboto:300,400,500,300italic')
+        ;
+	echo $this
+                ->headScript()
+                ->prependFile($this->basePath() . '/global/vendor/breakpoints/breakpoints.js')
+	;
+        ?>
+	<script>
+		Breakpoints();
+	</script>   
+    </head>
+    <body class="home">
+        <?php
+        echo $this->content;
+        ?>      
+        <!-- BEGIN: PAGE SCRIPTS -->
+        <?php
+        echo $this
+                ->headScript()
+                ->prependFile($this->basePath() . '/js/validacoes.js' . $versao)
+                ->prependFile($this->basePath() . '/js/funcoes.js' . $versao)
+                ->prependFile($this->basePath() . '/global/js/config/colors.js')
+                ->prependFile($this->basePath() . '/assets/js/Plugin/menu.js')
+                ->prependFile($this->basePath() . '/assets/js/Section/PageAside.js')
+                ->prependFile($this->basePath() . '/assets/js/Section/Sidebar.js')
+                ->prependFile($this->basePath() . '/assets/js/Section/GridMenu.js')
+                ->prependFile($this->basePath() . '/assets/js/Section/Menubar.js')
+                ->prependFile($this->basePath() . '/global/js/Config.js')
+                ->prependFile($this->basePath() . '/global/js/Plugin.js')
+                ->prependFile($this->basePath() . '/global/js/Base.js')
+                ->prependFile($this->basePath() . '/global/js/Component.js')
+                ->prependFile($this->basePath() . '/global/vendor/ashoverscroll/jquery-asHoverScroll.js')
+                ->prependFile($this->basePath() . '/global/vendor/asscrollable/jquery-asScrollable.js')
+                ->prependFile($this->basePath() . '/global/vendor/asscrollbar/jquery-asScrollbar.js')
+                ->prependFile($this->basePath() . '/global/vendor/mousewheel/jquery.mousewheel.js')
+                ->prependFile($this->basePath() . '/global/vendor/animsition/animsition.js')
+                ->prependFile($this->basePath() . '/global/vendor/bootstrap/bootstrap.js')
+                ->prependFile($this->basePath() . '/global/vendor/popper-js/umd/popper.min.js')
+                ->prependFile($this->basePath() . '/global/vendor/jquery/jquery.js')
+                ->prependFile($this->basePath() . '/global/vendor/babel-external-helpers/babel-external-helpers.js')
+        ;
+        echo $this->inlineScript();
+        ?> 
+	<script type="text/javascript">
+		(function(document, window, $) {
+			  'use strict';
+
+			  var Site = window.Site;
+
+			  $(document).ready(function() {
+			    Site.run();
+			  });
+		})(document, window, jQuery);
+	</script>
+        <!-- END: PAGE SCRIPTS -->
+    </body>
+</html>

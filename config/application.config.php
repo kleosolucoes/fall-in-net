@@ -8,8 +8,8 @@
 return array(
     'modules' => array(
         'Application',
-        'DoctrineModule',
-        'DoctrineORMModule',
+//        'DoctrineModule',
+//        'DoctrineORMModule',
     ),
     'module_listener_options' => array(
         'module_paths' => array(
