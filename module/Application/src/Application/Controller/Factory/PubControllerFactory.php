@@ -23,7 +23,7 @@ class PubControllerFactory extends KleoControllerFactory implements FactoryInter
 //    } catch (ServiceNotCreatedException $e) {
 //      $doctrineAuthenticationService = null;
 //    } catch (ExtensionNotLoadedException $e) {
-//      $doctrineAuthenticationService = null;
+      $doctrineAuthenticationService = null;
 //    }
 
     return new PubController($doctrineORMEntityManager, $doctrineAuthenticationService);
