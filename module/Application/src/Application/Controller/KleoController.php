@@ -23,8 +23,8 @@ class KleoController extends AbstractActionController {
     private $_doctrineORMEntityManager;
     private $sessao;
 
-    const nomeAplicacao = 'ZapMarketing';
-    const nomeAplicacaoDescricao = 'Envios em Massa pelo WhatsApp';
+    const nomeAplicacao = 'AFabricaOficial.com.br';
+    const nomeAplicacaoDescricao = 'Rotinas + Constância = Sucesso e Saúde';
     const idResponsavelAdmin = 1;
     const stringFormulario = 'formulario';
     const stringAction = 'action';
@@ -129,56 +129,6 @@ class KleoController extends AbstractActionController {
             }
         }
         return $response;
-    }
-
-    /**
-     * Funcao para escrever documentos com id da entidade
-     */
-    public function escreveDocumentos(KleoEntity $entidade, $apenasAjustarEntidade = true) {
-        $adaptadorHttp = new Http();
-        $destino = dirname(__DIR__) . self::diretorioDocumentos;
-        $adaptadorHttp->setDestination($destino);
-
-        $files = $adaptadorHttp->getFileInfo();
-        foreach ($files as $file => $info) {
-            if ($adaptadorHttp->isUploaded($file) && $adaptadorHttp->isValid($file)) {
-                $extension = substr($info['name'], strrpos($info['name'], '.') + 1);
-                $filename = '';
-
-                if ($file === KleoForm::inputFotoPerfil) {
-                    if ($extension != 'jpeg' && $extension != 'jpg') {
-                        return false;
-                    }
-                    $filename = $entidade->getId() . '_fotoPerfil.' . $extension;
-                    $entidade->setFoto_perfil($filename);
-                }
-                if ($file === KleoForm::inputUpload && $entidade instanceof Campanha) {
-                    if ($extension != 'jpeg' && $extension != 'jpg' && $extension != 'mp4' && $extension != 'pdf') {
-                        return false;
-                    }
-                    $filename = $entidade->getId() . '_upload.' . $extension;
-                    $entidade->setUpload($filename);
-                }
-                if ($file === KleoForm::inputUpload && $entidade instanceof Lista) {
-                    if ($extension != 'csv') {
-                        return false;
-                    }
-                    $filename = $entidade->getId() . '_contatos.' . $extension;
-                    $entidade->setUpload($filename);
-                }
-
-                if ($apenasAjustarEntidade) {
-                    $adaptadorHttp->addFilter('Rename', array(
-                        'target' => $destino . '/' . $filename,
-                        'overwrite' => true
-                    ));
-                    $adaptadorHttp->receive($info['name']);
-                }
-            } else {
-                //var_dump($adaptadorHttp->getMessages());
-            }
-        }
-        return $entidade;
     }
 
     public function mostrarMensagensDeErroFormulario($messages) {
