@@ -78,26 +78,26 @@ return array(
         ),
     ),
     # definir driver, classes anotadas para o doctrine e quem faz autenticação
-//    'doctrine' => array(
-//        'driver' => array(
-//            'application_entities' => array(
-//                'class' => 'Doctrine\ORM\Mapping\Driver\AnnotationDriver',
-//                'cache' => 'array',
-//                'paths' => array(__DIR__ . '/Model/Entity')
-//            ),
-//            'orm_default' => array(
-//                'drivers' => array(
-//                    'Application\Model\Entity' => 'application_entities'
-//                )
-//            )
-//        ),
-//       'authentication' => array(
-//            'orm_default' => array(
-//                'object_manager' => 'Doctrine\ORM\EntityManager',
-//                'identity_class' => 'Application\Model\Entity\Responsavel',
-//                'identity_property' => 'email',
-//                'credential_property' => 'senha',
-//            ),
-//        ),
-//    ),
+   'doctrine' => array(
+       'driver' => array(
+           'application_entities' => array(
+               'class' => 'Doctrine\ORM\Mapping\Driver\AnnotationDriver',
+               'cache' => 'array',
+               'paths' => array(__DIR__ . '/Model/Entity')
+           ),
+           'orm_default' => array(
+               'drivers' => array(
+                   'Application\Model\Entity' => 'application_entities'
+               )
+           )
+       ),
+      'authentication' => array(
+           'orm_default' => array(
+               'object_manager' => 'Doctrine\ORM\EntityManager',
+               'identity_class' => 'Application\Model\Entity\Pessoa',
+               'identity_property' => 'email',
+               'credential_property' => 'senha',
+           ),
+       ),
+   ),
 );

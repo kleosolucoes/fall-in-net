@@ -13,13 +13,13 @@ class KleoControllerFactory {
 
     public function createServiceORM($sm) {
         // Serviço de Manipulação de entidade Doctrine    
-//        try {
-//            $doctrineORMEntityManager = $sm->get('Doctrine\ORM\EntityManager');
-//        } catch (ServiceNotCreatedException $e) {
-//            $doctrineORMEntityManager = null;
-//        } catch (ExtensionNotLoadedException $e) {
+       try {
+           $doctrineORMEntityManager = $sm->get('Doctrine\ORM\EntityManager');
+       } catch (ServiceNotCreatedException $e) {
+           $doctrineORMEntityManager = null;
+       } catch (ExtensionNotLoadedException $e) {
             $doctrineORMEntityManager = null;
-//        }
+       }
 
         return $doctrineORMEntityManager;
     }

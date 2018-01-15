@@ -18,13 +18,13 @@ class PubControllerFactory extends KleoControllerFactory implements FactoryInter
     $doctrineORMEntityManager = parent::createServiceORM($sm);
 
     // Serviço de Autenticação 
-//    try {
-//      $doctrineAuthenticationService = $sm->get('Zend\Authentication\AuthenticationService');
-//    } catch (ServiceNotCreatedException $e) {
-//      $doctrineAuthenticationService = null;
-//    } catch (ExtensionNotLoadedException $e) {
+   try {
+     $doctrineAuthenticationService = $sm->get('Zend\Authentication\AuthenticationService');
+   } catch (ServiceNotCreatedException $e) {
+     $doctrineAuthenticationService = null;
+   } catch (ExtensionNotLoadedException $e) {
       $doctrineAuthenticationService = null;
-//    }
+   }
 
     return new PubController($doctrineORMEntityManager, $doctrineAuthenticationService);
   }
