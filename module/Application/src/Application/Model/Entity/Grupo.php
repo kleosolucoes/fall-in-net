@@ -12,25 +12,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /** @ORM\Entity */
-class Grupo extends CircuitoEntity {
-
-    protected $ciclo;
-    protected $eventos;
-
-    /**
-     * @ORM\OneToOne(targetEntity="FatoRanking", mappedBy="grupo")
-     */
-    private $fatoRanking;
-
-    /**
-     * @ORM\OneToOne(targetEntity="GrupoCv", mappedBy="grupo")
-     */
-    private $grupoCv;
-
-    /**
-     * @ORM\OneToMany(targetEntity="Entidade", mappedBy="grupo")
-     */
-    protected $entidade;
+class Grupo extends KleoEntity {
 
     /**
      * @ORM\OneToMany(targetEntity="GrupoResponsavel", mappedBy="grupo")
@@ -48,11 +30,6 @@ class Grupo extends CircuitoEntity {
     protected $grupoPessoa;
 
     /**
-     * @ORM\OneToMany(targetEntity="GrupoAtendimento", mappedBy="grupo")
-     */
-    protected $grupoAtendimento;
-
-    /**
      * @ORM\OneToMany(targetEntity="GrupoPaiFilho", mappedBy="grupoPaiFilhoPai")
      */
     protected $grupoPaiFilhoFilhos;
@@ -63,62 +40,11 @@ class Grupo extends CircuitoEntity {
     protected $grupoPaiFilhoPai;
 
     public function __construct() {
-        $this->entidade = new ArrayCollection();
         $this->grupoResponsavel = new ArrayCollection();
         $this->grupoEvento = new ArrayCollection();
         $this->grupoPessoa = new ArrayCollection();
-        $this->grupoAtendimento = new ArrayCollection();
         $this->grupoPaiFilhoFilhos = new ArrayCollection();
         $this->grupoPaiFilhoPai = new ArrayCollection();
-    }
-
-    /**
-     * Recupera todas as entidades vinculadas aquele grupo
-     * @return Entidade
-     */
-    function getEntidade() {
-        return $this->entidade;
-    }
-
-    /**
-     * Retorna a entidade ativa
-     * @return Entidade
-     */
-    function getEntidadeAtiva() {
-        $entidadeAtiva = null;
-        foreach ($this->getEntidade() as $entidade) {
-            if ($entidade->verificarSeEstaAtivo()) {
-                $entidadeAtiva = $entidade;
-                break;
-            }
-        }
-//        if (!$entidadeAtiva) {
-//            foreach ($this->getEntidade() as $entidade) {
-//                if (!$entidade->verificarSeEstaAtivo()) {
-//                    $entidadeAtiva = $entidade;
-//                    break;
-//                }
-//            }
-//        }
-        return $entidadeAtiva;
-    }
-
-    function getEntidadeInativaPorDataInativacao($dataInativacao = null) {
-        $entidadeInativa = null;
-
-        foreach ($this->getEntidade() as $entidade) {
-            if ($dataInativacao && $entidade->getData_inativacaoStringPadraoBanco() === $dataInativacao) {
-                $entidadeInativa = $entidade;
-                break;
-            }
-
-            if (!$dataInativacao && !$entidade->verificarSeEstaAtivo()) {
-                $entidadeInativa = $entidade;
-                break;
-            }
-        }
-
-        return $entidadeInativa;
     }
 
     /**
@@ -142,89 +68,6 @@ class Grupo extends CircuitoEntity {
             }
         }
         return $grupoResponsavel;
-    }
-
-    /**
-     * Recupera as pessoas das responsabilidades ativas
-     * @return Pessoa[]
-     */
-    function getResponsabilidadesAtivas($inativos = false) {
-        $responsabilidadesAtivas = array();
-        /* Responsabilidades */
-        $responsabilidadesTodosStatus = $this->getGrupoResponsavel();
-        if ($responsabilidadesTodosStatus) {
-            /* Verificar responsabilidades ativas */
-            foreach ($responsabilidadesTodosStatus as $responsabilidadeTodosStatus) {
-                if ($inativos) {
-                    $responsabilidadesAtivas[] = $responsabilidadeTodosStatus;
-                } else {
-                    if ($responsabilidadeTodosStatus->verificarSeEstaAtivo()) {
-                        $responsabilidadesAtivas[] = $responsabilidadeTodosStatus;
-                    }
-                }
-            }
-        }
-        return $responsabilidadesAtivas;
-    }
-
-    function verificaSeECasal() {
-        $resposta = false;
-        if (count($this->getResponsabilidadesAtivas()) == 2) {
-            $resposta = true;
-        }
-        return $resposta;
-    }
-
-    /**
-     * Recupera o total de grupo atendimentos ativos no mes e ano
-     * @return integer
-     */
-    function totalDeAtendimentos($mes, $ano) {
-        $total = 0;
-        $grupoAtendimentos = $this->getGrupoAtendimento();
-        foreach ($grupoAtendimentos as $grupoAtendimento) {
-            if ($grupoAtendimento->verificaSeTemNesseMesEAno($mes, $ano)) {
-                $total++;
-            }
-        }
-        return $total;
-    }
-
-    /**
-     * Recupera o total de grupo atendimentos ativos no mes e ano
-     * @return integer
-     */
-    public static function relatorioDeAtendimentosAbaixo($discipulos, $mes, $ano) {
-        $relatorio = array();
-        $totalGruposFilhosAtivos = 0;
-        $totalGruposAtendidos = 0;
-        foreach ($discipulos as $gpFilho) {
-            $totalGruposAtendido = 0;
-            $grupoFilho = $gpFilho->getGrupoPaiFilhoFilho();
-            if ($grupoFilho->getResponsabilidadesAtivas()) {
-                foreach ($grupoFilho->getGrupoAtendimento() as $grupoAtendimento) {
-                    if ($grupoAtendimento->verificaSeTemNesseMesEAno(
-                                    $mes, $ano)) {
-                        $totalGruposAtendido++;
-                    }
-                }
-                if ($totalGruposAtendido >= 1) {
-                    $totalGruposAtendidos++;
-                }
-
-                $totalGruposFilhosAtivos++;
-            }
-        }
-
-        if ($totalGruposFilhosAtivos) {
-            $progresso = ($totalGruposAtendidos / $totalGruposFilhosAtivos) * 100;
-        } else {
-            $progresso = 0;
-        }
-        $relatorio[0] = $progresso;
-        $relatorio[1] = $totalGruposAtendidos;
-        $relatorio[2] = $totalGruposFilhosAtivos;
-        return $relatorio;
     }
 
     /**
@@ -338,71 +181,6 @@ class Grupo extends CircuitoEntity {
         return $grupoPaiFilhoPaiAtivo;
     }
 
-    /**
-     * Recupera os filhos ativos
-     * @return Pessoa[]
-     */
-    function getGrupoPaiFilhoPaiInativo() {
-        $grupoPaiFilhoPaiInativo = null;
-        /* Responsabilidades */
-        $grupoPaiFilhoPais = $this->getGrupoPaiFilhoPai();
-        if (count($grupoPaiFilhoPais) > 0) {
-            /* Verificar responsabilidades ativas */
-            foreach ($grupoPaiFilhoPais as $gpp) {
-                if (!$gpp->verificarSeEstaAtivo()) {
-                    $grupoPaiFilhoPaiInativo = $gpp;
-                    break;
-                }
-            }
-        }
-        return $grupoPaiFilhoPaiInativo;
-    }
-
-    function getGrupoPaiFilhoPaiPorDataInativacao($dataInativacao) {
-        $grupoPaiFilhoPaiInativada = null;
-        if ($dataInativacao) {
-            /* Responsabilidades */
-            $grupoPaiFilhoPais = $this->getGrupoPaiFilhoPai();
-            if ($grupoPaiFilhoPais) {
-                /* Verificar responsabilidades ativas */
-                foreach ($grupoPaiFilhoPais as $gpp) {
-                    if ($gpp->getData_inativacaoStringPadraoBanco() === $dataInativacao) {
-                        $grupoPaiFilhoPaiInativada = $gpp;
-                        break;
-                    }
-                }
-            }
-        }
-        return $grupoPaiFilhoPaiInativada;
-    }
-
-    function getPessoasAtivas() {
-        $pessoas = null;
-        $grupoResponsavel = $this->getResponsabilidadesAtivas();
-        if ($grupoResponsavel) {
-            $pessoas = array();
-            foreach ($grupoResponsavel as $gr) {
-                $p = $gr->getPessoa();
-                $pessoas[] = $p;
-            }
-        }
-        return $pessoas;
-    }
-
-    function getPessoasInativas() {
-        $pessoas = null;
-        $comInativos = true;
-        $grupoResponsavel = $this->getResponsabilidadesAtivas($comInativos);
-        if ($grupoResponsavel) {
-            $pessoas = array();
-            foreach ($grupoResponsavel as $gr) {
-                $p = $gr->getPessoa();
-                $pessoas[] = $p;
-            }
-        }
-        return $pessoas;
-    }
-
     function getNomeLideresAtivos() {
         $pessoas = $this->getPessoasAtivas();
         $nomes = '';
@@ -429,29 +207,6 @@ class Grupo extends CircuitoEntity {
             $nomes = $nomes . ' (INATIVO - ' . $dataInativacao . ')';
         }
         return $nomes;
-    }
-
-    function getNomeLideresInativos() {
-        $pessoas = $this->getPessoasInativas();
-        $nomes = '';
-        $contador = 1;
-
-        foreach ($pessoas as $pessoa) {
-            if ($contador === 2) {
-                $nomes .= ' & ';
-            }
-            if (count($pessoas) == 2) {
-                $nomes .= $pessoa->getNomePrimeiro();
-            } else {
-                $nomes .= $pessoa->getNomePrimeiroUltimo();
-            }
-            $contador++;
-        }
-        return $nomes;
-    }
-
-    function setEntidade($entidade) {
-        $this->entidade = $entidade;
     }
 
     function setGrupoResponsavel($grupoResponsavel) {
@@ -534,38 +289,7 @@ class Grupo extends CircuitoEntity {
         return $grupoEventos;
     }
 
-    /**
-     * Retorna o grupo evento Revisao
-     * @return GrupoEvento
-     */
-    function getGrupoEventoRevisao() {
-        $grupoSelecionado = $this;
-        $grupoEventos = null;
-        if ($grupoSelecionado->getEntidadeAtiva()->getEntidadeTipo()->getId() === Entidade::SUBEQUIPE) {
-            while ($grupoSelecionado->getEntidadeAtiva()->getEntidadeTipo()->getId() === Entidade::SUBEQUIPE ||
-            $grupoSelecionado->getEntidadeAtiva()->getEntidadeTipo()->getId() === Entidade::EQUIPE) {
-
-                $grupoSelecionado = $grupoSelecionado->getGrupoPaiFilhoPaiAtivo()->getGrupoPaiFilhoPai();
-                if ($grupoSelecionado->getEntidadeAtiva()->getEntidadeTipo()->getId() === Entidade::IGREJA) {
-                    break;
-                }
-            }
-            $grupoEventos = $grupoSelecionado->getGrupoEventoAtivosPorTipo(EventoTipo::tipoRevisao);
-        } else if ($grupoSelecionado->getEntidadeAtiva()->getEntidadeTipo()->getId() === Entidade::EQUIPE) {
-            while ($grupoSelecionado->getEntidadeAtiva()->getEntidadeTipo()->getId() === Entidade::EQUIPE) {
-                $grupoSelecionado = $grupoSelecionado->getGrupoPaiFilhoPaiAtivo()->getGrupoPaiFilhoPai();
-                if ($grupoSelecionado->getEntidadeAtiva()->getEntidadeTipo()->getId() === Entidade::IGREJA) {
-                    break;
-                }
-            }
-            $grupoEventos = $grupoSelecionado->getGrupoEventoAtivosPorTipo(EventoTipo::tipoRevisao);
-        } else {
-            $grupoEventos = $grupoSelecionado->getGrupoEventoAtivosPorTipo(EventoTipo::tipoRevisao);
-        }
-
-        return $grupoEventos;
-    }
-
+   
     /**
      * Retorna o grupo evento
      * @return GrupoEvento
@@ -664,86 +388,7 @@ class Grupo extends CircuitoEntity {
         return $resposta;
     }
 
-    function getGrupoEventoNoPeriodo($periodo, $apenasCelulas = false) {
-        $grupoEventosNoPeriodo = array();
-        $grupoEventoOrdenadosPorDiaDaSemana = $this->getGrupoEventoOrdenadosPorDiaDaSemana();
-
-        $grupoEventos = $grupoEventoOrdenadosPorDiaDaSemana;
-        if ($apenasCelulas) {
-            unset($grupoEventos);
-            if (!empty($grupoEventoOrdenadosPorDiaDaSemana)) {
-                foreach ($grupoEventoOrdenadosPorDiaDaSemana as $grupoEventoTodos) {
-                    if ($grupoEventoTodos->getEvento()->verificaSeECelula()) {
-                        $grupoEventos[] = $grupoEventoTodos;
-                    }
-                }
-            }
-        }
-
-        if (!empty($grupoEventos)) {
-            foreach ($grupoEventos as $grupoEvento) {
-                $arrayPeriodo = Funcoes::montaPeriodo($periodo);
-                $stringComecoDoPeriodo = $arrayPeriodo[3] . '-' . $arrayPeriodo[2] . '-' . $arrayPeriodo[1];
-                $dataDoInicioDoPeriodoParaComparar = strtotime($stringComecoDoPeriodo);
-                $dataDoGrupoEventoParaComparar = strtotime($grupoEvento->getData_criacaoStringPadraoBanco());
-
-                $validacaoDataDeCriacaoAntesDoInicioDoPeriodo = false;
-                $validacaoDataDeCriacaoNoMeioDoPeriodo = false;
-
-                if ($grupoEvento->verificarSeEstaAtivo()) {
-                    /* Evento criado antes do inicio do periodo */
-                    if ($dataDoGrupoEventoParaComparar <= $dataDoInicioDoPeriodoParaComparar) {
-                        $validacaoDataDeCriacaoAntesDoInicioDoPeriodo = true;
-                    }
-
-                    /* Evento criado no meio do periodo */
-                    $stringFimDoPeriodo = $arrayPeriodo[6] . '-' . $arrayPeriodo[5] . '-' . $arrayPeriodo[4];
-                    $dataDoFimDoPeriodoParaComparar = strtotime($stringFimDoPeriodo);
-
-                    if ($dataDoGrupoEventoParaComparar > $dataDoInicioDoPeriodoParaComparar && $dataDoGrupoEventoParaComparar <= $dataDoFimDoPeriodoParaComparar) {
-                        $validacaoDataDeCriacaoNoMeioDoPeriodo = true;
-                    }
-                }
-
-                /* Evento inativao no meio do periodo */
-                if (!$grupoEvento->verificarSeEstaAtivo()) {
-                    $stringFimDoPeriodo = $arrayPeriodo[6] . '-' . $arrayPeriodo[5] . '-' . $arrayPeriodo[4];
-                    $dataDoFimDoPeriodoParaComparar = strtotime($stringFimDoPeriodo);
-                    $dataDoGrupoEventoParaComparar = strtotime($grupoEvento->getData_inativacaoStringPadraoBanco());
-
-                    /* Meio do periodo */
-                    $excluidoDepoisQueOEventoOcorreu = true;
-                    $diaQueOcorreOEvento = $grupoEvento->getEvento()->getDia();
-                    if ($diaQueOcorreOEvento == 1) {
-                        $diaQueOcorreOEvento = 7;
-                    } else {
-                        $diaQueOcorreOEvento--;
-                    }
-                    $diaDaSemanaQueFoiExcluido = date('w', $dataDoGrupoEventoParaComparar);
-                    if ($diaDaSemanaQueFoiExcluido == 0) {
-                        $diaDaSemanaQueFoiExcluido = 7;
-                    }
-                    if ($diaQueOcorreOEvento > $diaDaSemanaQueFoiExcluido) {
-                        $excluidoDepoisQueOEventoOcorreu = false;
-                    }
-                    if ($dataDoGrupoEventoParaComparar >= $dataDoInicioDoPeriodoParaComparar &&
-                            $dataDoGrupoEventoParaComparar <= $dataDoFimDoPeriodoParaComparar &&
-                            $excluidoDepoisQueOEventoOcorreu) {
-                        $validacaoDataDeCriacaoAntesDoInicioDoPeriodo = true;
-                    } else {
-                        if ($dataDoGrupoEventoParaComparar > $dataDoFimDoPeriodoParaComparar) {
-                            $validacaoDataDeCriacaoAntesDoInicioDoPeriodo = true;
-                        }
-                    }
-                }
-
-                if ($validacaoDataDeCriacaoAntesDoInicioDoPeriodo || $validacaoDataDeCriacaoNoMeioDoPeriodo) {
-                    $grupoEventosNoPeriodo[] = $grupoEvento;
-                }
-            }
-        }
-        return $grupoEventosNoPeriodo;
-    }
+   
 
     function getGrupoPessoasNoPeriodo($periodo) {
 
@@ -810,177 +455,7 @@ class Grupo extends CircuitoEntity {
         return $grupoPessoasNoPeriodo;
     }
 
-    /**
-     * Retorna o grupo evento no ciclo selecionado
-     * @param int $ciclo
-     * @param int $mes
-     * @param int $ano
-     * @return GrupoEvento
-     */
-    function getGrupoEventoNoCiclo($ciclo = 1, $mes = 5, $ano = 2016) {
-        $ciclo = (int) $ciclo;
-        $mes = str_pad($mes, 2, 0, STR_PAD_LEFT);
-        /* Validar Inativado */
-        $verificacaoDataInativacao = false;
-        if ($this->verificarSeEstaAtivo()) {
-            $verificacaoDataInativacao = true;
-        } else {
-            if ($this->getData_inativacaoAno() == $ano && $this->getData_inativacaoMes() == $mes) {
-                $verificacaoDataInativacao = true;
-            }
-        }
-        if ($verificacaoDataInativacao) {
-            if (is_null($this->getEventos())) {
-                $primeiroDiaDaSemana = date('N', mktime(0, 0, 0, $mes, 1, $ano));
-                $diaAtual = date('d');
-                $mesAtual = date('m'); /* Mes com zero */
-                $anoAtual = date('Y');
-                $cicloAtual = Funcoes::cicloAtual($mes, $ano);
-//                if ($ciclo === 1) {
-//                    if ($primeiroDiaDaSemana === 1) {
-//                        $primeiroDiaDaSemana = 8;
-//                    } else {
-//                        $primeiroDiaDaSemana++;
-//                    }
-//                }
-                $ultimoDiaDaSemana = date('N', mktime(0, 0, 0, $mes, cal_days_in_month(CAL_GREGORIAN, $mes, $ano), $ano));
-                if ($ultimoDiaDaSemana == 1) {
-                    $ultimoDiaDaSemana = 8;
-                } else {
-                    $ultimoDiaDaSemana++;
-                }
-                $eventos = null;
-                if (!empty($this->getGrupoEventoOrdenadosPorDiaDaSemana())) {
-
-                    foreach ($this->getGrupoEventoOrdenadosPorDiaDaSemana() as $ge) {
-                        $verificacaoDiaInativacao = false;
-                        /* Validando dia da inativacao */
-                        $primeiroDiaDoCiclo = Funcoes::periodoCicloMesAno($ciclo, $mes, $ano, '', 1);
-                        if ($this->verificarSeEstaAtivo()) {
-                            $verificacaoDiaInativacao = true;
-                        } else {
-                            if ($this->getData_inativacaoDia() >= $primeiroDiaDoCiclo) {
-                                $verificacaoDiaInativacao = true;
-                            }
-                        }
-
-                        if ($verificacaoDiaInativacao) {
-                            $validacaoCelulaExcluidaMesmoDia = false;
-                            /* Validação de célula , quando excluida no dia sem lançamento não aparecer */
-                            if ($ge->getEvento()->verificaSeECelula()) {
-                                if ($ge->getData_criacao() === $ge->getData_inativacao()) {
-                                    if (!count($ge->getEvento()->getEventoFrequencia())) {
-                                        $validacaoCelulaExcluidaMesmoDia = true;
-                                    }
-                                }
-                            }
-
-                            if (!$validacaoCelulaExcluidaMesmoDia) {
-                                /* Condição para data de cadastro */
-                                $verificacaoData = false;
-
-                                if ($ge->getData_criacaoAno() <= $ano) {
-                                    if ($ge->getData_criacaoAno() == $ano) {
-                                        if ($ge->getData_criacaoMes() <= $mes) {
-                                            if ($ge->getData_criacaoMes() == $mes) {
-                                                $ge->setNovo(true);
-                                                if ($ciclo === $cicloAtual) {
-                                                    /* se foi cadastrado antes do dia atual ja esta valido */
-                                                    $diaDaCriacao = $ge->getData_criacaoDia();
-
-                                                    if ($diaDaCriacao <= date('d')) {
-                                                        $verificacaoData = true;
-                                                    } else {
-                                                        /* Validar dia cadastro grupo e evento */
-                                                        $diaDaSemanaDaCriacao = date('N', mktime(0, 0, 0, $mes, $diaDaCriacao, $ano));
-                                                        if ($diaDaSemanaDaCriacao == 1) {
-                                                            $diaDaSemanaDaCriacao = 8;
-                                                        } else {
-                                                            $diaDaSemanaDaCriacao++;
-                                                        }
-                                                        if (!($ge->getEvento()->getDiaAjustado() < $diaDaSemanaDaCriacao) && $ge->getData_criacaoDia() <= $diaAtual) {
-                                                            $verificacaoData = true;
-                                                        }
-                                                    }
-                                                } else {
-                                                    $primeiroDiaCiclo = Funcoes::periodoCicloMesAno($ciclo, $mes, $ano, '', 1);
-                                                    if ($ge->getData_criacaoDia() <= $primeiroDiaCiclo) {
-                                                        $verificacaoData = true;
-                                                    }
-                                                }
-                                            } else {
-                                                $verificacaoData = true;
-                                            }
-                                        }
-                                    } else {
-                                        $verificacaoData = true;
-                                    }
-                                }
-
-                                /* Validacao de ciclos inicial e final */
-                                $verificacaoDiaSemana = false;
-                                $cicloTotal = Funcoes::totalCiclosMes($mes, $ano);
-                                if ($verificacaoData && ($ciclo === 1 || $ciclo === $cicloTotal)) {
-                                    if ($ciclo === 1) {
-                                        if ($ge->getEvento()->getDiaAjustado() >= $primeiroDiaDaSemana) {
-                                            $verificacaoDiaSemana = true;
-                                        }
-                                    }
-                                    if ($ciclo == $cicloTotal) {
-                                        if ($ge->getEvento()->getDiaAjustado() <= $ultimoDiaDaSemana) {
-                                            $verificacaoDiaSemana = true;
-                                        }
-                                    }
-                                } else {
-                                    $verificacaoDiaSemana = true;
-                                }
-
-                                if ($verificacaoData && $verificacaoDiaSemana) {
-                                    $eventos[] = $ge;
-                                }
-                            }
-                        }
-                    }
-                }
-                $this->setEventos($eventos);
-            }
-        }
-        return $this->getEventos();
-    }
-
-    function getGrupoEventoCelula() {
-        $grupoEventos = null;
-        foreach ($this->getGrupoEvento() as $grupoEvento) {
-            if ($grupoEvento->verificarSeEstaAtivo() && $grupoEvento->getEvento()->verificaSeECelula()) {
-                $grupoEventos[] = $grupoEvento;
-            }
-        }
-        return $grupoEventos;
-    }
-
-    function getGrupoEventoCulto() {
-        $grupoEventos = null;
-        foreach ($this->getGrupoEvento() as $ge) {
-            if ($ge->verificarSeEstaAtivo() && $ge->getEvento()->verificaSeECulto()) {
-                $grupoEventos[] = $ge;
-            }
-        }
-        return $grupoEventos;
-    }
-
-//    function getGrupoEventoRevisao() {
-//        $eventos = null;
-//        if (!empty($this->getGrupoEvento())) {
-//            foreach ($this->getGrupoEvento() as $ge) {
-//                if ($ge->verificarSeEstaAtivo() && $ge->getEvento()->verificaSeERevisao()) {
-//                    $eventos[] = $ge;
-//                }
-//            }
-//        }
-//        $this->setEventos($eventos);
-//        return $this->getEventos();
-//    }
-
+   
     function setGrupoEvento($grupoEvento) {
         $this->grupoEvento = $grupoEvento;
     }
@@ -1028,14 +503,6 @@ class Grupo extends CircuitoEntity {
         $this->grupoPessoa = $grupoPessoa;
     }
 
-    function getCiclo() {
-        return $this->ciclo;
-    }
-
-    function setCiclo($ciclo) {
-        $this->ciclo = $ciclo;
-    }
-
     function getEventos() {
         return $this->eventos;
     }
@@ -1067,89 +534,4 @@ class Grupo extends CircuitoEntity {
     function setGrupoPaiFilhoPai($grupoPaiFilhoPai) {
         $this->grupoPaiFilhoPai = $grupoPaiFilhoPai;
     }
-
-    function getGrupoAtendimento() {
-        return $this->grupoAtendimento;
-    }
-
-    function setGrupoAtendimento($grupoAtendimento) {
-        $this->grupoAtendimento = $grupoAtendimento;
-        return $this;
-    }
-
-    /**
-     * Retorn o GrupoCv
-     * @return GrupoCv
-     */
-    function getGrupoCv() {
-        return $this->grupoCv;
-    }
-
-    function setGrupoCv($grupoCv) {
-        $this->grupoCv = $grupoCv;
-    }
-
-    /**
-     * Retorna o grupo igreja do Grupo
-     * @return GrupoEvento
-     */
-    function getGrupoIgreja() {
-        $grupoSelecionado = $this;
-        $grupoIgreja = null;
-        if ($grupoSelecionado->getEntidadeAtiva()->getEntidadeTipo()->getId() === Entidade::SUBEQUIPE) {
-            while ($grupoSelecionado->getEntidadeAtiva()->getEntidadeTipo()->getId() === Entidade::SUBEQUIPE ||
-            $grupoSelecionado->getEntidadeAtiva()->getEntidadeTipo()->getId() === Entidade::EQUIPE) {
-                $grupoSelecionado = $grupoSelecionado->getGrupoPaiFilhoPaiAtivo()->getGrupoPaiFilhoPai();
-                if ($grupoSelecionado->getEntidadeAtiva()->getEntidadeTipo()->getId() === Entidade::IGREJA) {
-                    break;
-                }
-            }
-            $grupoIgreja = $grupoSelecionado;
-        } else if ($grupoSelecionado->getEntidadeAtiva()->getEntidadeTipo()->getId() === Entidade::EQUIPE) {
-            while ($grupoSelecionado->getEntidadeAtiva()->getEntidadeTipo()->getId() === Entidade::EQUIPE) {
-                $grupoSelecionado = $grupoSelecionado->getGrupoPaiFilhoPaiAtivo()->getGrupoPaiFilhoPai();
-                if ($grupoSelecionado->getEntidadeAtiva()->getEntidadeTipo()->getId() === Entidade::IGREJA) {
-                    break;
-                }
-            }
-            $grupoIgreja = $grupoSelecionado;
-        } else if ($grupoSelecionado->getEntidadeAtiva()->getEntidadeTipo()->getId() === Entidade::IGREJA) {
-            $grupoIgreja = $grupoSelecionado;
-        } else {
-            $grupoIgreja = null;
-        }
-        return $grupoIgreja;
-    }
-
-    /**
-     * Retorna o grupo equipe do Grupo
-     * @return GrupoEvento
-     */
-    function getGrupoEquipe() {
-        $grupoSelecionado = $this;
-        $grupoIgreja = null;
-        if ($grupoSelecionado->getEntidadeAtiva()->getEntidadeTipo()->getId() === Entidade::SUBEQUIPE) {
-            while ($grupoSelecionado->getEntidadeAtiva()->getEntidadeTipo()->getId() === Entidade::SUBEQUIPE) {
-                $grupoSelecionado = $grupoSelecionado->getGrupoPaiFilhoPaiAtivo()->getGrupoPaiFilhoPai();
-                if ($grupoSelecionado->getEntidadeAtiva()->getEntidadeTipo()->getId() === Entidade::EQUIPE) {
-                    break;
-                }
-            }
-            $grupoIgreja = $grupoSelecionado;
-        } else if ($grupoSelecionado->getEntidadeAtiva()->getEntidadeTipo()->getId() === Entidade::EQUIPE) {
-            $grupoIgreja = $grupoSelecionado;
-        } else {
-            $grupoIgreja = null;
-        }
-        return $grupoIgreja;
-    }
-
-    function getFatoRanking() {
-        return $this->fatoRanking;
-    }
-
-    function setFatoRanking($fatoRanking) {
-        $this->fatoRanking = $fatoRanking;
-    }
-
 }

@@ -3,330 +3,78 @@
 namespace Application\Model\Entity;
 
 /**
- * Nome: Evento.php
+ * Nome: Tarefa.php
  * @author Leonardo Pereira Magalhães <falecomleonardopereira@gmail.com>
- * Descricao: Entidade anotada da tabela Evento
+ * Descricao: Entidade anotada da tabela tarefa
  */
-use Application\Controller\Helper\Constantes;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use Exception;
-use Zend\InputFilter\InputFilter;
-use Zend\InputFilter\InputFilterAwareInterface;
-use Zend\InputFilter\InputFilterInterface;
 
-/** @ORM\Entity */
-class Tarefa extends CircuitoEntity implements InputFilterAwareInterface {
-
-    protected $inputFilter;
-    protected $idAntigo;
+/**
+ * @ORM\Entity 
+ * @ORM\Table(name="tarefa")
+ */
+class Tarefa extends KleoEntity {
 
     /**
-     * @ORM\OneToMany(targetEntity="GrupoTarefa", mappedBy="tarefa") 
+     * @ORM\ManyToOne(targetEntity="Pessoa", inversedBy="tarefa")
+     * @ORM\JoinColumn(name="pessoa_id", referencedColumnName="id")
      */
-    protected $grupoTarefa;
-
-    public function __construct() {
-        $this->$rupoTarefa = new ArrayCollection();
-    }
+    private $pessoa;
 
     /**
      * @ORM\ManyToOne(targetEntity="TarefaTipo", inversedBy="tarefa")
-     * @ORM\JoinColumn(name="tipo_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="tarefa_tipo_id", referencedColumnName="id")
      */
-    private $eventoTipo;
+    private $tarefaTipo;
 
     /** @ORM\Column(type="integer") */
-    protected $dia;
-
-    /** @ORM\Column(type="string") */
-    protected $nome;
-
-    /** @ORM\Column(type="string") */
-    protected $hora;
-
-    /** @ORM\Column(type="string") */
-    protected $data;
+    protected $pessoa_id;
 
     /** @ORM\Column(type="integer") */
-    protected $tipo_id;
+    protected $tarefa_tipo_id;
 
-    /**
-     * Retorna o tipo de evento
-     * @return EventoTipo
-     */
-    function getEventoTipo() {
-        return $this->eventoTipo;
+    /** @ORM\Column(type="string") */
+    protected $realizada;
+
+
+    function getPessoa() {
+        return $this->pessoa;
     }
 
-    function getDia() {
-        return $this->dia;
+    function getTarefaTipo() {
+        return $this->evento;
     }
 
-    /**
-     * Retorna o dia sendo domingo dia 8 para ordenação correta
-     * @return int
-     */
-    function getDiaAjustado() {
-        $aux = $this->dia;
-        if ($this->dia == 1) {
-            $aux = 8;
-        }
-        return $aux;
+    function getPessoa_id() {
+        return $this->pessoa_id;
     }
 
-    function getHora() {
-        return $this->hora;
+    function getTarefa_tipo_id() {
+        return $this->tarefa_tipo_id;
     }
 
-    function getHoraSemMinutosESegundos() {
-        return substr($this->getHora(), 0, 2);
+    function getRealizada() {
+        return $this->realizada;
     }
 
-    function getMinutosSemHorasESegundos() {
-        return substr($this->getHora(), 3, 2);
+    function setPessoa($pessoa) {
+        $this->pessoa = $pessoa;
     }
 
-    function getHoraFormatoHoraMinuto() {
-        $resposta = '';
-        /* Se for hora em ponto hora mais 'H' */
-        $hora = substr($this->hora, 0, 2);
-        $minutos = substr($this->hora, 3, 2);
-        if ((int) $minutos == 0) {
-            $resposta = $hora . 'H';
-        } else {
-            $resposta = $hora . '.';
-        }
-        return $resposta;
+    function setTarefaTipo($tarefaTipo) {
+        $this->tarefaTipo = $tarefaTipo;
     }
 
-    /**
-     * Retorna as horas com os minutos apenas
-     * @return String
-     */
-    function getHoraFormatoHoraMinutoParaListagem() {
-        return substr($this->hora, 0, 5);
+    function setPessoa_id($pessoa_id) {
+        $this->pessoa_id = $pessoa_id;
     }
 
-    function setEventoTipo($eventoTipo) {
-        $this->eventoTipo = $eventoTipo;
+    function setTarefa_tipo_id($tarefa_tipo_id) {
+        $this->tarefa_tipo_id = $tarefa_tipo_id;
     }
 
-    function setDia($dia) {
-        $this->dia = $dia;
-    }
-
-    function setHora($hora) {
-        $this->hora = $hora;
-    }
-
-    /**
-     * Retorna grupo evento
-     * @return GrupoEvento
-     */
-    function getGrupoEvento() {
-        return $this->grupoEvento;
-    }
-
-    /**
-     * Retorna o grupo evento
-     * @return GrupoEvento
-     */
-    function getGrupoEventoAtivos() {
-        $grupoEventos = null;
-        foreach ($this->getGrupoEvento() as $ge) {
-            if ($ge->verificarSeEstaAtivo()) {
-                $grupoEventos[] = $ge;
-            }
-        }
-        return $grupoEventos;
-    }
-
-    /**
-     * Retorna o grupo evento
-     * @return GrupoEvento
-     */
-    function getGrupoEventoAtivo() {
-        $grupoEvento = null;
-        foreach ($this->getGrupoEvento() as $ge) {
-            if ($ge->verificarSeEstaAtivo()) {
-                $grupoEvento = $ge;
-                break;
-            }
-        }
-        return $grupoEvento;
-    }
-
-    function setGrupoEvento($grupoEvento) {
-        $this->grupoEvento = $grupoEvento;
-    }
-
-    /**
-     * Retorna o evento da célula
-     * @return EventoCelula
-     */
-    function getEventoCelula() {
-        return $this->eventoCelula;
-    }
-
-    function setEventoCelula($eventoCelula) {
-        $this->eventoCelula = $eventoCelula;
-    }
-
-    /**
-     * Retorna as frequnências do evento
-     * @return EventoFrequencia
-     */
-    function getEventoFrequencia() {
-        return $this->eventoFrequencia;
-    }
-
-    function setEventoFrequencia($eventoFrequencia) {
-        $this->eventoFrequencia = $eventoFrequencia;
-    }
-
-    /**
-     * Verifica se o evento é do tipo célula
-     * @return boolean 
-     */
-    function verificaSeECelula() {
-        $resposta = false;
-        if ($this->getEventoTipo()->getId() === EventoTipo::tipoCelula) {
-            $resposta = true;
-        }
-        return $resposta;
-    }
-
-    /**
-     * Verifica se o evento é do tipo culto
-     * @return boolean
-     */
-    function verificaSeECulto() {
-        $resposta = false;
-        if ($this->getEventoTipo()->getId() === EventoTipo::tipoCulto) {
-            $resposta = true;
-        }
-        return $resposta;
-    }
-
-    /**
-     * Verifica se o evento é do tipo culto
-     * @return boolean
-     */
-    function verificaSeERevisao() {
-        $resposta = false;
-        if ($this->getTipo_id() == EventoTipo::tipoRevisao) {
-            $resposta = true;
-        }
-        return $resposta;
-    }
-
-    function getTipo_id() {
-        return $this->tipo_id;
-    }
-
-    function setTipo_id($tipo_id) {
-        $this->tipo_id = $tipo_id;
-    }
-
-    public function getInputFilter() {
-        
-    }
-
-    public static function getInputFilterEvento() {
-        $inputFilter = new InputFilter();
-        /* Dia da Semana */
-        $inputFilter->add(array(
-            Constantes::$VALIDACAO_NAME => Constantes::$FORM_DIA_DA_SEMANA,
-            Constantes::$VALIDACAO_REQUIRED => true,
-            Constantes::$VALIDACAO_VALIDATORS => array(
-                array(
-                    Constantes::$VALIDACAO_NAME => Constantes::$VALIDACAO_NOT_EMPTY,
-                ),
-            ),
-        ));
-        /* Hora */
-        $inputFilter->add(array(
-            Constantes::$VALIDACAO_NAME => Constantes::$FORM_HORA,
-            Constantes::$VALIDACAO_REQUIRED => true,
-            Constantes::$VALIDACAO_VALIDATORS => array(
-                array(
-                    Constantes::$VALIDACAO_NAME => Constantes::$VALIDACAO_NOT_EMPTY,
-                ),
-            ),
-        ));
-        /* Minutos */
-        $inputFilter->add(array(
-            Constantes::$VALIDACAO_NAME => Constantes::$FORM_MINUTOS,
-            Constantes::$VALIDACAO_REQUIRED => true,
-            Constantes::$VALIDACAO_VALIDATORS => array(
-                array(
-                    Constantes::$VALIDACAO_NAME => Constantes::$VALIDACAO_NOT_EMPTY,
-                ),
-            ),
-        ));
-
-        return $inputFilter;
-    }
-
-    public static function getInputFilterEventoCulto() {
-        $inputFilter = Evento::getInputFilterEvento();
-        /* Nome */
-        $inputFilter->add(array(
-            Constantes::$VALIDACAO_NAME => Constantes::$FORM_NOME,
-            Constantes::$VALIDACAO_REQUIRED => true,
-            Constantes::$VALIDACAO_VALIDATORS => array(
-                array(
-                    Constantes::$VALIDACAO_NAME => Constantes::$VALIDACAO_NOT_EMPTY,
-                ),
-            ),
-        ));
-
-        return $inputFilter;
-    }
-
-    /**
-     * @param InputFilterInterface $inputFilter
-     * @throws Exception
-     */
-    public function setInputFilter(InputFilterInterface $inputFilter) {
-        throw new Exception("Nao utilizado");
-    }
-
-    function getNome() {
-        return $this->nome;
-    }
-
-    function getNomeAjustado() {
-        $nomeAjustado = substr($this->nome, 0, 8);
-        if (strlen($this->nome) > 8) {
-            $nomeAjustado .= '...';
-        }
-        return $nomeAjustado;
-    }
-
-    function setNome($nome) {
-        $this->nome = $nome;
-    }
-
-    public function exchangeArray($data) {
-        $this->nome = (!empty($data[Constantes::$FORM_NOME]) ? strtoupper($data[Constantes::$FORM_NOME]) : null);
-    }
-
-    function getIdAntigo() {
-        return $this->idAntigo;
-    }
-
-    function setIdAntigo($idAntigo) {
-        $this->idAntigo = $idAntigo;
-    }
-
-    function getData() {
-        return $this->data;
-    }
-
-    function setData($data) {
-        $this->data = $data;
+    function setRealizada($realizada) {
+        $this->realizada = $realizada;
     }
 
 }

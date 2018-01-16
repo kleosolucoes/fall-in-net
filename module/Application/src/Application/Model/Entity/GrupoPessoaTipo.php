@@ -17,7 +17,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity 
  * @ORM\Table(name="grupo_pessoa_tipo")
  */
-class GrupoPessoaTipo extends CircuitoEntity {
+class GrupoPessoaTipo extends KleoEntity {
 
     const VISITANTE = 1;
     const CONSOLIDACAO = 2;

@@ -17,7 +17,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity 
  * @ORM\Table(name="grupo_pessoa")
  */
-class GrupoPessoa extends CircuitoEntity {
+class GrupoPessoa extends KleoEntity {
 
     /**
      * @ORM\ManyToOne(targetEntity="Pessoa", inversedBy="grupoPessoa")
@@ -44,37 +44,7 @@ class GrupoPessoa extends CircuitoEntity {
     protected $grupo_id;
 
     /** @ORM\Column(type="integer") */
-    protected $tipo_id;
-
-    /** @ORM\Column(type="string") */
-    protected $transferido;
-
-    /** @ORM\Column(type="string") */
-    protected $nucleo_perfeito;
-
-    /**
-     * Verificar se a data de inativação está nula
-     * @return boolean
-     */
-    public function verificarSeEstaAtivo() {
-        $resposta = false;
-        if (is_null($this->getData_inativacao())) {
-            $resposta = true;
-        }
-        return $resposta;
-    }
-
-    /**
-     * Verificar se a data de inativação foi no mes informado
-     * @return boolean
-     */
-    public function verificarSeInativacaoFoiNoMesInformado($mes, $ano) {
-        $resposta = false;
-        if ($this->getData_inativacaoMes() == $mes && $this->getData_inativacaoAno() == $ano) {
-            $resposta = true;
-        }
-        return $resposta;
-    }
+    protected $grupo_pessoa_tipo_id;
 
     /**
      * Retorna a pessoa
@@ -132,28 +102,12 @@ class GrupoPessoa extends CircuitoEntity {
         $this->grupoPessoaTipo = $grupoPessoaTipo;
     }
 
-    function getTransferido() {
-        return $this->transferido;
+    function getGrupo_pessoa_tipo_id() {
+        return $this->grupo_pessoa_tipo_id;
     }
 
-    function setTransferido($transferido) {
-        $this->transferido = $transferido;
-    }
-
-    function getNucleo_perfeito() {
-        return $this->nucleo_perfeito;
-    }
-
-    function setNucleo_perfeito($nucleo_perfeito) {
-        $this->nucleo_perfeito = $nucleo_perfeito;
-    }
-
-    function getTipo_id() {
-        return $this->tipo_id;
-    }
-
-    function setTipo_id($tipo_id) {
-        $this->tipo_id = $tipo_id;
+    function setGrupo_pessoa_tipo_id($grupo_pessoa_tipo_id) {
+        $this->grupo_pessoa_tipo_id = $grupo_pessoa_tipo_id;
     }
 
 }

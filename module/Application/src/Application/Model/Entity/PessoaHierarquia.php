@@ -14,7 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity 
  * @ORM\Table(name="pessoa_hierarquia")
  */
-class PessoaHierarquia extends CircuitoEntity {
+class PessoaHierarquia extends KleoEntity {
 
     /**
      * @ORM\ManyToOne(targetEntity="Hierarquia", inversedBy="pessoaHierarquia")

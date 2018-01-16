@@ -14,7 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity 
  * @ORM\Table(name="grupo_evento")
  */
-class GrupoEvento extends CircuitoEntity {
+class GrupoEvento extends KleoEntity {
 
     /**
      * @ORM\ManyToOne(targetEntity="Evento", inversedBy="grupoEvento")

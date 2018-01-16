@@ -33,32 +33,38 @@ class Pessoa extends KleoEntity implements InputFilterAwareInterface {
     protected $inputFilterPessoaFrequencia;
   const EMAIL = 'email';
 
-//     /**
-//      * @ORM\OneToMany(targetEntity="GrupoResponsavel", mappedBy="pessoa") 
-//      */
-//     protected $grupoResponsavel;
+    /**
+     * @ORM\OneToMany(targetEntity="GrupoResponsavel", mappedBy="pessoa") 
+     */
+    protected $grupoResponsavel;
 
     
-//     /**
-//      * @ORM\OneToMany(targetEntity="EventoFrequencia", mappedBy="pessoa") 
-//      */
-//     protected $eventoFrequencia;
+    /**
+     * @ORM\OneToMany(targetEntity="EventoFrequencia", mappedBy="pessoa") 
+     */
+    protected $eventoFrequencia;
 
-//     /**
-//      * @ORM\OneToMany(targetEntity="GrupoPessoa", mappedBy="pessoa") 
-//      */
-//     protected $grupoPessoa;
+    /**
+     * @ORM\OneToMany(targetEntity="GrupoPessoa", mappedBy="pessoa") 
+     */
+    protected $grupoPessoa;
 
-//     /**
-//      * @ORM\OneToMany(targetEntity="PessoaHierarquia", mappedBy="pessoa") 
-//      */
-//     protected $pessoaHierarquia;
+    /**
+     * @ORM\OneToMany(targetEntity="PessoaHierarquia", mappedBy="pessoa") 
+     */
+    protected $pessoaHierarquia;
+  
+    /**
+     * @ORM\OneToMany(targetEntity="Tarefa", mappedBy="pessoa") 
+     */
+    protected $tarefa;
 
     public function __construct() {
-//         $this->grupoResponsavel = new ArrayCollection();
-//         $this->eventoFrequencia = new ArrayCollection();
-//         $this->grupoPessoa = new ArrayCollection();
-//         $this->pessoaHierarquia = new ArrayCollection();
+        $this->grupoResponsavel = new ArrayCollection();
+        $this->eventoFrequencia = new ArrayCollection();
+        $this->grupoPessoa = new ArrayCollection();
+        $this->pessoaHierarquia = new ArrayCollection();
+        $this->tarefa = new ArrayCollection();
     }
 
     /** @ORM\Column(type="string") */
@@ -515,6 +521,18 @@ class Pessoa extends KleoEntity implements InputFilterAwareInterface {
 
     function setPessoaHierarquia($pessoaHierarquia) {
         $this->pessoaHierarquia = $pessoaHierarquia;
+    }
+  
+    /**
+     * Retorna array das tarefas
+     * @return Tarefa
+     */
+    function getTarefa() {
+        return $this->tarefa;
+    }
+
+    function setTarefa($tarefa) {
+        $this->tarefa = $tarefa;
     }
 
     function getSexo() {

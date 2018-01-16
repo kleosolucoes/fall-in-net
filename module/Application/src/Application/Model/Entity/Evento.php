@@ -16,7 +16,7 @@ use Zend\InputFilter\InputFilterAwareInterface;
 use Zend\InputFilter\InputFilterInterface;
 
 /** @ORM\Entity */
-class Evento extends CircuitoEntity implements InputFilterAwareInterface {
+class Evento extends KleoEntity implements InputFilterAwareInterface {
 
     protected $inputFilter;
     protected $idAntigo;
@@ -60,7 +60,7 @@ class Evento extends CircuitoEntity implements InputFilterAwareInterface {
     protected $data;
 
     /** @ORM\Column(type="integer") */
-    protected $tipo_id;
+    protected $evento_tipo_id;
 
     /**
      * Retorna o tipo de evento
@@ -232,12 +232,12 @@ class Evento extends CircuitoEntity implements InputFilterAwareInterface {
         return $resposta;
     }
 
-    function getTipo_id() {
-        return $this->tipo_id;
+    function getEvento_tipo_id() {
+        return $this->evento_tipo_id;
     }
 
-    function setTipo_id($tipo_id) {
-        $this->tipo_id = $tipo_id;
+    function setEvento_tipo_id($evento_tipo_id) {
+        $this->evento_tipo_id = $evento_tipo_id;
     }
 
     public function getInputFilter() {
