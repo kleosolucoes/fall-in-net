@@ -15,14 +15,9 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Hierarquia extends KleoEntity {
 
-    const BISPO = 1;
-    const PASTOR = 2;
-    const MISSIONARIO = 3;
-    const DIACONO = 4;
-    const OBREIRO = 5;
-    const LIDER_DE_CELULA = 6;
-    const LIDER_EM_TREINAMENTO = 7;
-
+    const ATIVO_SEM_REUNIAO = 1;
+    const ATIVO_COM_REUNIAO = 2;
+  
     /**
      * @ORM\OneToMany(targetEntity="PessoaHierarquia", mappedBy="hierarquia") 
      */

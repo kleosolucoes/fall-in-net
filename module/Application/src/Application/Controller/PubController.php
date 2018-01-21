@@ -169,17 +169,14 @@ class PubController extends KleoController {
         if ($authenticationResult->isValid()) {
             
             $pessoa = $this->getRepositorio()->getPessoaORM()->encontrarPorEmail($usuarioTrim);
-            /* Se o responsavel esta ativo */
-//             $reponsavelSituacaoAtivo = $responsavel->getResponsavelSituacaoAtivo();
-// 
-          if($pessoa){
-//             if ($reponsavelSituacaoAtivo->getSituacao()->getId() === Situacao::ativo) {
+           
+            if ($pessoa->verificarSeTemAlgumaResponsabilidadeAtiva()) {
                 /* Registro de sessão */
                 $sessao = $this->getSessao();
                 $sessao->idPessoa = $pessoa->getId();
 
                 return $this->redirect()->toRoute(self::rotaAdm, array(
-                            self::stringAction => self::stringCampanhas,
+                            self::stringAction => self::stringIndex,
                 ));
             } else {
                 return $this->forward()->dispatch(self::controllerPub, array(

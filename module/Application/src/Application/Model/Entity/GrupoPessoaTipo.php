@@ -6,9 +6,6 @@ namespace Application\Model\Entity;
  * Nome: GrupoPessoaTipo.php
  * @author Leonardo Pereira Magalhães <falecomleonardopereira@gmail.com>
  * Descricao: Entidade anotada da tabela grupo_pessoa_tipo
- * 1 - VISITANTE
- * 2 - CONSOLIDACAO
- * 3 - MEMBRO
  */
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
@@ -19,9 +16,8 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class GrupoPessoaTipo extends KleoEntity {
 
-    const VISITANTE = 1;
-    const CONSOLIDACAO = 2;
-    const MEMBRO = 3;
+    const PONTE = 1;
+    const PROSPECTO = 2;
 
     /**
      * @ORM\OneToMany(targetEntity="GrupoPessoa", mappedBy="grupoPessoaTipo") 

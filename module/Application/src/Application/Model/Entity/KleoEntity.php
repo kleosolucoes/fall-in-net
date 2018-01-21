@@ -30,8 +30,12 @@ class KleoEntity {
     /**
      * Seta data e hora de criação
      */
-    function setDataEHoraDeCriacao() {
-        $timeNow = new DateTime();
+    function setDataEHoraDeCriacao($date = null) {
+        if ($date) {
+            $timeNow = DateTime::createFromFormat('Y-m-d', $date);
+        } else {
+            $timeNow = new DateTime();
+        }
         $this->setData_criacao($timeNow);
         $this->setHora_criacao($timeNow->format('H:s:i'));
     }
@@ -76,6 +80,9 @@ class KleoEntity {
     }
     function getData_criacaoFormatada() {
         return $this->data_criacao->format('d/m/Y');
+    }
+    function getData_criacaoFormatoBandoDeDados() {
+        return $this->data_criacao->format('Y-m-d');
     }
     function getHora_criacao() {
         return $this->hora_criacao;

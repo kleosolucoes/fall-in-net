@@ -3,7 +3,7 @@
 use Application\Controller\KleoController;
 
 echo $this->doctype();
-$versao = '?v=1.2.5';
+$versao = '?v=1.2.9';
 ?>
 <html class="no-js css-menubar" lang="pt-BR">
 	<head>
@@ -33,9 +33,8 @@ $versao = '?v=1.2.5';
 		echo $this
 			->headLink(array('rel' => 'shortcut icon', 'type' => 'image/vnd.microsoft.icon', 'href' => $this->basePath() . '/img/favicon.jpeg'))               
 			->prependStylesheet($this->basePath() . '/css/splash.css' . $versao)
-			->prependStylesheet($this->basePath() . '/global/fonts/brand-icons/brand-icons.min.css')
 			->prependStylesheet($this->basePath() . '/global/fonts/web-icons/web-icons.min.css')
-			->prependStylesheet($this->basePath() . '/global/vendor/flag-icon-css/flag-icon.css')
+			->prependStylesheet($this->basePath() . '/global/fonts/font-awesome/font-awesome.min.css')
 			->prependStylesheet($this->basePath() . '/global/vendor/slidepanel/slidePanel.css')
 			->prependStylesheet($this->basePath() . '/global/vendor/switchery/switchery.css')
 			->prependStylesheet($this->basePath() . '/global/vendor/asscrollable/asScrollable.css')
@@ -67,8 +66,12 @@ $versao = '?v=1.2.5';
 		<!--[if lt IE 8]>
 <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
 <![endif]-->
-		
-		
+		<?php
+		if ($this->mostrarMenu !== 0) {
+			echo $this->menu();
+		}
+		?> 
+
 		<!-- Page -->
 		<div class="page">
 			<div class="page-content container-fluid">
@@ -117,7 +120,7 @@ $versao = '?v=1.2.5';
 		<script>Config.set('assets', '../../../assets');</script>
 
 		<script type="text/javascript">
-			
+
 		</script>
 		<!-- END: PAGE SCRIPTS -->
 	</body>

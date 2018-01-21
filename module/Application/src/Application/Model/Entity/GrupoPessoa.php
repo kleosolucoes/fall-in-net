@@ -33,7 +33,7 @@ class GrupoPessoa extends KleoEntity {
 
     /**
      * @ORM\ManyToOne(targetEntity="GrupoPessoaTipo", inversedBy="grupoPessoa")
-     * @ORM\JoinColumn(name="tipo_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="grupo_pessoa_tipo_id", referencedColumnName="id")
      */
     private $grupoPessoaTipo;
 

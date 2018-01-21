@@ -126,6 +126,7 @@ CREATE TABLE IF NOT EXISTS `hierarquia` (
 CREATE TABLE IF NOT EXISTS `pessoa` (
   `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT,
   `nome` varchar(150) NOT NULL,
+  `telefone` bigint(11) NOT NULL,
   `email` varchar(80) DEFAULT NULL,
   `senha` varchar(40) DEFAULT NULL,
   `data_criacao` date NOT NULL,
@@ -142,10 +143,10 @@ CREATE TABLE IF NOT EXISTS `pessoa_hierarquia` (
   `data_inativacao` date DEFAULT NULL,
   `hora_inativacao` time DEFAULT NULL,
   `pessoa_id` bigint(11) unsigned NOT NULL,
-  `hierarquia` int(1) unsigned NOT NULL,
+  `hierarquia_id` int(1) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   KEY `index_pessoa_hierarquia_pessoa_id` (`pessoa_id`),
-  KEY `index_pessoa_hierarquia_hierarquia_id` (`hierarquia`)
+  KEY `index_pessoa_hierarquia_hierarquia_id` (`hierarquia_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `tarefa` (
@@ -198,7 +199,7 @@ ALTER TABLE `grupo_responsavel`
   ADD CONSTRAINT `fk_grupo_responsavel_pessoa_id` FOREIGN KEY (`pessoa_id`) REFERENCES `pessoa` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 ALTER TABLE `pessoa_hierarquia`
-  ADD CONSTRAINT `fk_pessoa_hierarquia_hierarquia_id` FOREIGN KEY (`hierarquia`) REFERENCES `hierarquia` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_pessoa_hierarquia_hierarquia_id` FOREIGN KEY (`hierarquia_id`) REFERENCES `hierarquia` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_pessoa_hierarquia_pessoa_id` FOREIGN KEY (`pessoa_id`) REFERENCES `pessoa` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 ALTER TABLE `tarefa`

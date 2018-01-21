@@ -15,16 +15,14 @@ use Zend\InputFilter\InputFilter;
 use Zend\InputFilter\InputFilterAwareInterface;
 use Zend\InputFilter\InputFilterInterface;
 
-/** @ORM\Entity */
+/**
+ * @ORM\Entity 
+ * @ORM\Table(name="evento")
+ */
 class Evento extends KleoEntity implements InputFilterAwareInterface {
 
     protected $inputFilter;
     protected $idAntigo;
-
-    /**
-     * @ORM\OneToOne(targetEntity="EventoCelula", mappedBy="evento")
-     */
-    private $eventoCelula;
 
     /**
      * @ORM\OneToMany(targetEntity="GrupoEvento", mappedBy="evento") 
@@ -43,7 +41,7 @@ class Evento extends KleoEntity implements InputFilterAwareInterface {
 
     /**
      * @ORM\ManyToOne(targetEntity="EventoTipo", inversedBy="evento")
-     * @ORM\JoinColumn(name="tipo_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="evento_tipo_id", referencedColumnName="id")
      */
     private $eventoTipo;
 
@@ -55,9 +53,6 @@ class Evento extends KleoEntity implements InputFilterAwareInterface {
 
     /** @ORM\Column(type="string") */
     protected $hora;
-
-    /** @ORM\Column(type="string") */
-    protected $data;
 
     /** @ORM\Column(type="integer") */
     protected $evento_tipo_id;
@@ -123,10 +118,6 @@ class Evento extends KleoEntity implements InputFilterAwareInterface {
         $this->eventoTipo = $eventoTipo;
     }
 
-    function setDia($dia) {
-        $this->dia = $dia;
-    }
-
     function setHora($hora) {
         $this->hora = $hora;
     }
@@ -173,18 +164,6 @@ class Evento extends KleoEntity implements InputFilterAwareInterface {
     }
 
     /**
-     * Retorna o evento da célula
-     * @return EventoCelula
-     */
-    function getEventoCelula() {
-        return $this->eventoCelula;
-    }
-
-    function setEventoCelula($eventoCelula) {
-        $this->eventoCelula = $eventoCelula;
-    }
-
-    /**
      * Retorna as frequnências do evento
      * @return EventoFrequencia
      */
@@ -207,31 +186,7 @@ class Evento extends KleoEntity implements InputFilterAwareInterface {
         }
         return $resposta;
     }
-
-    /**
-     * Verifica se o evento é do tipo culto
-     * @return boolean
-     */
-    function verificaSeECulto() {
-        $resposta = false;
-        if ($this->getEventoTipo()->getId() === EventoTipo::tipoCulto) {
-            $resposta = true;
-        }
-        return $resposta;
-    }
-
-    /**
-     * Verifica se o evento é do tipo culto
-     * @return boolean
-     */
-    function verificaSeERevisao() {
-        $resposta = false;
-        if ($this->getTipo_id() == EventoTipo::tipoRevisao) {
-            $resposta = true;
-        }
-        return $resposta;
-    }
-
+  
     function getEvento_tipo_id() {
         return $this->evento_tipo_id;
     }
@@ -332,12 +287,5 @@ class Evento extends KleoEntity implements InputFilterAwareInterface {
         $this->idAntigo = $idAntigo;
     }
 
-    function getData() {
-        return $this->data;
-    }
-
-    function setData($data) {
-        $this->data = $data;
-    }
 
 }

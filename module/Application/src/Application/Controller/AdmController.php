@@ -2,27 +2,18 @@
 
 namespace Application\Controller;
 
-use Application\Form\CadastroBotForm;
-use Application\Form\CadastroCampanhaForm;
-use Application\Form\CadastroListaForm;
-use Application\Form\CampanhaSituacaoForm;
 use Application\Form\KleoForm;
-use Application\Form\ResponsavelSituacaoForm;
-use Application\Form\TransferenciaForm;
-use Application\Model\Entity\Bot;
-use Application\Model\Entity\BotOpcao;
-use Application\Model\Entity\Campanha;
-use Application\Model\Entity\CampanhaLista;
-use Application\Model\Entity\CampanhaSituacao;
-use Application\Model\Entity\ContaCorrente;
-use Application\Model\Entity\Contato;
-use Application\Model\Entity\Lista;
-use Application\Model\Entity\ResponsavelSituacao;
-use Application\Model\Entity\Situacao;
+use Application\Form\PonteProspectoForm;
 use Application\Model\ORM\RepositorioORM;
+use Application\Model\Entity\Pessoa;
+use Application\Model\Entity\GrupoPessoa;
+use Application\Model\Entity\Tarefa;
+use Application\Model\Entity\EventoFrequencia;
 use Doctrine\ORM\EntityManager;
 use Exception;
 use Zend\View\Model\ViewModel;
+use Zend\Json\Json;
+use DateTime;
 
 /**
  * Nome: AdmController.php
@@ -31,1070 +22,251 @@ use Zend\View\Model\ViewModel;
  */
 class AdmController extends KleoController {
 
-    /**
+  private $grupo;
+  /**
      * Contrutor sobrecarregado com os serviços de ORM
      */
-    public function __construct(EntityManager $doctrineORMEntityManager = null) {
+  public function __construct(EntityManager $doctrineORMEntityManager = null) {
 
-        if (!is_null($doctrineORMEntityManager)) {
-            parent::__construct($doctrineORMEntityManager);
+    if (!is_null($doctrineORMEntityManager)) {
+      parent::__construct($doctrineORMEntityManager);
+    }
+  }
+
+  public function indexAction() {
+    $grupo = self::getGrupo();
+    $grupoEventos = $grupo->getGrupoEventoAcima();
+    $arrayTarefas = array();
+    $grupoPessoas = $grupo->getGrupoPessoaAtivasNoPeriodoDe2Semanas();
+    if($grupoPessoas){
+      foreach($grupoPessoas as $grupoPessoa){
+        foreach($grupoPessoa->getPessoa()->getTarefa() as $tarefa){
+          $arrayTarefas[] = $tarefa;
         }
+      }
+    }
+    $arrayAgenda = array();
+    for($j = 0;$j <= 14;$j++){
+      $contadorDeTarrefas = 0;
+      $diaParaComparar = date('Y-m-d', strtotime('now +'.$j.' days'));
+      foreach($arrayTarefas as $tarefa){
+        if($tarefa->getData_criacaoFormatoBandoDeDados() == $diaParaComparar){
+          $arrayAgenda[$j][] = $tarefa;
+          $contadorDeTarrefas++;
+        }
+      }
+      foreach($grupoEventos as $grupoEvento){
+        $diaDaSemana = date('N', strtotime('now +'.$j.' days')); 
+        if($grupoEvento->getEvento()->getDia() == $diaDaSemana){
+          $arrayAgenda[$j][] = $grupoEvento->getEvento();
+          $contadorDeTarrefas++;
+        }
+      }
+      if($contadorDeTarrefas === 0){
+        $arrayAgenda[$j][0] = 'Sem tarefas nesse dia';  
+      }
     }
 
-    public function indexAction() {
-
-        return new ViewModel();
+    $formulario = $this->params()->fromRoute(self::stringFormulario);
+    if (!$formulario) {
+      $formulario = new PonteProspectoForm('cadastroPonteProspecto');
     }
+    return new ViewModel(array(
+      self::stringAgenda => $arrayAgenda,
+      self::stringGrupoPessoas => $grupoPessoas,
+      self::stringFormulario => $formulario,
+    ));
+  }
 
-    /**
-     * Função padrão, traz a tela principal
-     * GET /admResponsaveis
+  /**
+     * Função para validar e finalizar cadastro
+     * GET /admPonteProspectoFinalizar
      */
-    public function responsaveisAction() {
+  public function ponteProspectoFinalizarAction() {
+    $request = $this->getRequest();
+    if ($request->isPost()) {
 
-        $repositorioORM = new RepositorioORM($this->getDoctrineORMEntityManager());
-        $responsaveis = $repositorioORM->getResponsavelORM()->encontrarTodosOrdenadosPorUltimoEAtivos();
-        return new ViewModel(
-                array(
-            self::stringResponsaveis => $responsaveis,
-                )
+      try {
+        self::getRepositorio()->iniciarTransacao();
+
+        $pessoa = new Pessoa();
+
+        $formulario = new PonteProspectoForm(null);
+        $formulario->setInputFilter($pessoa->getInputFilterCadastrarPonteProspecto());
+
+        $post = array_merge_recursive(
+          $request->getPost()->toArray(), $request->getFiles()->toArray()
         );
-    }
 
-    /**
-     * Formulario para alterar situacao
-     * GET /admResponsavelSituacao
-     */
-    public function responsavelSituacaoAction() {
+        $formulario->setData($post);
 
-        $this->getSessao();
+        /* validação */
+        if ($formulario->isValid()) {
+          $validatedData = $formulario->getData();
+          $pessoa->exchangeArray($formulario->getData());
+          self::getRepositorio()->getPessoaORM()->persistir($pessoa);
+          $grupo = self::getGrupo();
 
-        $repositorioORM = new RepositorioORM($this->getDoctrineORMEntityManager());
-        $sessao = self::getSessao();
-        $idResponsavel = $sessao->idSessao;
-        if (empty($idResponsavel)) {
-            return $this->redirect()->toRoute(self::rotaAdm, array(
-                        self::stringAction => self::stringResponsaveis,
-            ));
-        }
-        unset($sessao->idSessao);
+          $grupoPessoaTipo = self::getRepositorio()->getGrupoPessoaTipoORM()->encontrarPorId($post[KleoForm::inputGrupoPessoaTipo]);
+          $grupoPessoa = new GrupoPessoa();
+          $grupoPessoa->setGrupo($grupo);
+          $grupoPessoa->setPessoa($pessoa);
+          $grupoPessoa->setGrupoPessoaTipo($grupoPessoaTipo);
+          self::getRepositorio()->getGrupoPessoaORM()->persistir($grupoPessoa);
 
-        $responsavel = $repositorioORM->getResponsavelORM()->encontrarPorId($idResponsavel);
-        $situacoes = $repositorioORM->getSituacaoORM()->encontrarTodos();
-
-        $responsavelSituacaoForm = new ResponsavelSituacaoForm('ResponsavelSituacao', $idResponsavel, $situacoes, $responsavel->getResponsavelSituacaoAtivo()->getSituacao()->getId());
-        return new ViewModel(
-                array(
-            self::stringFormulario => $responsavelSituacaoForm,
-            self::stringResponsavel => $responsavel,
-        ));
-    }
-
-    /**
-     * Ação para alterar situacao
-     * GET /admResponsavelSituacaoFinalizar
-     */
-    public function responsavelSituacaoFinalizarAction() {
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-            $repositorioORM = new RepositorioORM($this->getDoctrineORMEntityManager());
-            try {
-                $repositorioORM->iniciarTransacao();
-                $post_data = $request->getPost();
-                $responsavel = $repositorioORM->getResponsavelORM()->encontrarPorId($post_data[KleoForm::inputId]);
-
-                $gerar = false;
-                if ($responsavel->getResponsavelSituacaoAtivo()->getSituacao()->getId() !== intval($post_data[KleoForm::inputSituacao])) {
-                    $gerar = true;
-                }
-                if ($gerar) {
-                    $token = '';
-                    $intValIdSituacao = intval($post_data[KleoForm::inputSituacao]);
-                    if ($intValIdSituacao === Situacao::ativo) {
-                        $token = $responsavel->gerarToken();
-                        $responsavel->setToken($token);
-                        $repositorioORM->getResponsavelORM()->persistir($responsavel, false);
-                    }
-
-                    $responsavelSituacaoAtivo = $responsavel->getResponsavelSituacaoAtivo();
-                    $responsavelSituacaoAtivo->setDataEHoraDeInativacao();
-                    $repositorioORM->getResponsavelSituacaoORM()->persistir($responsavelSituacaoAtivo, false);
-
-                    $situacao = $repositorioORM->getSituacaoORM()->encontrarPorId($post_data[KleoForm::inputSituacao]);
-                    $responsavelSituacao = new ResponsavelSituacao();
-                    $responsavelSituacao->setResponsavel($responsavel);
-                    $responsavelSituacao->setSituacao($situacao);
-
-                    $repositorioORM->getResponsavelSituacaoORM()->persistir($responsavelSituacao);
-
-                    $emails[] = $responsavel->getEmail();
-                    $titulo = self::emailTitulo;
-                    $mensagem = '';
-
-                    if ($intValIdSituacao === Situacao::ativo) {
-                        $mensagem = '<p>Cadastro ativado</p>';
-                        $mensagem .= '<p>Usuario: ' . $responsavel->getEmail() . '</p>';
-                        $mensagem .= '<p><a href="' . self::url . 'responsavelSenhaAtualizacao/' . $token . '">Clique aqui cadastrar sua senha</a></p>';
-                    }
-                    self::enviarEmail($emails, $titulo, $mensagem);
-                    $repositorioORM->fecharTransacao();
-                } else {
-                    $repositorioORM->desfazerTransacao();
-                }
-                return $this->redirect()->toRoute(self::rotaAdm, array(
-                            self::stringAction => self::stringResponsaveis,
-                ));
-            } catch (Exception $exc) {
-                $repositorioORM->desfazerTransacao();
-                echo $exc->getMessage();
-            }
-        }
-    }
-
-    /**
-     * Formulario para ver responsavel
-     * GET /admResponsavelVer
-     */
-    public function responsavelVerAction() {
-
-        $this->getSessao();
-
-        $repositorioORM = new RepositorioORM($this->getDoctrineORMEntityManager());
-        $sessao = self::getSessao();
-        $idResponsavel = $sessao->idSessao;
-        if (empty($idResponsavel)) {
-            return $this->redirect()->toRoute(self::rotaAdm, array(
-                        self::stringAction => self::stringResponsaveis,
-            ));
-        }
-        unset($sessao->idSessao);
-
-        $responsavel = $repositorioORM->getResponsavelORM()->encontrarPorId($idResponsavel);
-
-        return new ViewModel(
-                array(
-            self::stringResponsavel => $responsavel,
-        ));
-    }
-
-    /**
-     * Tela com listagem de campanhas
-     * GET /admCampanhas
-     */
-    public function campanhasAction() {
-        $sessao = $this->getSessao();
-        $repositorioORM = new RepositorioORM($this->getDoctrineORMEntityManager());
-        if ($sessao->idResponsavel != self::idResponsavelAdmin) {
-            $campanhas = $repositorioORM->getCampanhaORM()->encontrarPorIdResponsavelEAtivos($sessao->idResponsavel);
-        }
-        if ($sessao->idResponsavel == self::idResponsavelAdmin) {
-            $campanhas = $repositorioORM->getCampanhaORM()->encontrarTodosOrdenadosPorUltimoEAtivos();
-        }
-
-        return new ViewModel(
-                array(
-            self::stringCampanhas => $campanhas,
-            'idResponsavel' => $sessao->idResponsavel,
-                )
-        );
-    }
-
-    /**
-     * Formulario para ver responsavel
-     * GET /admCampanhaVer
-     */
-    public function campanhaVerAction() {
-
-        $this->getSessao();
-
-        $repositorioORM = new RepositorioORM($this->getDoctrineORMEntityManager());
-        $sessao = self::getSessao();
-        $idCampanha = $sessao->idSessao;
-        if (empty($idCampanha)) {
-            return $this->redirect()->toRoute(self::rotaAdm, array(
-                        self::stringAction => self::stringCampanhas,
-            ));
-        }
-        unset($sessao->idSessao);
-
-        $campanha = $repositorioORM->getCampanhaORM()->encontrarPorId($idCampanha);
-
-        $myfile = fopen("public/assets/campanha_" . $campanha->getId() . ".txt", "w");
-
-        $lista = $campanha->getCampanhaLista()[0]->getLista();
-        foreach ($lista->getContato() as $contato) {
-            if ($contato->getNumero() > 0) {
-              $numero = $contato->getNumero();
-              if(substr($numero,0,2) != '55'){
-                $numero = '55' . $numero;
+          $grupoEventos = $grupo->getGrupoEventoAcima();
+          $naoMudarDataDeCadastro = false;
+          for($indice = 0;$indice <= 14;$indice++){
+            foreach($grupoEventos as $grupoEvento){
+              $diaDaSemana = date('N', strtotime('now +'.$indice.' days')); 
+              if($grupoEvento->getEvento()->getDia() == $diaDaSemana && $indice !== 0){
+                $this->cadastrarTarefa($pessoa, Tarefa::LIGAR, $indice);
+                $this->cadastrarTarefa($pessoa, Tarefa::MENSAGEM, $indice);
+                $this->cadastrarTarefa($pessoa, Tarefa::LIGAR, $indice+1);
+                $this->cadastrarTarefa($pessoa, Tarefa::MENSAGEM, $indice+2);
               }
-                fwrite($myfile, $numero . "\n");
+              if($indice === 0){
+                $diaDaSemanaMais1 = date('N', strtotime('now +'.($indice+1).' days')); 
+                if($grupoEvento->getEvento()->getDia() != $diaDaSemanaMais1){
+                  $this->cadastrarTarefa($pessoa, Tarefa::LIGAR, $indice+1);
+                }
+                $diaDaSemanaMais2 = date('N', strtotime('now +'.($indice+2).' days')); 
+                if($grupoEvento->getEvento()->getDia() != $diaDaSemanaMais2){
+                  $this->cadastrarTarefa($pessoa, Tarefa::MENSAGEM, $indice+2);
+                }
+              }
             }
+          }
+          self::getRepositorio()->fecharTransacao();
+
+          return $this->redirect()->toRoute(self::rotaAdm, array(
+            self::stringAction => self::stringIndex,
+          ));
+
+        } else {
+          self::getRepositorio()->desfazerTransacao();
+          return $this->forward()->dispatch(self::controllerAdm, array(
+            self::stringAction => self::stringIndex,
+            self::stringFormulario => $formulario,
+          ));
         }
-        fclose($myfile);
+      } catch (Exception $exc) {
+        self::getRepositorio()->desfazerTransacao();
+        echo $exc->getMessage();
+      }
+    }
+    return new ViewModel();
+  }
 
+  private function cadastrarTarefa($pessoa, $tipoTarefa, $diasAFrente) {
+    $tarefaTipo = self::getRepositorio()->getTarefaTipoORM()->encontrarPorId($tipoTarefa);
+    $naoMudarDataDeCadastro = false;
+    $dataDeCriacao = date('Y-m-d', strtotime('now +'.$diasAFrente.' days'));
+    $tarefa = new Tarefa();
+    $tarefa->setPessoa($pessoa);
+    $tarefa->setTarefaTipo($tarefaTipo);
+    $tarefa->setDataEHoraDeCriacao($dataDeCriacao);
+    self::getRepositorio()->getTarefaORM()->persistir($tarefa, $naoMudarDataDeCadastro);
+  }
 
-        return new ViewModel(
-                array(
-            self::stringCampanha => $campanha,
+  /**
+     * Muda a frequência de uma tarefa
+     * @return Json
+     */
+  public function mudarFrequenciaTarefaAction() {
+    $request = $this->getRequest();
+    $response = $this->getResponse();
+    if ($request->isPost()) {
+      try {
+        self::getRepositorio()->iniciarTransacao();
+        $naoMudarDataDeCriacao = false;
+        $post_data = $request->getPost();
+        $valor = $post_data['valor'];
+        $idTarefa = $post_data['idTarefa'];
+        $tarefa = self::getRepositorio()->getTarefaORM()->encontrarPorId($idTarefa);
+        $tarefa->setRealizada($valor);
+        self::getRepositorio()->getTarefaORM()->persistir($tarefa, $naoMudarDataDeCriacao);
+
+        self::getRepositorio()->fecharTransacao();
+        $response->setContent(Json::encode(
+          array('response' => 'true')
         ));
+      } catch (Exception $exc) {
+        $self::getRepositorio()->desfazerTransacao();
+        echo $exc->getTraceAsString();
+      }
     }
+    return $response;
+  }
 
-    /**
-     * Tela com listagem de campanha
-     * GET /admCampanha
+
+  /**
+     * Muda a frequência de uma frequencia
+     * @return Json
      */
-    public function campanhaAction() {
-        $sessao = $this->getSessao();
-        $formulario = $this->params()->fromRoute(self::stringFormulario);
+  public function mudarFrequenciaEventoAction() {
+    $request = $this->getRequest();
+    $response = $this->getResponse();
+    if ($request->isPost()) {
+      try {
+        self::getRepositorio()->iniciarTransacao();
+        $post_data = $request->getPost();
+        $valor = $post_data['valor'];
+        $idEvento = $post_data['idEvento'];
+        $idPessoa = $post_data['idPessoa'];
+        $diaRealDoEvento = $post_data['diaRealDoEvento'];
+        $diaFormatado = DateTime::createFromFormat('Y-m-d', $diaRealDoEvento);
+        $evento = self::getRepositorio()->getEventoORM()->encontrarPorId($idEvento);
+        $pessoa = self::getRepositorio()->getPessoaORM()->encontrarPorId($idPessoa);
 
-        $repositorioORM = new RepositorioORM($this->getDoctrineORMEntityManager());
-        $listas = $repositorioORM->getListaORM()->encontrarPorIdResponsavelEAtivos($sessao->idResponsavel);
-
-        if ($formulario) {
-            $cadastroCampanhaForm = $formulario;
-            $cadastroCampanhaForm->setarListas($listas);
+        $eventosFiltrado = $pessoa->getEventoFrequenciaFiltradoPorEventoEDia($idEvento, $diaRealDoEvento);
+        if ($eventosFiltrado) {
+          /* Frequencia existe */
+          $frequencia = $eventosFiltrado;
+          $frequencia->setFrequencia($valor);
+          self::getRepositorio()->getEventoFrequenciaORM()->persistir($frequencia);
         } else {
-            $cadastroCampanhaForm = new CadastroCampanhaForm('cadastroCampanha', $listas);
+          $eventoFrequencia = new EventoFrequencia();
+          $eventoFrequencia->setEvento($evento);
+          $eventoFrequencia->setPessoa($pessoa);
+          $eventoFrequencia->setFrequencia($valor);
+          $eventoFrequencia->setDia($diaFormatado);
+          self::getRepositorio()->getEventoFrequenciaORM()->persistir($eventoFrequencia);
         }
-
-        return new ViewModel(
-                array(self::stringFormulario => $cadastroCampanhaForm,)
-        );
-    }
-
-    /**
-     * Função para validar e finalizar cadastro
-     * GET /admCampanhaFinalizar
-     */
-    public function campanhaFinalizarAction() {
-        $sessao = $this->getSessao();
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-            $repositorioORM = new RepositorioORM($this->getDoctrineORMEntityManager());
-            try {
-                $repositorioORM->iniciarTransacao();
-
-                $campanha = new Campanha();
-
-                $listas = $repositorioORM->getListaORM()->encontrarPorIdResponsavelEAtivos($sessao->idResponsavel);
-                $cadastrarCampanhaForm = new CadastroCampanhaForm(null, $listas);
-                $cadastrarCampanhaForm->setInputFilter($campanha->getInputFilterCadastrarCampanha());
-
-                $post = array_merge_recursive(
-                        $request->getPost()->toArray(), $request->getFiles()->toArray()
-                );
-
-                $cadastrarCampanhaForm->setData($post);
-
-                /* validação */
-                if ($cadastrarCampanhaForm->isValid()) {
-                    $validatedData = $cadastrarCampanhaForm->getData();
-                    $campanha->exchangeArray($cadastrarCampanhaForm->getData());
-
-                    $apenasAjustarEntidade = false;
-                    $resposta = self::escreveDocumentos($campanha, $apenasAjustarEntidade);
-                    if ($resposta) {
-                        $campanha = $resposta;
-
-                        $responsavel = $repositorioORM->getResponsavelORM()->encontrarPorId($sessao->idResponsavel);
-                        $campanha->setResponsavel($responsavel);
-                        $campanha->setDataEHoraDeInativacao();
-                        $repositorioORM->getCampanhaORM()->persistir($campanha);
-
-                        $campanha = self::escreveDocumentos($campanha);
-                        $repositorioORM->getCampanhaORM()->persistir($campanha);
-
-                        $situacaoPendente = $repositorioORM->getSituacaoORM()->encontrarPorId(Situacao::agendada);
-                        $campanhaSituacao = new CampanhaSituacao();
-                        $campanhaSituacao->setCampanha($campanha);
-                        $campanhaSituacao->setSituacao($situacaoPendente);
-                        $repositorioORM->getCampanhaSituacaoORM()->persistir($campanhaSituacao);
-
-                        /* Listas de contatos */
-                        $lista = $repositorioORM->getListaORM()->encontrarPorId($validatedData[KleoForm::inputListaId]);
-                        $campanhaLista = new CampanhaLista();
-                        $campanhaLista->setCampanha($campanha);
-                        $campanhaLista->setLista($lista);
-                        $repositorioORM->getCampanhaListaORM()->persistir($campanhaLista);
-
-                        $repositorioORM->fecharTransacao();
-                        $sessao->idSessao = $campanha->getId();
-                        return $this->redirect()->toRoute(self::rotaAdm, array(
-                                    self::stringAction => 'CampanhaConfirmacao',
-                        ));
-                    }
-                } else {
-                    $repositorioORM->desfazerTransacao();
-                    return $this->forward()->dispatch(self::controllerAdm, array(
-                                self::stringAction => self::stringCampanha,
-                                self::stringFormulario => $cadastrarCampanhaForm,
-                    ));
-                }
-            } catch (Exception $exc) {
-                $repositorioORM->desfazerTransacao();
-                echo $exc->getMessage();
-            }
-        }
-        return new ViewModel();
-    }
-
-    /**
-     * Tela para confirmacao da campanha
-     * GET /admCampanhaConfirmacao
-     */
-    public function campanhaConfirmacaoAction() {
-        $sessao = $this->getSessao();
-
-        $repositorioORM = new RepositorioORM($this->getDoctrineORMEntityManager());
-
-        $idCampanha = (int) $sessao->idSessao;
-        $campanha = $repositorioORM->getCampanhaORM()->encontrarPorId($idCampanha);
-
-        return new ViewModel(
-                array(
-            self::stringCampanha => $campanha,
-                )
-        );
-    }
-
-    /**
-     * Tela para confirmacao da campanha
-     * GET /admCampanhaAtivacao
-     */
-    public function campanhaAtivacaoAction() {
-        $sessao = $this->getSessao();
-
-        $repositorioORM = new RepositorioORM($this->getDoctrineORMEntityManager());
-        try {
-            $repositorioORM->iniciarTransacao();
-
-            $idCampanha = (int) $sessao->idSessao;
-            unset($sessao->idSessao);
-            $campanha = $repositorioORM->getCampanhaORM()->encontrarPorId($idCampanha);
-            $campanha->setData_inativacao(null);
-            $campanha->setHora_inativacao(null);
-
-            $repositorioORM->getCampanhaORM()->persistir($campanha, false);
-
-            $repositorioORM->fecharTransacao();
-            return $this->redirect()->toRoute(self::rotaAdm, array(
-                        self::stringAction => self::stringCampanhas,
-            ));
-        } catch (Exception $exc) {
-            $repositorioORM->desfazerTransacao();
-            echo $exc->getMessage();
-        }
-    }
-
-    /**
-     * Formulario para alterar situacao
-     * GET /admCampanhaSituacao
-     */
-    public function campanhaSituacaoAction() {
-
-        $this->getSessao();
-
-        $repositorioORM = new RepositorioORM($this->getDoctrineORMEntityManager());
-        $sessao = self::getSessao();
-        $idSessao = $sessao->idSessao;
-        if (empty($idSessao)) {
-            return $this->redirect()->toRoute(self::rotaAdm, array(
-                        self::stringAction => self::stringCampanhas,
-            ));
-        }
-        unset($sessao->idSessao);
-
-        $campanha = $repositorioORM->getCampanhaORM()->encontrarPorId($idSessao);
-        $situacoes = $repositorioORM->getSituacaoORM()->encontrarTodos();
-
-        $campanhaSituacaoForm = new CampanhaSituacaoForm('CampanhaSituacao', $idSessao, $situacoes, $campanha->getCampanhaSituacaoAtivo()->getSituacao()->getId());
-        return new ViewModel(
-                array(
-            self::stringFormulario => $campanhaSituacaoForm,
-            self::stringCampanha => $campanha,
+        self::getRepositorio()->fecharTransacao();
+        $response->setContent(Json::encode(
+          array('response' => 'true')
         ));
+      } catch (Exception $exc) {
+        self::getRepositorio()->desfazerTransacao();
+        echo $exc->getTraceAsString();
+      }
     }
+    return $response;
+  }
 
-    /**
-     * Ação para alterar situacao
-     * GET /admCampanhaSituacaoFinalizar
-     */
-    public function campanhaSituacaoFinalizarAction() {
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-            $repositorioORM = new RepositorioORM($this->getDoctrineORMEntityManager());
-            try {
-                $repositorioORM->iniciarTransacao();
-                $post_data = $request->getPost();
-                $campanha = $repositorioORM->getCampanhaORM()->encontrarPorId($post_data[KleoForm::inputId]);
-                $intValIdSituacao = intval($post_data[KleoForm::inputSituacao]);
-
-                $gerar = false;
-                if ($campanha->getCampanhaSituacaoAtivo()->getSituacao()->getId() !== $intValIdSituacao) {
-                    $gerar = true;
-                }
-                if ($gerar) {
-
-                    $campanhaSituacaoAtivo = $campanha->getCampanhaSituacaoAtivo();
-                    $campanhaSituacaoAtivo->setDataEHoraDeInativacao();
-                    $repositorioORM->getCampanhaSituacaoORM()->persistir($campanhaSituacaoAtivo, false);
-
-                    $situacao = $repositorioORM->getSituacaoORM()->encontrarPorId($post_data[KleoForm::inputSituacao]);
-                    $campanhaSituacao = new CampanhaSituacao();
-                    $campanhaSituacao->setCampanha($campanha);
-                    $campanhaSituacao->setSituacao($situacao);
-                    $repositorioORM->getCampanhaSituacaoORM()->persistir($campanhaSituacao);
-
-                    $emails[] = $campanha->getResponsavel()->getEmail();
-                    $titulo = self::emailTitulo;
-                    $mensagem = '';
-
-                    if ($intValIdSituacao === Situacao::ativo) {
-                        $mensagem = '<p>Campanha aprovada</p>';
-                        $mensagem .= '<p>Campanha: ' . $campanha->getNome() . '</p>';
-                        $mensagem .= '<p>Data de envio: ' . $campanha->getData_envio()->format('d/m/Y') . '</p>';
-                    }
-                    self::enviarEmail($emails, $titulo, $mensagem);
-                    $repositorioORM->fecharTransacao();
-                } else {
-                    $repositorioORM->desfazerTransacao();
-                }
-                return $this->redirect()->toRoute(self::rotaAdm, array(
-                            self::stringAction => self::stringCampanhas,
-                ));
-            } catch (Exception $exc) {
-                $repositorioORM->desfazerTransacao();
-                echo $exc->getMessage();
-            }
-        }
-    }
-
-    /**
-     * Tela com listagem de contatos
-     * GET /admlistas
-     */
-    public function listasAction() {
-        $sessao = $this->getSessao();
-        $repositorioORM = new RepositorioORM($this->getDoctrineORMEntityManager());
-
-        if ($sessao->idResponsavel != self::idResponsavelAdmin) {
-            $listas = $repositorioORM->getListaORM()->encontrarPorIdResponsavelEAtivos($sessao->idResponsavel);
-        }
-
-        if ($sessao->idResponsavel == self::idResponsavelAdmin) {
-            $listas = $repositorioORM->getListaORM()->encontrarTodosOrdenadosPorUltimoEAtivos();
-        }
-
-        return new ViewModel(
-                array(
-            self::stringListas => $listas,
-            'idResponsavel' => $sessao->idResponsavel,
-                )
-        );
-    }
-
-    /**
-     * Tela com listagem de campanha
-     * GET /admlista
-     */
-    public function listaAction() {
-        $formulario = $this->params()->fromRoute(self::stringFormulario);
-
-        if ($formulario) {
-            $cadastroListaForm = $formulario;
-        } else {
-            $cadastroListaForm = new CadastroListaForm('cadastroLista');
-        }
-        return new ViewModel(
-                array(self::stringFormulario => $cadastroListaForm,)
-        );
-    }
-
-    /**
-     * Função para validar e finalizar cadastro
-     * GET /admListaFinalizar
-     */
-    public function listaFinalizarAction() {
-        $sessao = $this->getSessao();
-        set_time_limit(0);
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-            $repositorioORM = new RepositorioORM($this->getDoctrineORMEntityManager());
-            try {
-                $repositorioORM->iniciarTransacao();
-
-                $lista = new Lista();
-
-                $cadastrarListaForm = new CadastroListaForm(null);
-                $cadastrarListaForm->setInputFilter($lista->getInputFilterCadastrarLista());
-
-                $post = array_merge_recursive(
-                        $request->getPost()->toArray(), $request->getFiles()->toArray()
-                );
-
-                $cadastrarListaForm->setData($post);
-
-                /* validação */
-                if ($cadastrarListaForm->isValid()) {
-                    $validatedData = $cadastrarListaForm->getData();
-
-                    $inputDescriacao = $post[KleoForm::inputDescricao];
-                    if ($inputDescriacao != '') {
-                        if (strlen($inputDescriacao) < 3 || strlen($inputDescriacao) > 80) {
-                            $repositorioORM->desfazerTransacao();
-                            $cadastrarListaForm->get(KleoForm::inputDescricao)->setMessages(array('Descrição pode ser vazia ou de tamanho entre 3 a 80 caracteres'));
-                            return $this->forward()->dispatch(self::controllerAdm, array(
-                                        self::stringAction => self::stringLista,
-                                        self::stringFormulario => $cadastrarListaForm,
-                            ));
-                        }
-                    }
-
-                    $lista->exchangeArray($cadastrarListaForm->getData());
-
-                    $apenasAjustarEntidade = false;
-                    $resposta = self::escreveDocumentos($lista, $apenasAjustarEntidade);
-                    if (!$resposta) {
-                        $repositorioORM->desfazerTransacao();
-                        $cadastrarListaForm->get(KleoForm::inputUpload)->setMessages(array('Não é arquivo CSV'));
-                        return $this->forward()->dispatch(self::controllerAdm, array(
-                                    self::stringAction => self::stringLista,
-                                    self::stringFormulario => $cadastrarListaForm,
-                        ));
-                    }
-                    $lista = $resposta;
-
-                    $responsavel = $repositorioORM->getResponsavelORM()->encontrarPorId($sessao->idResponsavel);
-                    $lista->setResponsavel($responsavel);
-                    $repositorioORM->getListaORM()->persistir($lista);
-
-                    $lista = self::escreveDocumentos($lista);
-
-                    /* Cadastro inativado caso confirme a lista ativa ela */
-                    $lista->setDataEHoraDeInativacao();
-
-                    $repositorioORM->getListaORM()->persistir($lista);
-
-                    /* Lendo o CSV */
-                    $arquivo = file(self::url . 'assets/' . $lista->getUpload());
-                    // To check the number of lines  
-                    if ($arquivo) {
-                        if (count($arquivo) > 25000) {
-                            $repositorioORM->desfazerTransacao();
-                            $cadastrarListaForm->get(KleoForm::inputUpload)->setMessages(array('Arquivo não pode ter mais de 25 mil contatos'));
-                            return $this->forward()->dispatch(self::controllerAdm, array(
-                                        self::stringAction => self::stringLista,
-                                        self::stringFormulario => $cadastrarListaForm,
-                            ));
-                        }
-                        foreach ($arquivo as $numero) {
-                            $contato = new Contato();
-                            if (intval($numero)) {
-                                if (strlen(intval($numero)) == 11) {
-                                    $contato->setNumero($numero);
-                                } else {
-                                    $contato->setNumero(0);
-                                    $contato->setDataEHoraDeInativacao();
-                                }
-                            } else {
-                                $contato->setNumero(0);
-                                $contato->setDataEHoraDeInativacao();
-                            }
-
-                            $contato->setLista($lista);
-                            $repositorioORM->getContatoORM()->persistir($contato);
-                        }
-                    }
-
-                    $repositorioORM->fecharTransacao();
-
-                    $sessao->idSessao = $lista->getId();
-                    return $this->redirect()->toRoute(self::rotaAdm, array(
-                                self::stringAction => 'listaConfirmacao',
-                    ));
-                } else {
-                    $repositorioORM->desfazerTransacao();
-                    return $this->forward()->dispatch(self::controllerAdm, array(
-                                self::stringAction => self::stringLista,
-                                self::stringFormulario => $cadastrarListaForm,
-                    ));
-                }
-            } catch (Exception $exc) {
-                $repositorioORM->desfazerTransacao();
-                echo $exc->getMessage();
-            }
-        }
-        return new ViewModel();
-    }
-
-    /**
-     * Tela para confirmacao da lista
-     * GET /admlistaConfirmacao
-     */
-    public function listaConfirmacaoAction() {
-        $sessao = $this->getSessao();
-        set_time_limit(0);
-        $repositorioORM = new RepositorioORM($this->getDoctrineORMEntityManager());
-
-        $idLista = (int) $sessao->idSessao;
-        $lista = $repositorioORM->getListaORM()->encontrarPorId($idLista);
-
-        $numeros = array();
-        $numerosInvalidos = 0;
-        foreach ($lista->getContato() as $contato) {
-            if ($contato->verificarSeEstaAtivo()) {
-                $numeros[$contato->getNumero()] = 1;
-                foreach ($lista->getContato() as $contatoVerificacao) {
-                    if ($contato->getId() != $contatoVerificacao->getId() &&
-                            $contato->getNumero() == $contatoVerificacao->getNumero()) {
-                        $numeros[$contato->getNumero()] += 1;
-                        $contatoVerificacao->setDataEHoraDeInativacao();
-                        $repositorioORM->getContatoORM()->persistir($contatoVerificacao, false);
-                    }
-                }
-            } else {
-                if ($contato->getNumero() == 0) {
-                    $numerosInvalidos++;
-                }
-            }
-        }
-
-        $numerosDuplicados = null;
-        foreach ($numeros as $key => $valor) {
-            if ($valor > 1) {
-                /* duplicados */
-                $numerosDuplicados[$key] = $valor;
-            }
-        }
-
-        return new ViewModel(
-                array(
-            self::stringLista => $lista,
-            'numerosDuplicados' => $numerosDuplicados,
-            'numerosInvalidos' => $numerosInvalidos,
-                )
-        );
-    }
-
-    /**
-     * Tela para confirmacao da lista
-     * GET /admlistaAtivacao
-     */
-    public function listaAtivacaoAction() {
-        $sessao = $this->getSessao();
-
-        $repositorioORM = new RepositorioORM($this->getDoctrineORMEntityManager());
-        try {
-            $repositorioORM->iniciarTransacao();
-
-            $idLista = (int) $sessao->idSessao;
-            unset($sessao->idSessao);
-            $lista = $repositorioORM->getListaORM()->encontrarPorId($idLista);
-            $lista->setData_inativacao(null);
-            $lista->setHora_inativacao(null);
-
-            $repositorioORM->getListaORM()->persistir($lista, false);
-
-            $repositorioORM->fecharTransacao();
-            return $this->redirect()->toRoute(self::rotaAdm, array(
-                        self::stringAction => self::stringListas,
-            ));
-        } catch (Exception $exc) {
-            $repositorioORM->desfazerTransacao();
-            echo $exc->getMessage();
-        }
-    }
-
-    /**
-     * Função para excluir lista
-     * GET /admListaExcluir
-     */
-    public function listaExcluirAction() {
-        $sessao = $this->getSessao();
-        $request = $this->getRequest();
-
-        $repositorioORM = new RepositorioORM($this->getDoctrineORMEntityManager());
-        try {
-            $repositorioORM->iniciarTransacao();
-
-            $idLista = (int) $sessao->idSessao;
-            $listaParaExcluir = $repositorioORM->getListaORM()->encontrarPorId($idLista);
-            $listaParaExcluir->setDataEHoraDeInativacao();
-
-            $repositorioORM->getListaORM()->persistir($listaParaExcluir, false);
-
-            $repositorioORM->fecharTransacao();
-            return $this->redirect()->toRoute(self::rotaAdm, array(
-                        self::stringAction => self::stringListas,
-            ));
-        } catch (Exception $exc) {
-            $repositorioORM->desfazerTransacao();
-            echo $exc->getMessage();
-        }
-    }
-
-    /**
-     * Função padrão, traz a tela principal
-     * GET /admcontaCorrente
-     */
-    public function contaCorrenteAction() {
-        $repositorioORM = new RepositorioORM($this->getDoctrineORMEntityManager());
-        $responsaveis = $repositorioORM->getResponsavelORM()->encontrarTodos();
-        return new ViewModel(
-                array(
-            self::stringResponsaveis => $responsaveis,
-                )
-        );
-    }
-
-    /**
-     * Formulario para ver responsavel
-     * GET /admExtrato
-     */
-    public function extratoAction() {
-        $sessao = self::getSessao();
-        $idResponsavel = $sessao->idSessao;
-        if (empty($idResponsavel)) {
-            return $this->redirect()->toRoute(self::rotaAdm, array(
-                        self::stringAction => 'ContaCorrente',
-            ));
-        }
-
-        $repositorioORM = new RepositorioORM($this->getDoctrineORMEntityManager());
-        unset($sessao->idSessao);
-
-        $responsavel = $repositorioORM->getResponsavelORM()->encontrarPorId($idResponsavel);
-
-        return new ViewModel(
-                array(
-            self::stringResponsavel => $responsavel,
-        ));
-    }
-
-    /**
-     * Tela com cadastro de credito
-     * GET /admTransferencia
-     */
-    public function transferenciaAction() {
-        $sessao = self::getSessao();
-
-        $formulario = $this->params()->fromRoute(self::stringFormulario);
-        $repositorioORM = new RepositorioORM($this->getDoctrineORMEntityManager());
-
-        if ($formulario) {
-            $transferenciaForm = $formulario;
-            $idResponsavel = $transferenciaForm->get(KleoForm::inputId)->getValue();
-            $responsavel = $repositorioORM->getResponsavelORM()->encontrarPorId($idResponsavel);
-        } else {
-            $idResponsavel = $sessao->idSessao;
-            if (empty($idResponsavel)) {
-                return $this->redirect()->toRoute(self::rotaAdm, array(
-                            self::stringAction => 'ContaCorrente',
-                ));
-            }
-            unset($sessao->idSessao);
-            $responsavel = $repositorioORM->getResponsavelORM()->encontrarPorId($idResponsavel);
-            $transferenciaForm = new TransferenciaForm('transferencia', $responsavel);
-        }
-
-        return new ViewModel(
-                array(
-            self::stringFormulario => $transferenciaForm,
-            self::stringResponsavel => $responsavel,
-                )
-        );
-    }
-
-    /**
-     * Finalizando o cadastro de credito 
-     * GET /admTransferenciaFinalizar
-     */
-    public function transferenciaFinalizarAction() {
-        $sessao = $this->getSessao();
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-            $repositorioORM = new RepositorioORM($this->getDoctrineORMEntityManager());
-            try {
-                $repositorioORM->iniciarTransacao();
-
-                $post_data = $request->getPost();
-                $contaCorrente = new ContaCorrente();
-
-                $responsavel = $repositorioORM->getResponsavelORM()->encontrarPorId($post_data[KleoForm::inputId]);
-
-                $transferenciaForm = new TransferenciaForm(null, $responsavel);
-                $transferenciaForm->setInputFilter($contaCorrente->getInputFilterTransferencia());
-
-                $transferenciaForm->setData($post_data);
-
-                /* validação */
-                if ($transferenciaForm->isValid()) {
-                    $validatedData = $transferenciaForm->getData();
-                    $contaCorrente->exchangeArray($validatedData);
-
-                    $contaCorrente->setResponsavel($responsavel);
-                    $repositorioORM->getContaCorrenteORM()->persistir($contaCorrente);
-
-                    $repositorioORM->fecharTransacao();
-                    return $this->redirect()->toRoute(self::rotaAdm, array(
-                                self::stringAction => 'ContaCorrente',
-                    ));
-                } else {
-                    $repositorioORM->desfazerTransacao();
-                    return $this->forward()->dispatch(self::controllerAdm, array(
-                                self::stringAction => 'Transferencia',
-                                self::stringFormulario => $transferenciaForm,
-                    ));
-                }
-            } catch (Exception $exc) {
-                $repositorioORM->desfazerTransacao();
-                echo $exc->getMessage();
-            }
-        }
-        return new ViewModel();
-    }
-
-    public function creditoAction() {
-        return new ViewModel();
-    }
-
-    public function solicitarCreditoAction() {
-        $sessao = $this->getSessao();
-        $repositorioORM = new RepositorioORM($this->getDoctrineORMEntityManager());
-        $responsavel = $repositorioORM->getResponsavelORM()->encontrarPorId($sessao->idResponsavel);
-
-        $valor = 0;
-        $creditos = 0;
-        switch ($sessao->idSessao) {
-            case 1:
-                $valor = 0.091;
-                $creditos = 5000;
-                break;
-            case 2:
-                $valor = 0.089;
-                $creditos = 10000;
-                break;
-            case 3:
-                $valor = 0.085;
-                $creditos = 30000;
-                break;
-            case 4:
-                $valor = 0.065;
-                $creditos = 50000;
-                break;
-            case 5:
-                $valor = 0.055;
-                $creditos = 100000;
-                break;
-            case 6:
-                $valor = 0.042;
-                $creditos = 300000;
-                break;
-        }
-
-
-        $emails[] = self::emailLeo;
-        $emails[] = self::emailKort;
-        $emails[] = self::emailSilverio;
-        $titulo = 'Solicitacao de creditos';
-        $mensagem .= '<p>Id ' . $responsavel->getId() . '</p>';
-        $mensagem .= '<p>Empresa ' . $responsavel->getNomeEmpresa() . '</p>';
-        $mensagem .= '<p>Resposavel ' . $responsavel->getNome() . '</p>';
-        $mensagem .= '<p>Telefone <a href="tel:' . $responsavel->getTelefone() . '">' . $responsavel->getTelefone() . '</a></p>';
-        $mensagem .= '<p>Email ' . $responsavel->getEmail() . '</p>';
-        $mensagem .= '<p>Creditos ' . $creditos . '</p>';
-        $mensagem .= '<p>Valor ' . $valor . '</p>';
-
-        self::enviarEmail($emails, $titulo, $mensagem);
-
-        return new ViewModel();
-    }
-
-    /**
-     * Tela com listagem de bots
-     * GET /admbots
-     */
-    public function botsAction() {
-        $sessao = $this->getSessao();
-        $repositorioORM = new RepositorioORM($this->getDoctrineORMEntityManager());
-
-        if ($sessao->idResponsavel != self::idResponsavelAdmin) {
-            $bots = $repositorioORM->getBotORM()->encontrarPorIdResponsavelEAtivos($sessao->idResponsavel);
-        }
-
-        if ($sessao->idResponsavel == self::idResponsavelAdmin) {
-            $bots = $repositorioORM->getBotORM()->encontrarTodosOrdenadosPorUltimoEAtivos();
-        }
-
-        return new ViewModel(
-                array(
-            self::stringBots => $bots,
-            'idResponsavel' => $sessao->idResponsavel,
-                )
-        );
-    }
-
-    /**
-     * Tela com listagem de campanha
-     * GET /admbot
-     */
-    public function botAction() {
-        $formulario = $this->params()->fromRoute(self::stringFormulario);
-
-        if ($formulario) {
-            $cadastroBotForm = $formulario;
-        } else {
-            $cadastroBotForm = new CadastroBotForm('cadastroBot');
-        }
-        return new ViewModel(
-                array(self::stringFormulario => $cadastroBotForm,)
-        );
-    }
-
-    /**
-     * Função para validar e finalizar cadastro
-     * GET /admbotFinalizar
-     */
-    public function botFinalizarAction() {
-        $sessao = $this->getSessao();
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-            $repositorioORM = new RepositorioORM($this->getDoctrineORMEntityManager());
-            try {
-                $repositorioORM->iniciarTransacao();
-
-                $bot = new Bot();
-
-                $cadastrarBotForm = new CadastroBotForm(null);
-                $cadastrarBotForm->setInputFilter($bot->getInputFilterCadastrarBot());
-
-                $post_data = $request->getPost();
-                $cadastrarBotForm->setData($post_data);
-
-                /* validação */
-                if ($cadastrarBotForm->isValid()) {
-                    $validatedData = $cadastrarBotForm->getData();
-
-                    $bot->exchangeArray($validatedData);
-
-                    $responsavel = $repositorioORM->getResponsavelORM()->encontrarPorId($sessao->idResponsavel);
-                    $bot->setResponsavel($responsavel);
-                    $bot->setDataEHoraDeInativacao();
-                    $repositorioORM->getBotORM()->persistir($bot);
-
-                    for ($indice = 1; $indice <= 3; $indice++) {
-                        $botOpcao = new BotOpcao();
-                        $botOpcao->setBot($bot);
-                        $botOpcao->setTitulo($post_data[KleoForm::inputTitulo . $indice]);
-                        $botOpcao->setResposta($post_data[KleoForm::inputResposta . $indice]);
-                        $repositorioORM->getBotOpcaoORM()->persistir($botOpcao);
-                    }
-
-                    $repositorioORM->fecharTransacao();
-
-                    $sessao->idSessao = $bot->getId();
-                    return $this->redirect()->toRoute(self::rotaAdm, array(
-                                self::stringAction => 'botConfirmacao',
-                    ));
-                } else {
-                    $repositorioORM->desfazerTransacao();
-                    return $this->forward()->dispatch(self::controllerAdm, array(
-                                self::stringAction => self::stringBot,
-                                self::stringFormulario => $cadastrarBotForm,
-                    ));
-                }
-            } catch (Exception $exc) {
-                $repositorioORM->desfazerTransacao();
-                echo $exc->getMessage();
-            }
-        }
-        return new ViewModel();
-    }
-
-    /**
-     * Tela para confirmacao da bot
-     * GET /admbotConfirmacao
-     */
-    public function botConfirmacaoAction() {
-        $sessao = $this->getSessao();
-        $repositorioORM = new RepositorioORM($this->getDoctrineORMEntityManager());
-
-        $id = (int) $sessao->idSessao;
-        $bot = $repositorioORM->getBotORM()->encontrarPorId($id);
-
-        return new ViewModel(array(self::stringBot => $bot,));
-    }
-
-    /**
-     * Tela para confirmacao do bot
-     * GET /admbotAtivacao
-     */
-    public function botAtivacaoAction() {
-        $sessao = $this->getSessao();
-
-        $repositorioORM = new RepositorioORM($this->getDoctrineORMEntityManager());
-        try {
-            $repositorioORM->iniciarTransacao();
-
-            $id = (int) $sessao->idSessao;
-            unset($sessao->idSessao);
-            $bot = $repositorioORM->getBotORM()->encontrarPorId($id);
-            $bot->setData_inativacao(null);
-            $bot->setHora_inativacao(null);
-
-            $repositorioORM->getBotORM()->persistir($bot, false);
-
-            $repositorioORM->fecharTransacao();
-            return $this->redirect()->toRoute(self::rotaAdm, array(
-                        self::stringAction => self::stringBots,
-            ));
-        } catch (Exception $exc) {
-            $repositorioORM->desfazerTransacao();
-            echo $exc->getMessage();
-        }
-    }
-
-    /**
-     * Função para excluir bot
-     * GET /admbotExcluir
-     */
-    public function botExcluirAction() {
-        $sessao = $this->getSessao();
-
-        $repositorioORM = new RepositorioORM($this->getDoctrineORMEntityManager());
-        try {
-            $repositorioORM->iniciarTransacao();
-
-            $id = (int) $sessao->idSessao;
-            $botParaExcluir = $repositorioORM->getBotORM()->encontrarPorId($id);
-            $botParaExcluir->setDataEHoraDeInativacao();
-
-            $repositorioORM->getBotORM()->persistir($botParaExcluir, false);
-
-            $repositorioORM->fecharTransacao();
-            return $this->redirect()->toRoute(self::rotaAdm, array(
-                        self::stringAction => self::stringBots,
-            ));
-        } catch (Exception $exc) {
-            $repositorioORM->desfazerTransacao();
-            echo $exc->getMessage();
-        }
-    }
-
-    /**
+  /**
      * Função que direciona a tela de acesso
      * GET /sair
      */
-    public function sairAction() {
-        /* Fechando a sessão */
-        $sessao = $this->getSessao();
-        $sessao->getManager()->destroy();
+  public function sairAction() {
+    /* Fechando a sessão */
+    $sessao = $this->getSessao();
+    $sessao->getManager()->destroy();
 
-        /* Redirecionamento */
-        return $this->redirect()->toRoute(self::rotaPub, array(
-                    self::stringAction => self::stringLogin,
-        ));
+    /* Redirecionamento */
+    return $this->redirect()->toRoute(self::rotaPub, array(
+      self::stringAction => self::stringLogin,
+    ));
+  }
+
+  public function getGrupo() {
+    if (!$this->grupo) {
+      $sessao = self::getSessao();
+      $pessoaLogada = self::getRepositorio()->getPessoaORM()->encontrarPorId($sessao->idPessoa);
+      $this->grupo = $pessoaLogada->getResponsabilidadesAtivas()[0]->getGrupo();
     }
+    return $this->grupo;
+  }
 
 }

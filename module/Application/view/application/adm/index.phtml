@@ -1,3 +1,164 @@
-<h1>
-  index logado
-</h1>
+<?php
+use Application\Model\Entity\Tarefa;
+use Application\Model\Entity\Evento;
+use Application\Model\Entity\GrupoPessoaTipo;
+use Application\Form\KleoForm;
+use Application\View\Helper\Botao;
+
+$formulario = $this->formulario;
+
+?>
+<!-- Panel -->
+<div class="panel">
+  <div class="panel-heading">
+    <h2 class="panel-title bg-blue-600 white">
+      <?php echo date('D').'<br />'.date('F d'); ?>
+    </h2>
+  </div>
+  <div class="panel-body">
+    <table class='table table-sm'>
+      <tbody>
+        <?php for($j = 0;$j <= 14;$j++){?>
+        <tr>
+          <td>
+            <p>
+              <?php 
+  echo date('D', strtotime('now +'.$j.' days')); 
+  echo '<br />' . date('d', strtotime('now +'.$j.' days')); 
+              ?>
+            </p>
+          </td>
+          <td>
+            <?php
+  if($this->agenda[$j][0] instanceof Tarefa || $this->agenda[$j][0] instanceof Evento){
+    foreach($this->agenda[$j] as $elemento){
+      if($elemento instanceof Tarefa){
+        if($elemento->getTarefaTipo()->getId() === Tarefa::LIGAR){
+          $corTarefa = 'info';
+          $icone = 'fa-phone';
+        }
+        if($elemento->getTarefaTipo()->getId() === Tarefa::MENSAGEM){
+          $corTarefa = 'success';
+          $icone = 'fa-envelope';
+        }
+        $iconeTarefaRealizada = 'down';
+        $corTarefaRealizada = 'default';
+        if($elemento->getRealizada() === "S"){
+          $iconeTarefaRealizada = 'up';
+          $corTarefaRealizada = 'primary';
+        }
+            ?>
+            <div class="row">
+              <div class="alert alert-icon alert-<?php echo $corTarefa; ?> w-full" role="alert">
+                <i class="icon <?php echo $icone; ?>" aria-hidden="true"></i>
+                <?php echo $elemento->getTarefaTipo()->getNome() . ' para ' . $elemento->getPessoa()->getNome(); ?>
+                <button id="botao_<?php echo $elemento->getId(); ?>" 
+                        onclick="mudarFrequencia(1, <?php echo $elemento->getId(); ?>,0,0,0);" 
+                        type="button" class="float-right btn btn-sm btn-<?php echo $corTarefaRealizada; ?>" >
+                  <i class="icon fa-thumbs-<?php echo $iconeTarefaRealizada; ?>" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+            <?php
+      }
+      if($elemento instanceof Evento){
+            ?>
+            <div class="row">
+              <div class="alert alert-danger w-full" role="alert">
+                <?php 
+        echo $elemento->getNome(); 
+        if($this->grupoPessoas){
+          foreach($this->grupoPessoas as $grupoPessoa){
+            echo '<p>'.$grupoPessoa->getPessoa()->getNome();
+            $diaRealDoEvento = date('Y-m-d', strtotime('now +'.$j.' days'));
+            $eventosFiltrado = $grupoPessoa->getPessoa()->getEventoFrequenciaFiltradoPorEventoEDia($elemento->getId(), $diaRealDoEvento);
+            $iconeTarefaRealizada = 'down';
+            $corTarefaRealizada = 'default';
+            if($eventosFiltrado){
+              if($eventosFiltrado->getFrequencia() === "S"){
+                $iconeTarefaRealizada = 'up';
+                $corTarefaRealizada = 'primary';
+              }  
+            }
+
+                ?>
+                <button id="botao_<?php echo $elemento->getId().'_'.$grupoPessoa->getPessoa()->getId(); ?>" 
+                        onclick="mudarFrequencia(2,0, <?php echo $elemento->getId() . ',' . $grupoPessoa->getPessoa()->getId() . ', \'' .  $diaRealDoEvento . '\'' ?>);"
+                        type="button" class="float-right btn btn-sm btn-<?php echo $corTarefaRealizada; ?>" >
+                  <i class="icon fa-thumbs-<?php echo $iconeTarefaRealizada; ?>" aria-hidden="true"></i>
+                </button>
+                <?php
+            echo '</p>';
+          }
+        }
+                ?>
+              </div>
+            </div>
+            <?php
+      }
+    }
+    /* fim foreach */
+  }else{
+    echo $this->agenda[$j][0];
+  }
+
+            ?>
+          </td>
+        </tr>
+        <?php } ?>
+      </tbody>
+    </table>
+  </div>
+</div>
+<!-- Site Action -->
+<div id="divSiteAction" class="site-action" data-plugin="actionBtn">
+  <button onclick="$('#divSiteAction').toggleClass('active');" type="button" class="site-action-toggle btn-raised btn btn-success btn-floating">
+    <i class="front-icon wb-plus animation-scale-up" aria-hidden="true"></i>
+    <i class="back-icon wb-close animation-scale-up" aria-hidden="true"></i>
+  </button>
+  <div class="site-action-buttons">
+    <button onclick="$('#inputGrupoPessoaTipo').val(<?php echo GrupoPessoaTipo::PONTE; ?>);" type="button" data-toggle="modal" data-target="#addStageFrom" class="btn-raised btn btn-success btn-floating animation-slide-bottom">
+      <i class="icon wb-users" aria-hidden="true"></i>
+    </button>
+    <button onclick="$('#inputGrupoPessoaTipo').val(<?php echo GrupoPessoaTipo::PROSPECTO; ?>);" type="button" data-toggle="modal" data-target="#addStageFrom" class="btn-raised btn btn-success btn-floating animation-slide-bottom">
+      <i class="icon wb-user-add" aria-hidden="true"></i>
+    </button>
+  </div>
+</div>
+<!-- End Site Action -->
+<?php
+$formulario->prepare();
+
+$formulario->setAttribute(KleoForm::stringAction, 'admPonteProspectoFinalizar');
+echo $this->form()->openTag($formulario);
+echo $this->formHidden($formulario->get(KleoForm::inputCSRF));
+echo $this->formHidden($formulario->get(KleoForm::inputGrupoPessoaTipo));
+?>
+<div class="modal fade" id="addStageFrom" aria-hidden="true" aria-labelledby="addStageFrom"
+     role="dialog" tabindex="-1">
+  <div class="modal-dialog modal-simple">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" aria-hidden="true" data-dismiss="modal">×</button>
+        <h4 class="modal-title">Nova Pessoa</h4>
+      </div>
+      <div class="modal-body">
+        <form action="#" method="post" role="form">
+          <?php 
+          echo $this->inputFormulario(KleoForm::traducaoNome, $formulario->get(KleoForm::inputNome)); 
+          echo $this->inputFormulario(KleoForm::traducaoTelefone, $formulario->get(KleoForm::inputTelefone)); 
+          ?>
+        </form>
+      </div>
+      <div class="modal-footer text-left">
+        <?php  
+        echo $this->botao('Cadastrar', $this->funcaoOnClick('submeterFormulario(this.form)')); 
+        echo $this->botao('Cancelar', 'data-dismiss="modal"',Botao::botaoSecundario); 
+        ?>
+      </div>
+    </div>
+  </div>
+</div>
+<?php
+echo $this->form()->closeTag();
+

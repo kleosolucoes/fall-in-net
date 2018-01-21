@@ -10,10 +10,12 @@ class Botao extends AbstractHelper {
     private $label;
     private $extra;
     private $tipoBotao;
+    const botaoPrimario = 1;
+    const botaoSecundario = 2;
     public function __construct() {
         
     }
-    public function __invoke($label, $extra = '', $tipoBotao = 1) {
+    public function __invoke($label, $extra = '', $tipoBotao = Botao::botaoPrimario) {
         $this->setLabel($label);
         $this->setExtra($extra);
         $this->setTipoBotao($tipoBotao);
@@ -21,8 +23,8 @@ class Botao extends AbstractHelper {
     }
     public function renderHtml() {
         $html = '';
-        $classCor = 'info';
-        if($this->getTipoBotao() === 2){
+        $classCor = 'primary';
+        if($this->getTipoBotao() === Botao::botaoSecundario){
             $classCor = 'default';
         }
         $html .= '<button style="margin-left:10px; padding: 10px;" type="button" ' . $this->getExtra() . ' class="btn btn-' . $classCor . ' pull-right ml10">';

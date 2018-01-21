@@ -1,5 +1,3 @@
-
-
 function validacoesFormulario(campo){
   var temErro = false;
   var mensagemDeErro = '';
@@ -66,11 +64,12 @@ function validacoesFormulario(campo){
       break;
     default: break;
   }
-
   if(temErro){
     escreveMensagemDeErro(campo.id, mensagemDeErro);
+    return true;
   }else{
     limpaAMensagemDeErro(campo.id);
+    return false;
   }
 
 }
@@ -81,10 +80,14 @@ function escreveMensagemDeErro(id, mensagem){
       '</small></p>';
   var idDiv = 'mensagemErro' + id;
   document.getElementById(idDiv).innerHTML = html;
+  document.getElementById(id).classList.remove("is-valid");
+  document.getElementById(id).classList.add("is-invalid");
 }
 
 function limpaAMensagemDeErro(id){
   var html = '';
   var idDiv = 'mensagemErro' + id;
   document.getElementById(idDiv).innerHTML = html;
+  document.getElementById(id).classList.add("is-valid");
+  document.getElementById(id).classList.remove("is-invalid");
 }
