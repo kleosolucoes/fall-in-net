@@ -133,6 +133,115 @@ class KleoController extends AbstractActionController {
     }
   }
 
+  public static function diaDaSemanaPorDia($dia, $tipo = 0) {
+    $resposta = '';
+    switch ($dia) {
+      case 1:$resposta = 'SEG';
+        if ($tipo == 1) {
+          $resposta = 'SEGUNDA-FEIRA';
+        }
+        break;
+      case 2:$resposta = 'TER';
+        if ($tipo == 1) {
+          $resposta = 'TERÇA-FEIRA';
+        }
+        break;
+      case 3:$resposta = 'QUA';
+        if ($tipo == 1) {
+          $resposta = 'QUARTA-FEIRA';
+        }
+        break;
+      case 4:$resposta = 'QUI';
+        if ($tipo == 1) {
+          $resposta = 'QUINTA-FEIRA';
+        }
+        break;
+      case 5:$resposta = 'SEX';
+        if ($tipo == 1) {
+          $resposta = 'SEXTA-FEIRA';
+        }
+        break;
+      case 6:$resposta = 'SÁB';
+        if ($tipo == 1) {
+          $resposta = 'SÁBADO';
+        }
+        break;
+      case 7:$resposta = 'DOM';
+        if ($tipo == 1) {
+          $resposta = 'DOMINGO';
+        }
+        break;
+    }
+    return $resposta;
+  }
+
+  public static function mesPorExtenso($mes, $tipo = 0) {
+    $resposta = '';
+    switch ($mes) {
+      case 1:$resposta = 'JAN';
+        if ($tipo == 1) {
+          $resposta = 'JANEIRO';
+        }
+        break;
+      case 2:$resposta = 'FEV';
+        if ($tipo == 1) {
+          $resposta = 'FEVEREIRO';
+        }
+        break;
+      case 3:$resposta = 'MAR';
+        if ($tipo == 1) {
+          $resposta = 'MARÇO';
+        }
+        break;
+      case 4:$resposta = 'ABR';
+        if ($tipo == 1) {
+          $resposta = 'ABRIL';
+        }
+        break;
+      case 5:$resposta = 'MAI';
+        if ($tipo == 1) {
+          $resposta = 'MAIO';
+        }
+        break;
+      case 6:$resposta = 'JUN';
+        if ($tipo == 1) {
+          $resposta = 'JUNHO';
+        }
+        break;
+      case 7:$resposta = 'JUL';
+        if ($tipo == 1) {
+          $resposta = 'JULHO';
+        }
+        break;
+      case 8:$resposta = 'AGO';
+        if ($tipo == 1) {
+          $resposta = 'AGOSTO';
+        }
+        break;
+      case 9:$resposta = 'SET';
+        if ($tipo == 1) {
+          $resposta = 'SETEMBRO';
+        }
+        break;
+      case 10:$resposta = 'OUT';
+        if ($tipo == 1) {
+          $resposta = 'OUTUBRO';
+        }
+        break;
+      case 11:$resposta = 'NOV';
+        if ($tipo == 1) {
+          $resposta = 'NOVEMBRO';
+        }
+        break;
+      case 12:$resposta = 'DEZ';
+        if ($tipo == 1) {
+          $resposta = 'DEZEMBRO';
+        }
+        break;
+    }
+    return $resposta;
+  }
+
   /**
      * Recupera ORM
      * @return EntityManager

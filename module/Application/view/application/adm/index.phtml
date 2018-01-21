@@ -3,6 +3,7 @@ use Application\Model\Entity\Tarefa;
 use Application\Model\Entity\Evento;
 use Application\Model\Entity\GrupoPessoaTipo;
 use Application\Form\KleoForm;
+use Application\Controller\KleoController;
 use Application\View\Helper\Botao;
 
 $formulario = $this->formulario;
@@ -12,18 +13,24 @@ $formulario = $this->formulario;
 <div class="panel">
   <div class="panel-heading">
     <h2 class="panel-title bg-blue-600 white">
-      <?php echo date('D').'<br />'.date('F d'); ?>
+      <?php 
+      echo KleoController::diaDaSemanaPorDia(date('N'),1).'<br />';
+      echo KleoController::mesPorExtenso(date('m'),1).' '. date('d'); ?>
     </h2>
   </div>
   <div class="panel-body">
     <table class='table table-sm'>
       <tbody>
-        <?php for($j = 0;$j <= 14;$j++){?>
+        <?php for($j = 0;$j <= 14;$j++){
+  if(date('d', strtotime('now +'.$j.' days')) == 1){
+    echo '<tr class="bg-primary text-center"><td colspan="2"><p>'.KleoController::mesPorExtenso(date('m', strtotime('now +'.$j.' days')),1).'</p></td></tr>';       
+  }
+        ?>
         <tr>
           <td>
             <p>
               <?php 
-  echo date('D', strtotime('now +'.$j.' days')); 
+  echo KleoController::diaDaSemanaPorDia(date('N', strtotime('now +'.$j.' days'))); 
   echo '<br />' . date('d', strtotime('now +'.$j.' days')); 
               ?>
             </p>

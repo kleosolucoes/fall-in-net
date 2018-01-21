@@ -247,7 +247,7 @@ class AdmController extends KleoController {
 
   /**
      * Função que direciona a tela de acesso
-     * GET /sair
+     * GET /admSair
      */
   public function sairAction() {
     /* Fechando a sessão */
