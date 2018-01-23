@@ -64,10 +64,10 @@ class Pessoa extends \Application\Model\Entity\Pessoa implements \Doctrine\ORM\P
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'inputFilter', 'inputFilterCadastrarPonteProspecto', 'grupoResponsavel', 'eventoFrequencia', 'grupoPessoa', 'pessoaHierarquia', 'tarefa', 'nome', 'telefone', 'email', 'senha', 'id', 'data_criacao', 'hora_criacao', 'data_inativacao', 'hora_inativacao');
+            return array('__isInitialized__', 'inputFilter', 'inputFilterCadastrarPonteProspecto', 'grupoResponsavel', 'eventoFrequencia', 'grupoPessoa', 'pessoaHierarquia', 'tarefa', 'ponteProspectoProspectos', 'ponteProspectoPonte', 'nome', 'telefone', 'email', 'senha', 'id', 'data_criacao', 'hora_criacao', 'data_inativacao', 'hora_inativacao');
         }
 
-        return array('__isInitialized__', 'inputFilter', 'inputFilterCadastrarPonteProspecto', 'grupoResponsavel', 'eventoFrequencia', 'grupoPessoa', 'pessoaHierarquia', 'tarefa', 'nome', 'telefone', 'email', 'senha', 'id', 'data_criacao', 'hora_criacao', 'data_inativacao', 'hora_inativacao');
+        return array('__isInitialized__', 'inputFilter', 'inputFilterCadastrarPonteProspecto', 'grupoResponsavel', 'eventoFrequencia', 'grupoPessoa', 'pessoaHierarquia', 'tarefa', 'ponteProspectoProspectos', 'ponteProspectoPonte', 'nome', 'telefone', 'email', 'senha', 'id', 'data_criacao', 'hora_criacao', 'data_inativacao', 'hora_inativacao');
     }
 
     /**
@@ -176,23 +176,23 @@ class Pessoa extends \Application\Model\Entity\Pessoa implements \Doctrine\ORM\P
     /**
      * {@inheritDoc}
      */
-    public function exchangeArray($data)
+    public function exchangeArray($data, $nomeFromulario = '')
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'exchangeArray', array($data));
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'exchangeArray', array($data, $nomeFromulario));
 
-        return parent::exchangeArray($data);
+        return parent::exchangeArray($data, $nomeFromulario);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getInputFilterCadastrarPonteProspecto()
+    public function getInputFilterCadastrarPonteProspecto($nomeFormulario)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getInputFilterCadastrarPonteProspecto', array());
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getInputFilterCadastrarPonteProspecto', array($nomeFormulario));
 
-        return parent::getInputFilterCadastrarPonteProspecto();
+        return parent::getInputFilterCadastrarPonteProspecto($nomeFormulario);
     }
 
     /**

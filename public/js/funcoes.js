@@ -31,7 +31,7 @@ function mudarPaginaComLoader(url) {
 
 function submeterFormulario(form) {
   var temErros = false;
-  var inputs = document.getElementsByTagName("input");
+  var inputs = form.elements;
   var i;
   for (i = 0; i < inputs.length; i++) {
     if(inputs[i].type == 'text' ||
@@ -61,6 +61,8 @@ $(window).bind("load", function () {
   $('.splash').css('display', 'none')
 });
 
+var tipoTarefa = 1;
+var tipoFrequencia = 2;
 function mudarFrequencia(tipo, idTarefa, idEvento, idPessoa, diaRealDoEvento) {
   var faThumbsDown = 'fa-thumbs-down';
   var faThumbsUp = 'fa-thumbs-up';
@@ -71,9 +73,7 @@ function mudarFrequencia(tipo, idTarefa, idEvento, idPessoa, diaRealDoEvento) {
   var btnDefault = 'btn-default';
   var btnSuccess = 'btn-primary';
   var btnTransicao = 'btn-default';
-  var tipoTarefa = 1;
-  var tipoFrequencia = 2;
-   var botao;
+  var botao;
   if(tipo === tipoTarefa){
     botao = $('#botao_' + idTarefa);
   }
@@ -127,4 +127,19 @@ function mudarFrequencia(tipo, idTarefa, idEvento, idPessoa, diaRealDoEvento) {
         botao.removeClass(disabled);
       }
     }, 'json');
+}
+var tipoPonte = 1;
+var tipoProspecto = 2;
+var hidden = 'hidden';
+function selecionarPonteProspecto(tipo){
+  var divFormularioPonte = $('#divFormularioPonte');
+  var divFormularioProspecto = $('#divFormularioProspecto'); 
+  if(tipo === tipoPonte){
+    divFormularioPonte.css("display", "block");
+    divFormularioProspecto.css("display", "none");
+  }
+  if(tipo === tipoProspecto){
+    divFormularioPonte.css("display", "none");
+    divFormularioProspecto.css("display", "block");
+  }
 }

@@ -28,6 +28,7 @@ class RepositorioORM {
     private $_eventoFrequenciaORM;
     private $_tarefaTipoORM;
     private $_tarefaORM;
+    private $_ponteProspectoORM;
 
     /**
      * Contrutor
@@ -190,6 +191,17 @@ class RepositorioORM {
             $this->_tarefaORM = new KleoORM($this->getDoctrineORMEntityManager(), 'Application\Model\Entity\Tarefa');
         }
         return $this->_tarefaORM;
+    }
+  
+   /**
+     * Metodo public para obter a instancia do PonteProspectoORM
+     * @return CircuitoORM
+     */
+    public function getPonteProspectoORM() {
+        if (is_null($this->_ponteProspectoORM)) {
+            $this->_ponteProspectoORM = new KleoORM($this->getDoctrineORMEntityManager(), 'Application\Model\Entity\PonteProspecto');
+        }
+        return $this->_ponteProspectoORM;
     }
     
     /**

@@ -17,6 +17,7 @@ class KleoForm extends Form {
   const inputNome = 'inputNome';
   const inputTelefone = 'inputTelefone';
   const inputGrupoPessoaTipo = 'inputGrupoPessoaTipo';
+  const inputPonte = 'inputPonte';
   const inputEmail = 'inputEmail';
   const inputRepetirEmail = 'inputRepetirEmail';
   const inputSenha = 'inputSenha';
@@ -32,6 +33,7 @@ class KleoForm extends Form {
   const stringPlaceholder = 'placeholder';
   const stringAction = 'action';
   const stringRequired = 'required';
+  const stringDisabled = 'disabled';
   const stringValue = 'value';
   const stringOnblur = 'onblur';
   const stringValidacoesFormulario = 'validacoesFormulario(this);';
@@ -42,6 +44,8 @@ class KleoForm extends Form {
   const traducaoRepetirEmail = 'Repita o Email';
   const traducaoSenha = 'Senha';
   const traducaoRepetirSenha = 'Repetir Senha';
+  const traducaoSelecione = 'Selecione';
+  const traducaoPonte = 'Ponte';
   
   public function __construct($name = null) {
 

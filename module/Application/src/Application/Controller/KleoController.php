@@ -23,8 +23,8 @@ class KleoController extends AbstractActionController {
   private $sessao;
   private $repositorio;
 
-  const nomeAplicacao = 'AFabricaOficial';
-  const nomeAplicacaoDescricao = 'Rotinas + Constância = Sucesso e Saúde';
+  const nomeAplicacao = 'URSA';
+  const nomeAplicacaoDescricao = 'Unidade de Relacionamento e Supervisão Avançada';
   const idResponsavelAdmin = 1;
   const stringFormulario = 'formulario';
   const stringAction = 'action';
@@ -33,6 +33,7 @@ class KleoController extends AbstractActionController {
   const stringLogin = 'login';
   const stringIndex = 'index';
   const stringAgenda = 'agenda';
+  const stringPontes = 'pontes';
   const stringGrupoPessoas = 'grupoPessoas';
   const controllerPub = 'Application\Controller\Pub';
   const controllerAdm = 'Application\Controller\Adm';

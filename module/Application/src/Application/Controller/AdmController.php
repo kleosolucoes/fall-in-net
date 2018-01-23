@@ -3,12 +3,15 @@
 namespace Application\Controller;
 
 use Application\Form\KleoForm;
-use Application\Form\PonteProspectoForm;
+use Application\Form\PonteForm;
+use Application\Form\ProspectoForm;
 use Application\Model\ORM\RepositorioORM;
 use Application\Model\Entity\Pessoa;
 use Application\Model\Entity\GrupoPessoa;
+use Application\Model\Entity\GrupoPessoaTipo;
 use Application\Model\Entity\Tarefa;
 use Application\Model\Entity\EventoFrequencia;
+use Application\Model\Entity\PonteProspecto;
 use Doctrine\ORM\EntityManager;
 use Exception;
 use Zend\View\Model\ViewModel;
@@ -34,12 +37,15 @@ class AdmController extends KleoController {
   }
 
   public function indexAction() {
-    $grupo = self::getGrupo();
-    $grupoEventos = $grupo->getGrupoEventoAcima();
+    $grupoEventos = self::getGrupo()->getGrupoEventoAcima();
     $arrayTarefas = array();
-    $grupoPessoas = $grupo->getGrupoPessoaAtivasNoPeriodoDe2Semanas();
+    $grupoPessoas = self::getGrupo()->getGrupoPessoaAtivasNoPeriodoDe1Semanas();
+    $arrayPontes = array();
     if($grupoPessoas){
       foreach($grupoPessoas as $grupoPessoa){
+        if($grupoPessoa->getGrupoPessoaTipo()->getId() === GrupoPessoaTipo::PONTE){
+          $arrayPontes[] = $grupoPessoa;
+        }
         foreach($grupoPessoa->getPessoa()->getTarefa() as $tarefa){
           $arrayTarefas[] = $tarefa;
         }
@@ -67,14 +73,17 @@ class AdmController extends KleoController {
       }
     }
 
-    $formulario = $this->params()->fromRoute(self::stringFormulario);
-    if (!$formulario) {
-      $formulario = new PonteProspectoForm('cadastroPonteProspecto');
+    $formularioPonte = new PonteForm('Ponte');
+    $formularioProspecto = null;
+    if(count($arrayPontes)>0){
+      $formularioProspecto = new ProspectoForm('Prospecto', $arrayPontes);
     }
     return new ViewModel(array(
       self::stringAgenda => $arrayAgenda,
       self::stringGrupoPessoas => $grupoPessoas,
-      self::stringFormulario => $formulario,
+      self::stringPontes => $arrayPontes,
+      self::stringFormulario.'Ponte' => $formularioPonte,
+      self::stringFormulario.'Prospecto' => $formularioProspecto,
     ));
   }
 
@@ -89,21 +98,36 @@ class AdmController extends KleoController {
       try {
         self::getRepositorio()->iniciarTransacao();
 
-        $pessoa = new Pessoa();
-
-        $formulario = new PonteProspectoForm(null);
-        $formulario->setInputFilter($pessoa->getInputFilterCadastrarPonteProspecto());
-
         $post = array_merge_recursive(
           $request->getPost()->toArray(), $request->getFiles()->toArray()
         );
 
+        $pessoa = new Pessoa();
+        if($post[KleoForm::inputGrupoPessoaTipo] == GrupoPessoaTipo::PONTE){
+          $nomeFromulario = 'Ponte';
+          $formulario = new PonteForm($nomeFromulario);
+
+        }
+        if($post[KleoForm::inputGrupoPessoaTipo] == GrupoPessoaTipo::PROSPECTO){
+          $nomeFromulario = 'Prospecto';
+          $grupoPessoas = self::getGrupo()->getGrupoPessoaAtivasNoPeriodoDe1Semanas();
+          $arrayPontes = array();
+          if($grupoPessoas){
+            foreach($grupoPessoas as $grupoPessoa){
+              if($grupoPessoa->getGrupoPessoaTipo()->getId() === GrupoPessoaTipo::PONTE){
+                $arrayPontes[] = $grupoPessoa;
+              }
+            }
+          }
+          $formulario = new ProspectoForm($nomeFromulario, $arrayPontes);
+        }
+        $formulario->setInputFilter($pessoa->getInputFilterCadastrarPonteProspecto($nomeFromulario));
         $formulario->setData($post);
 
         /* validação */
         if ($formulario->isValid()) {
           $validatedData = $formulario->getData();
-          $pessoa->exchangeArray($formulario->getData());
+          $pessoa->exchangeArray($formulario->getData(), $nomeFromulario);
           self::getRepositorio()->getPessoaORM()->persistir($pessoa);
           $grupo = self::getGrupo();
 
@@ -114,16 +138,23 @@ class AdmController extends KleoController {
           $grupoPessoa->setGrupoPessoaTipo($grupoPessoaTipo);
           self::getRepositorio()->getGrupoPessoaORM()->persistir($grupoPessoa);
 
+          if($post[KleoForm::inputGrupoPessoaTipo] == GrupoPessoaTipo::PROSPECTO){
+            $ponteProspecto = new PonteProspecto();
+            $ponte = self::getRepositorio()->getPessoaORM()->encontrarPorId($post[KleoForm::inputPonte]);
+            $ponteProspecto->setPonteProspectoProspecto($pessoa);
+            $ponteProspecto->setPonteProspectoPonte($ponte);
+            self::getRepositorio()->getPonteProspectoORM()->persistir($ponteProspecto);
+          }
+
           $grupoEventos = $grupo->getGrupoEventoAcima();
           $naoMudarDataDeCadastro = false;
-          for($indice = 0;$indice <= 14;$indice++){
+          for($indice = 0;$indice <= 7;$indice++){
             foreach($grupoEventos as $grupoEvento){
               $diaDaSemana = date('N', strtotime('now +'.$indice.' days')); 
               if($grupoEvento->getEvento()->getDia() == $diaDaSemana && $indice !== 0){
                 $this->cadastrarTarefa($pessoa, Tarefa::LIGAR, $indice);
                 $this->cadastrarTarefa($pessoa, Tarefa::MENSAGEM, $indice);
-                $this->cadastrarTarefa($pessoa, Tarefa::LIGAR, $indice+1);
-                $this->cadastrarTarefa($pessoa, Tarefa::MENSAGEM, $indice+2);
+                break;
               }
               if($indice === 0){
                 $diaDaSemanaMais1 = date('N', strtotime('now +'.($indice+1).' days')); 
@@ -145,10 +176,11 @@ class AdmController extends KleoController {
 
         } else {
           self::getRepositorio()->desfazerTransacao();
-          return $this->forward()->dispatch(self::controllerAdm, array(
-            self::stringAction => self::stringIndex,
-            self::stringFormulario => $formulario,
-          ));
+          var_dump($formulario->getMessages());
+          //           return $this->forward()->dispatch(self::controllerAdm, array(
+          //             self::stringAction => self::stringIndex,
+          //             self::stringFormulario => $formulario,
+          //           ));
         }
       } catch (Exception $exc) {
         self::getRepositorio()->desfazerTransacao();

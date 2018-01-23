@@ -360,9 +360,9 @@ class Grupo extends KleoEntity {
      * Retorna o grupo pessoa ativas no mes infomado
      * @return GrupoPessoa
      */
-  function getGrupoPessoaAtivasNoPeriodoDe2Semanas() {
+  function getGrupoPessoaAtivasNoPeriodoDe1Semanas() {
     $pessoas = null;
-    $dataDePeriodoValido = strtotime('now -14 days'); 
+    $dataDePeriodoValido = strtotime('now -7 days'); 
     if (!empty($this->getGrupoPessoa())) {
       foreach ($this->getGrupoPessoa() as $grupoPessoa) {
         /* Condição para data de cadastro */

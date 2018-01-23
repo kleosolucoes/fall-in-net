@@ -5,9 +5,6 @@ use Application\Model\Entity\GrupoPessoaTipo;
 use Application\Form\KleoForm;
 use Application\Controller\KleoController;
 use Application\View\Helper\Botao;
-
-$formulario = $this->formulario;
-
 ?>
 <!-- Panel -->
 <div class="panel">
@@ -21,7 +18,7 @@ $formulario = $this->formulario;
   <div class="panel-body">
     <table class='table table-sm'>
       <tbody>
-        <?php for($j = 0;$j <= 14;$j++){
+        <?php for($j = 0;$j <= 7;$j++){
   if(date('d', strtotime('now +'.$j.' days')) == 1){
     echo '<tr class="bg-primary text-center"><td colspan="2"><p>'.KleoController::mesPorExtenso(date('m', strtotime('now +'.$j.' days')),1).'</p></td></tr>';       
   }
@@ -124,22 +121,20 @@ $formulario = $this->formulario;
     <i class="back-icon wb-close animation-scale-up" aria-hidden="true"></i>
   </button>
   <div class="site-action-buttons">
-    <button onclick="$('#inputGrupoPessoaTipo').val(<?php echo GrupoPessoaTipo::PONTE; ?>);" type="button" data-toggle="modal" data-target="#addStageFrom" class="btn-raised btn btn-success btn-floating animation-slide-bottom">
+    <?php if(count($this->pontes) < 2){ ?>
+    <button onclick="selecionarPonteProspecto(<?php echo GrupoPessoaTipo::PONTE; ?>);" type="button" data-toggle="modal" data-target="#addStageFrom" class="btn-raised btn btn-success btn-floating animation-slide-bottom">
+      <i class="icon wb-user" aria-hidden="true"></i>
+    </button>
+    <?php } ?>
+    <?php if(count($this->pontes) > 0){ ?>
+    <button onclick="selecionarPonteProspecto(<?php echo GrupoPessoaTipo::PROSPECTO; ?>);" type="button" data-toggle="modal" data-target="#addStageFrom" class="btn-raised btn btn-success btn-floating animation-slide-bottom">
       <i class="icon wb-users" aria-hidden="true"></i>
     </button>
-    <button onclick="$('#inputGrupoPessoaTipo').val(<?php echo GrupoPessoaTipo::PROSPECTO; ?>);" type="button" data-toggle="modal" data-target="#addStageFrom" class="btn-raised btn btn-success btn-floating animation-slide-bottom">
-      <i class="icon wb-user-add" aria-hidden="true"></i>
-    </button>
+    <?php } ?>
   </div>
 </div>
 <!-- End Site Action -->
 <?php
-$formulario->prepare();
-
-$formulario->setAttribute(KleoForm::stringAction, 'admPonteProspectoFinalizar');
-echo $this->form()->openTag($formulario);
-echo $this->formHidden($formulario->get(KleoForm::inputCSRF));
-echo $this->formHidden($formulario->get(KleoForm::inputGrupoPessoaTipo));
 ?>
 <div class="modal fade" id="addStageFrom" aria-hidden="true" aria-labelledby="addStageFrom"
      role="dialog" tabindex="-1">
@@ -147,25 +142,44 @@ echo $this->formHidden($formulario->get(KleoForm::inputGrupoPessoaTipo));
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" aria-hidden="true" data-dismiss="modal">×</button>
-        <h4 class="modal-title">Nova Pessoa</h4>
+        <h4 id="modalTitle" class="modal-title">Nova Pessoa</h4>
       </div>
-      <div class="modal-body">
-        <form action="#" method="post" role="form">
-          <?php 
-          echo $this->inputFormulario(KleoForm::traducaoNome, $formulario->get(KleoForm::inputNome)); 
-          echo $this->inputFormulario(KleoForm::traducaoTelefone, $formulario->get(KleoForm::inputTelefone)); 
-          ?>
-        </form>
-      </div>
-      <div class="modal-footer text-left">
-        <?php  
+      <?php
+      $fimIndice = 2;
+      if(count($this->pontes) == 0){
+        $fimIndice = 1;
+      }
+      for($indice = 1;$indice <= $fimIndice; $indice++){
+        if($indice === 1){
+          $formulario = $this->formularioPonte;
+          $nomeFormulario = 'Ponte';
+        }
+        if($indice === 2){
+          $formulario = $this->formularioProspecto;
+          $nomeFormulario = 'Prospecto';
+        }
+
+        echo '<div id="divFormulario'.$nomeFormulario.'">';
+        $formulario->prepare();
+        $formulario->setAttribute(KleoForm::stringAction, 'admPonteProspectoFinalizar');
+        echo $this->form()->openTag($formulario);
+        echo $this->formHidden($formulario->get(KleoForm::inputCSRF));
+        echo $this->formHidden($formulario->get(KleoForm::inputGrupoPessoaTipo));
+        echo '<div class="modal-body">';
+        if($indice === 2){
+          echo $this->inputFormulario(KleoForm::traducaoPonte, $formulario->get(KleoForm::inputPonte)); 
+        }
+        echo $this->inputFormulario(KleoForm::traducaoNome, $formulario->get(KleoForm::inputNome.$nomeFormulario)); 
+        echo $this->inputFormulario(KleoForm::traducaoTelefone, $formulario->get(KleoForm::inputTelefone.$nomeFormulario)); 
+        echo '</div>';
+        echo '<div class="modal-footer text-left">';
         echo $this->botao('Cadastrar', $this->funcaoOnClick('submeterFormulario(this.form)')); 
         echo $this->botao('Cancelar', 'data-dismiss="modal"',Botao::botaoSecundario); 
-        ?>
-      </div>
+        echo '</div>';
+        echo $this->form()->closeTag();
+        echo '</div>';
+      }
+      ?>
     </div>
   </div>
 </div>
-<?php
-echo $this->form()->closeTag();
-

@@ -60,12 +60,24 @@ class Pessoa extends KleoEntity implements InputFilterAwareInterface {
      */
   protected $tarefa;
 
+  /**
+     * @ORM\OneToMany(targetEntity="PonteProspecto", mappedBy="ponteProspectoPonte")
+     */
+  protected $ponteProspectoProspectos;
+
+  /**
+     * @ORM\OneToMany(targetEntity="PonteProspecto", mappedBy="ponteProspectoProspecto")
+     */
+  protected $ponteProspectoPonte;
+
   public function __construct() {
     $this->grupoResponsavel = new ArrayCollection();
     $this->eventoFrequencia = new ArrayCollection();
     $this->grupoPessoa = new ArrayCollection();
     $this->pessoaHierarquia = new ArrayCollection();
     $this->tarefa = new ArrayCollection();
+    $this->ponteProspectoProspectos = new ArrayCollection();
+    $this->ponteProspectoPonte = new ArrayCollection();
   }
 
   /** @ORM\Column(type="string") */
@@ -101,63 +113,74 @@ class Pessoa extends KleoEntity implements InputFilterAwareInterface {
   //     /** @ORM\Column(type="string") */
   //     protected $sexo;
 
-  public function exchangeArray($data) {
-    $this->nome = (!empty($data[KleoForm::inputNome]) ? strtoupper($data[KleoForm::inputNome]) : null);
-    $this->telefone = (!empty($data[KleoForm::inputTelefone]) ? $data[KleoForm::inputTelefone] : null);
+  public function exchangeArray($data, $nomeFromulario = '') {
+    $this->nome = (!empty($data[KleoForm::inputNome.$nomeFromulario]) ? strtoupper($data[KleoForm::inputNome.$nomeFromulario]) : null);
+    $this->telefone = (!empty($data[KleoForm::inputTelefone.$nomeFromulario]) ? $data[KleoForm::inputTelefone.$nomeFromulario] : null);
   }
-  
-  public function getInputFilterCadastrarPonteProspecto() {
-        if (!$this->inputFilterCadastrarPonteProspecto) {
-            $inputFilter = new InputFilter();
-            $inputFilter->add(array(
-                'name' => KleoForm::inputNome,
-                'required' => true,
-                'filter' => array(
-                    array('name' => 'StripTags'), // removel xml e html string
-                    array('name' => 'StringTrim'), // removel espaco do inicio e do final da string
-                    array('name' => 'StringToUpper'), // transforma em maiusculo
-                ),
-                'validators' => array(
-                    array(
-                        'name' => 'NotEmpty',
-                    ),
-                    array(
-                        'name' => 'StringLength',
-                        'options' => array(
-                            'encoding' => 'UTF-8',
-                            'min' => 3,
-                            'max' => 50,
-                        ),
-                    ),
-                ),
-            ));
-            $inputFilter->add(array(
-                'name' => KleoForm::inputTelefone,
-                'required' => true,
-                'filter' => array(
-                    array('name' => 'StripTags'), // removel xml e html string
-                    array('name' => 'StringTrim'), // removel espaco do inicio e do final da string
-                    array('name' => 'Int'), // transforma string para inteiro
-                ),
-                'validators' => array(
-                    array(
-                        'name' => 'NotEmpty',
-                    ),
-                    array(
-                        'name' => 'StringLength',
-                        'options' => array(
-                            'encoding' => 'UTF-8',
-                            'min' => 11,
-                            'max' => 12,
-                        ),
-                    ),
-                ),
-            ));
-            
-            $this->inputFilterCadastrarPonteProspecto = $inputFilter;
-        }
-        return $this->inputFilterCadastrarPonteProspecto;
+
+  public function getInputFilterCadastrarPonteProspecto($nomeFormulario) {
+    if (!$this->inputFilterCadastrarPonteProspecto) {
+      $inputFilter = new InputFilter();
+      $inputFilter->add(array(
+        'name' => KleoForm::inputNome . $nomeFormulario,
+        'required' => true,
+        'filter' => array(
+          array('name' => 'StripTags'), // removel xml e html string
+          array('name' => 'StringTrim'), // removel espaco do inicio e do final da string
+          array('name' => 'StringToUpper'), // transforma em maiusculo
+        ),
+        'validators' => array(
+          array(
+            'name' => 'NotEmpty',
+          ),
+          array(
+            'name' => 'StringLength',
+            'options' => array(
+              'encoding' => 'UTF-8',
+              'min' => 3,
+              'max' => 50,
+            ),
+          ),
+        ),
+      ));
+      $inputFilter->add(array(
+        'name' => KleoForm::inputTelefone . $nomeFormulario,
+        'required' => true,
+        'filter' => array(
+          array('name' => 'StripTags'), // removel xml e html string
+          array('name' => 'StringTrim'), // removel espaco do inicio e do final da string
+          array('name' => 'Int'), // transforma string para inteiro
+        ),
+        'validators' => array(
+          array(
+            'name' => 'NotEmpty',
+          ),
+          array(
+            'name' => 'StringLength',
+            'options' => array(
+              'encoding' => 'UTF-8',
+              'min' => 10,
+              'max' => 11,
+            ),
+          ),
+        ),
+      ));
+      if($nomeFormulario == 'Prospecto'){
+        $inputFilter->add(array(
+          'name' => KleoForm::inputPonte,
+          'required' => true,
+          'validators' => array(
+            array(
+              'name' => 'NotEmpty',
+            ),
+          ),
+        )); 
+      }
+
+      $this->inputFilterCadastrarPonteProspecto = $inputFilter;
     }
+    return $this->inputFilterCadastrarPonteProspecto;
+  }
 
 
   /**
