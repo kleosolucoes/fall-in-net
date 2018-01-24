@@ -1,57 +1,21 @@
-<!-- Panel -->
-<div class="panel">
-  <div class="panel-heading">
-    <h2 class="panel-title bg-blue-600 white">
-      <?php echo date('D').'<br />'.date('F d'); ?>
-    </h2>
-  </div>
-  <div class="panel-body">
-    <table class='table table-sm'>
-      <tbody>
-        <?php for($j = 1;$j <= 3;$j++){?>
-        <tr>
-          <td>
-            <p>
-              <?php echo (date('D')).'<br />'.(date('d')+$j); ?>
-            </p>
-          </td>
-          <td>
-            <?php 
+<?php
 
-                                       $cor[1] = 'primary'; 
-                                       $cor[2] = 'secondary'; 
-                                       $cor[3] = 'success'; 
-                                       $cor[4] = 'warning';
-                                       $mensagem[1] = 'Ligar Fulano <br /><small>P: 99999-9999</small>';
-                                       $mensagem[2] = 'Visitar Ciclano';
-                                       $mensagem[3] = 'Mensagem Fulano';
-                                       for($i = 1;$i <= 2; $i++){
-                                         $valor = rand(1, 4);
-                                         $valor1 = rand(1, 3);
-            ?>
-            <div class="row">
-              <div class="alert alert-<?php echo $cor[$valor]; ?> w-full" role="alert">
-                <?php echo $mensagem[$valor1]; ?>
-                <button type="button" class="float-right btn btn-sm btn-secundary">
-                  <i class="icon wb-thumb-down" aria-hidden="true"></i>
-                </button>
-              </div>
-            </div>
-            <?php } ?>
-          </td>
-        </tr>
-        <?php } ?>
-      </tbody>
-    </table>
+use Application\Controller\KleoController;
+?>
+<style type="text/css">
+  .page-maintenance-icon.icon {
+    font-size:64px
+  }
+</style>
 
+<div class="page vertical-align text-center" data-animsition-in="fade-in" data-animsition-out="fade-out">>
+  <div class="page-content vertical-align-middle">
+    <i class="icon wb-settings icon-spin page-maintenance-icon" aria-hidden="true"></i>
+    <h2>Em Produção</h2>
+    <p><a class="btn btn-primary" href="/login">Acesso <?php echo KleoController::nomeAplicacaoFormatado; ?></a></p>
+    <footer class="page-copyright">
+      <p><?php echo KleoController::nomeAFabrica; ?></p>
+      <p>© 2018. All RIGHT RESERVED.</p>     
+    </footer>
   </div>
 </div>
-<!-- End Panel -->
-<!-- Site Action -->
-<div class="site-action" data-plugin="actionBtn">
-  <button type="button" class="site-action-toggle btn-raised btn btn-danger btn-floating">
-    <i class="front-icon wb-plus animation-scale-up" aria-hidden="true"></i>
-    <i class="back-icon wb-trash animation-scale-up" aria-hidden="true"></i>
-  </button>
-</div>
-<!-- End Site Action -->

@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `evento_frequencia` (
   PRIMARY KEY (`id`),
   KEY `index_evento_frequencia_evento_id` (`evento_id`),
   KEY `index_evento_frequencia_pessoa_id` (`pessoa_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `evento_tipo` (
   `id` int(6) unsigned NOT NULL AUTO_INCREMENT,
@@ -39,6 +39,21 @@ CREATE TABLE IF NOT EXISTS `evento_tipo` (
   `hora_inativacao` time DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+
+CREATE TABLE IF NOT EXISTS `fato_ciclo` (
+  `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT,
+  `data_criacao` date NOT NULL,
+  `hora_criacao` time NOT NULL,
+  `data_inativacao` date DEFAULT NULL,
+  `hora_inativacao` time DEFAULT NULL,
+  `ligacao` int(6) NOT NULL,
+  `mensagem` int(6) NOT NULL,
+  `ponte` int(6) NOT NULL,
+  `prospecto` int(6) NOT NULL,
+  `frequencia` int(6) NOT NULL,
+  `numero_identificador` varchar(160) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `grupo` (
   `id` int(6) unsigned NOT NULL AUTO_INCREMENT,
@@ -88,7 +103,7 @@ CREATE TABLE IF NOT EXISTS `grupo_pessoa` (
   KEY `index_grupo_pessoa_grupo_id` (`grupo_id`),
   KEY `index_grupo_pessoa_pessoa_id` (`pessoa_id`),
   KEY `index_grupo_pessoa_grupo_pessoa_tipo_id` (`grupo_pessoa_tipo_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=23 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=48 ;
 
 CREATE TABLE IF NOT EXISTS `grupo_pessoa_tipo` (
   `id` int(1) unsigned NOT NULL AUTO_INCREMENT,
@@ -134,7 +149,7 @@ CREATE TABLE IF NOT EXISTS `pessoa` (
   `data_inativacao` date DEFAULT NULL,
   `hora_inativacao` time DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=27 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=52 ;
 
 CREATE TABLE IF NOT EXISTS `pessoa_hierarquia` (
   `id` int(6) unsigned NOT NULL AUTO_INCREMENT,
@@ -160,7 +175,7 @@ CREATE TABLE IF NOT EXISTS `ponte_prospecto` (
   PRIMARY KEY (`id`),
   KEY `index_pronte_prospecto_ponte_id` (`ponte_id`),
   KEY `index_ponte_prospecto_prospecto_id` (`prospecto_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=10 ;
 
 CREATE TABLE IF NOT EXISTS `tarefa` (
   `id` int(1) unsigned NOT NULL AUTO_INCREMENT,
@@ -171,10 +186,12 @@ CREATE TABLE IF NOT EXISTS `tarefa` (
   `tarefa_tipo_id` int(1) unsigned NOT NULL,
   `pessoa_id` bigint(11) unsigned NOT NULL,
   `realizada` enum('S','N') NOT NULL DEFAULT 'N',
+  `data_alteracao` date NOT NULL,
+  `hora_alteracao` time NOT NULL,
   PRIMARY KEY (`id`),
   KEY `index_tarefa_tarefa_tipo_id` (`tarefa_tipo_id`),
   KEY `index_tarefa_pessoa_id` (`pessoa_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=117 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=194 ;
 
 CREATE TABLE IF NOT EXISTS `tarefa_tipo` (
   `id` int(1) unsigned NOT NULL AUTO_INCREMENT,
@@ -184,7 +201,7 @@ CREATE TABLE IF NOT EXISTS `tarefa_tipo` (
   `hora_inativacao` time DEFAULT NULL,
   `nome` varchar(30) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
 
 
 ALTER TABLE `evento`
@@ -216,8 +233,8 @@ ALTER TABLE `pessoa_hierarquia`
   ADD CONSTRAINT `fk_pessoa_hierarquia_pessoa_id` FOREIGN KEY (`pessoa_id`) REFERENCES `pessoa` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 ALTER TABLE `ponte_prospecto`
-  ADD CONSTRAINT `fk_ponte_prospecto_prospecto_id` FOREIGN KEY (`prospecto_id`) REFERENCES `pessoa` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_ponte_prospecto_ponte_id` FOREIGN KEY (`ponte_id`) REFERENCES `pessoa` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_ponte_prospecto_ponte_id` FOREIGN KEY (`ponte_id`) REFERENCES `pessoa` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_ponte_prospecto_prospecto_id` FOREIGN KEY (`prospecto_id`) REFERENCES `pessoa` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 ALTER TABLE `tarefa`
   ADD CONSTRAINT `fk_tarefa_pessoa_id` FOREIGN KEY (`pessoa_id`) REFERENCES `pessoa` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,

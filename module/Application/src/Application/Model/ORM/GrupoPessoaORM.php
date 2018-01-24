@@ -12,7 +12,7 @@ use Exception;
  * @author Leonardo Pereira Magalhães <falecomleonardopereira@gmail.com>
  * Descricao: Classe com acesso doctrine a entity grupo_pessoa
  */
-class GrupoPessoaORM extends CircuitoORM {
+class GrupoPessoaORM extends KleoORM {
 
     /**
      * Localizar entidade por $idPessoa, se $ativo e $tipo

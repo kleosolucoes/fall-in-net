@@ -29,6 +29,7 @@ class RepositorioORM {
     private $_tarefaTipoORM;
     private $_tarefaORM;
     private $_ponteProspectoORM;
+    private $_fatoCicloORM;
 
     /**
      * Contrutor
@@ -202,6 +203,17 @@ class RepositorioORM {
             $this->_ponteProspectoORM = new KleoORM($this->getDoctrineORMEntityManager(), 'Application\Model\Entity\PonteProspecto');
         }
         return $this->_ponteProspectoORM;
+    }
+   
+  /**
+     * Metodo public para obter a instancia do FatoCicloORM
+     * @return FatoCicloORM
+     */
+    public function getFatoCicloORM() {
+        if (is_null($this->_fatoCicloORM)) {
+            $this->_fatoCicloORM = new FatoCicloORM($this->getDoctrineORMEntityManager(), 'Application\Model\Entity\FatoCiclo');
+        }
+        return $this->_fatoCicloORM;
     }
     
     /**

@@ -13,7 +13,7 @@ use Exception;
  * @author Leonardo Pereira Magalhães <falecomleonardopereira@gmail.com>
  * Descricao: Classe com acesso doctrine a entity grupo_pessoa_tipo
  */
-class GrupoPessoaTipoORM extends CircuitoORM {
+class GrupoPessoaTipoORM extends KleoORM {
 
     /**
      * Localizar todos os tipos

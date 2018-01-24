@@ -10,7 +10,7 @@ use Exception;
  * @author Leonardo Pereira Magalhães <falecomleonardopereira@gmail.com>
  * Descricao: Classe com acesso doctrine a entity hierarquia
  */
-class HierarquiaORM extends CircuitoORM {
+class HierarquiaORM extends KleoORM {
 
     /**
      * Localizar todos as hierarquias

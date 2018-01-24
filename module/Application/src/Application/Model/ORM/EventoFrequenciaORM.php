@@ -12,7 +12,7 @@ use Exception;
  * @author Lucas Filipe de Carvalho Cunha <lucascarvalho.esw@gmail.com>
  * Descricao: Classe com acesso doctrine a entity evento_frequencia
  */
-class EventoFrequenciaORM extends CircuitoORM {
+class EventoFrequenciaORM extends KleoORM {
 
     /**
      * Busca Evento_Frequencia do Revisao por Id  (Não retorna excesção caso não encontre)

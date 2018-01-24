@@ -51,8 +51,22 @@ class AdmController extends KleoController {
         }
       }
     }
+
+    $diaDoEventoEmRelacaoHoje = 0;
+    for($indiceDia = 0;$indiceDia <= 7;$indiceDia++){
+      foreach($grupoEventos as $grupoEvento){
+        $diaDaSemana = date('N', strtotime('now +'.$indiceDia.' days')); 
+        if($grupoEvento->getEvento()->getDia() == $diaDaSemana){
+          $diaDoEventoEmRelacaoHoje = $indiceDia;
+        }
+      }
+    }
+
+    $inicioDoCiclo = (6 - $diaDoEventoEmRelacaoHoje) * -1;
+    $fimDoCiclo = $diaDoEventoEmRelacaoHoje;
+
     $arrayAgenda = array();
-    for($j = 0;$j <= 14;$j++){
+    for($j = $inicioDoCiclo;$j <= $fimDoCiclo;$j++){
       $contadorDeTarrefas = 0;
       $diaParaComparar = date('Y-m-d', strtotime('now +'.$j.' days'));
       foreach($arrayTarefas as $tarefa){
@@ -84,6 +98,8 @@ class AdmController extends KleoController {
       self::stringPontes => $arrayPontes,
       self::stringFormulario.'Ponte' => $formularioPonte,
       self::stringFormulario.'Prospecto' => $formularioProspecto,
+      'inicioDoCiclo' => $inicioDoCiclo,
+      'fimDoCiclo' => $fimDoCiclo,
     ));
   }
 
@@ -217,6 +233,7 @@ class AdmController extends KleoController {
         $idTarefa = $post_data['idTarefa'];
         $tarefa = self::getRepositorio()->getTarefaORM()->encontrarPorId($idTarefa);
         $tarefa->setRealizada($valor);
+        $tarefa->setDataEHoraDeAlteracao();
         self::getRepositorio()->getTarefaORM()->persistir($tarefa, $naoMudarDataDeCriacao);
 
         self::getRepositorio()->fecharTransacao();

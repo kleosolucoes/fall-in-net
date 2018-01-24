@@ -23,10 +23,11 @@ class KleoController extends AbstractActionController {
   private $sessao;
   private $repositorio;
 
+  
+  const nomeAFabrica = 'AFábrica';
   const nomeAplicacao = 'URSA';
   const nomeAplicacaoFormatado = 'U.R.S.A.';
   const nomeAplicacaoDescricao = 'Unidade de Relacionamento e Supervisão Avançada';
-  const idResponsavelAdmin = 1;
   const stringFormulario = 'formulario';
   const stringAction = 'action';
   const stringId = 'id';
@@ -40,14 +41,7 @@ class KleoController extends AbstractActionController {
   const controllerAdm = 'Application\Controller\Adm';
   const rotaPub = 'pub';
   const rotaAdm = 'adm';
-  //  const url = 'http://sender-falecomleonardopereira890682.codeanyapp.com/';
-  const url = 'http://zapmarketing.com.br/';
   const stringMensagem = 'mensagem';
-  const diretorioDocumentos = '/../../../../public/assets';
-  const emailTitulo = 'Zapmarketing';
-  const emailLeo = 'falecomleonardopereira@gmail.com';
-  const emailKort = 'diegokort@zapmarketing.com.br';
-  const emailSilverio = 'comercial@zapmarketing.com.br';
 
   /**
      * Contrutor sobrecarregado com os serviços de ORM

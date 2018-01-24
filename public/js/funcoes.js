@@ -1,5 +1,3 @@
-
-
 function kleo(action, id) {
   $(".splash").css("display", "block");
   $.post(
@@ -58,7 +56,17 @@ function isEmail(email) {
 
 $(window).bind("load", function () {
   // Remove splash screen after load
-  $('.splash').css('display', 'none')
+  $('.splash').css('display', 'none');
+
+
+  if($('#ancora')){
+    targetOffset = $('#ancora').offset().top;
+
+    $('html, body').animate({ 
+      scrollTop: targetOffset - 100
+    }, 1000); 
+  }
+
 });
 
 var tipoTarefa = 1;
@@ -128,18 +136,22 @@ function mudarFrequencia(tipo, idTarefa, idEvento, idPessoa, diaRealDoEvento) {
       }
     }, 'json');
 }
+
 var tipoPonte = 1;
 var tipoProspecto = 2;
 var hidden = 'hidden';
 function selecionarPonteProspecto(tipo){
   var divFormularioPonte = $('#divFormularioPonte');
   var divFormularioProspecto = $('#divFormularioProspecto'); 
+  var modalTitle = $('#modalTitle');
   if(tipo === tipoPonte){
     divFormularioPonte.css("display", "block");
     divFormularioProspecto.css("display", "none");
+    modalTitle.html('Nova Ponte');
   }
   if(tipo === tipoProspecto){
     divFormularioPonte.css("display", "none");
     divFormularioProspecto.css("display", "block");
+    modalTitle.html('Novo Prospecto');
   }
 }

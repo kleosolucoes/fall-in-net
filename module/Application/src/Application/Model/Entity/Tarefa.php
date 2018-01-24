@@ -7,6 +7,8 @@ namespace Application\Model\Entity;
  * @author Leonardo Pereira Magalhães <falecomleonardopereira@gmail.com>
  * Descricao: Entidade anotada da tabela tarefa
  */
+
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -18,8 +20,8 @@ class Tarefa extends KleoEntity {
   const LIGAR = 1;
   const MENSAGEM = 2;
   public function __construct() {
-        $this->setRealizada('N');
-    }
+    $this->setRealizada('N');
+  }
   /**
      * @ORM\ManyToOne(targetEntity="Pessoa", inversedBy="tarefa")
      * @ORM\JoinColumn(name="pessoa_id", referencedColumnName="id")
@@ -40,6 +42,35 @@ class Tarefa extends KleoEntity {
 
   /** @ORM\Column(type="string") */
   protected $realizada;
+
+  /** @ORM\Column(type="datetime", name="data_alteracao") */
+  protected $data_alteracao;
+  /** @ORM\Column(type="string") */
+  protected $hora_alteracao;
+  /**
+     * Seta data e hora de criação
+     */
+  function setDataEHoraDeAlteracao() {
+    $timeNow = new DateTime();
+    $this->setData_alteracao($timeNow);
+    $this->setHora_alteracao($timeNow->format('H:s:i'));
+  }
+
+  function setData_alteracao($data_alteracao) {
+    $this->data_alteracao = $data_alteracao;
+  }
+  
+  function setHora_alteracao($hora_alteracao) {
+    $this->hora_alteracao = $hora_alteracao;
+  }
+
+  function getData_alteracao() {
+    $this->data_alteracao;
+  }
+  
+  function getHora_alteracao() {
+    $this->hora_alteracao;
+  }
 
 
   function getPessoa() {
