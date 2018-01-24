@@ -605,5 +605,21 @@ class Pessoa extends KleoEntity implements InputFilterAwareInterface {
   function setSexo($sexo) {
     $this->sexo = $sexo;
   }
+  
+  function getPonteProspectoPonte() {
+    return $this->ponteProspectoPonte;
+  }
+
+  function setPonteProspectoPonte($ponteProspectoPonte) {
+    $this->ponteProspectoPonte = $ponteProspectoPonte;
+  }
+  
+  function getPonteProspectoProspectos() {
+    return $this->ponteProspectoProspectos;
+  }
+
+  function setPonteProspectoProspectos($ponteProspectoProspectos) {
+    $this->ponteProspectoProspectos = $ponteProspectoProspectos;
+  }
 
 }

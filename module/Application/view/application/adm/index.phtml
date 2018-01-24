@@ -6,6 +6,12 @@ use Application\Form\KleoForm;
 use Application\Controller\KleoController;
 use Application\View\Helper\Botao;
 ?>
+<?php if(count($this->pontes) == 0){ ?>
+<div class="alert alert-icon alert-info w-full" role="alert">
+  <i class="icon wb-alert" aria-hidden="true"></i>
+  <p>Vamos começar cadastrando uma Ponte.</p>
+</div>
+<?php } ?>
 <!-- Panel -->
 <div class="panel">
   <div class="panel-heading">
@@ -18,44 +24,57 @@ use Application\View\Helper\Botao;
   <div class="panel-body">
     <table class='table table-sm'>
       <tbody>
-        <?php for($j = 0;$j <= 7;$j++){
-  if(date('d', strtotime('now +'.$j.' days')) == 1){
-    echo '<tr class="bg-primary text-center"><td colspan="2"><p>'.KleoController::mesPorExtenso(date('m', strtotime('now +'.$j.' days')),1).'</p></td></tr>';       
-  }
+        <?php 
+        $ocorreuEvento = false;
+        for($j = 0;$j <= 7;$j++){
+          if(date('d', strtotime('now +'.$j.' days')) == 1){
+            echo '<tr class="bg-primary text-center"><td colspan="2"><p>'.KleoController::mesPorExtenso(date('m', strtotime('now +'.$j.' days')),1).'</p></td></tr>';       
+          }
         ?>
         <tr>
           <td>
             <p>
               <?php 
-  echo KleoController::diaDaSemanaPorDia(date('N', strtotime('now +'.$j.' days'))); 
-  echo '<br />' . date('d', strtotime('now +'.$j.' days')); 
+          echo KleoController::diaDaSemanaPorDia(date('N', strtotime('now +'.$j.' days'))); 
+          echo '<br />' . date('d', strtotime('now +'.$j.' days')); 
               ?>
             </p>
           </td>
           <td>
             <?php
-  if($this->agenda[$j][0] instanceof Tarefa || $this->agenda[$j][0] instanceof Evento){
-    foreach($this->agenda[$j] as $elemento){
-      if($elemento instanceof Tarefa){
-        if($elemento->getTarefaTipo()->getId() === Tarefa::LIGAR){
-          $corTarefa = 'info';
-          $icone = 'fa-phone';
-        }
-        if($elemento->getTarefaTipo()->getId() === Tarefa::MENSAGEM){
-          $corTarefa = 'success';
-          $icone = 'fa-envelope';
-        }
-        $iconeTarefaRealizada = 'down';
-        $corTarefaRealizada = 'default';
-        if($elemento->getRealizada() === "S"){
-          $iconeTarefaRealizada = 'up';
-          $corTarefaRealizada = 'primary';
-        }
+          if($this->agenda[$j][0] instanceof Tarefa || $this->agenda[$j][0] instanceof Evento){
+            foreach($this->agenda[$j] as $elemento){
+              if($elemento instanceof Tarefa){
+                if($elemento->getTarefaTipo()->getId() === Tarefa::LIGAR){
+                  $corTarefa = 'info';
+                  $icone = 'fa-phone';
+                }
+                if($elemento->getTarefaTipo()->getId() === Tarefa::MENSAGEM){
+                  $corTarefa = 'success';
+                  $icone = 'fa-envelope';
+                }
+                $iconeTarefaRealizada = 'down';
+                $corTarefaRealizada = 'default';
+                if($elemento->getRealizada() === "S"){
+                  $iconeTarefaRealizada = 'up';
+                  $corTarefaRealizada = 'primary';
+                }
             ?>
-            <div class="row">
+            <div class="row px-10">
               <div class="alert alert-icon alert-<?php echo $corTarefa; ?> w-full" role="alert">
                 <i class="icon <?php echo $icone; ?>" aria-hidden="true"></i>
-                <?php echo $elemento->getTarefaTipo()->getNome() . ' para ' . $elemento->getPessoa()->getNome(); ?>
+                <?php 
+                echo $elemento->getTarefaTipo()->getNome() . ' para ' . $elemento->getPessoa()->getNome(); 
+                if(count($elemento->getPessoa()->getPonteProspectoPonte())>0){
+                  echo ' prospecto de '.$elemento->getPessoa()->getPonteProspectoPonte()[0]->getPonteProspectoPonte()->getNome();
+                }
+                if($elemento->getTarefaTipo()->getId() === Tarefa::LIGAR){
+                  echo '<p><a class="btn btn-primary" href="tel:+55'.$elemento->getPessoa()->getTelefone().'">'.$elemento->getPessoa()->getTelefone().'</a></p>';
+                }
+                if($elemento->getTarefaTipo()->getId() === Tarefa::MENSAGEM){
+                  echo '<p><a class="btn btn-primary" target="_blanck" href="https://api.whatsapp.com/send?phone=55'.$elemento->getPessoa()->getTelefone().'&text=Bom%20dia%20'.$elemento->getPessoa()->getNome().'">MSG Whats</a></p>';
+                } 
+                ?>
                 <button id="botao_<?php echo $elemento->getId(); ?>" 
                         onclick="mudarFrequencia(1, <?php echo $elemento->getId(); ?>,0,0,0);" 
                         type="button" class="float-right btn btn-sm btn-<?php echo $corTarefaRealizada; ?>" >
@@ -64,26 +83,30 @@ use Application\View\Helper\Botao;
               </div>
             </div>
             <?php
-      }
-      if($elemento instanceof Evento){
+              }
+              if($elemento instanceof Evento){
+                $ocorreuEvento = true;
             ?>
-            <div class="row">
+            <div class="row px-10">
               <div class="alert alert-danger w-full" role="alert">
                 <?php 
-        echo $elemento->getNome(); 
-        if($this->grupoPessoas){
-          foreach($this->grupoPessoas as $grupoPessoa){
-            echo '<p>'.$grupoPessoa->getPessoa()->getNome();
-            $diaRealDoEvento = date('Y-m-d', strtotime('now +'.$j.' days'));
-            $eventosFiltrado = $grupoPessoa->getPessoa()->getEventoFrequenciaFiltradoPorEventoEDia($elemento->getId(), $diaRealDoEvento);
-            $iconeTarefaRealizada = 'down';
-            $corTarefaRealizada = 'default';
-            if($eventosFiltrado){
-              if($eventosFiltrado->getFrequencia() === "S"){
-                $iconeTarefaRealizada = 'up';
-                $corTarefaRealizada = 'primary';
-              }  
-            }
+                echo $elemento->getNome(); 
+                if($this->grupoPessoas){
+                  foreach($this->grupoPessoas as $grupoPessoa){
+                    echo '<p>'.$grupoPessoa->getPessoa()->getNome();
+                    if(count($grupoPessoa->getPessoa()->getPonteProspectoPonte())>0){
+                      echo ' prospecto de '.$grupoPessoa->getPessoa()->getPonteProspectoPonte()[0]->getPonteProspectoPonte()->getNome();
+                    }
+                    $diaRealDoEvento = date('Y-m-d', strtotime('now +'.$j.' days'));
+                    $eventosFiltrado = $grupoPessoa->getPessoa()->getEventoFrequenciaFiltradoPorEventoEDia($elemento->getId(), $diaRealDoEvento);
+                    $iconeTarefaRealizada = 'down';
+                    $corTarefaRealizada = 'default';
+                    if($eventosFiltrado){
+                      if($eventosFiltrado->getFrequencia() === "S"){
+                        $iconeTarefaRealizada = 'up';
+                        $corTarefaRealizada = 'primary';
+                      }  
+                    }
 
                 ?>
                 <button id="botao_<?php echo $elemento->getId().'_'.$grupoPessoa->getPessoa()->getId(); ?>" 
@@ -92,24 +115,29 @@ use Application\View\Helper\Botao;
                   <i class="icon fa-thumbs-<?php echo $iconeTarefaRealizada; ?>" aria-hidden="true"></i>
                 </button>
                 <?php
-            echo '</p>';
-          }
-        }
+                    echo '</p>';
+                  }
+                }
                 ?>
               </div>
             </div>
             <?php
-      }
-    }
-    /* fim foreach */
-  }else{
-    echo $this->agenda[$j][0];
-  }
+              }
+            }
+            /* fim foreach */
+          }else{
+            echo $this->agenda[$j][0];
+          }
 
             ?>
           </td>
         </tr>
-        <?php } ?>
+        <?php 
+          if($ocorreuEvento){
+            break;
+          }
+        } 
+        ?>
       </tbody>
     </table>
   </div>

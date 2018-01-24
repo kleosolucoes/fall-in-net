@@ -26,7 +26,7 @@ class Splash extends AbstractHelper {
     $html .= '<div class="splash">';
     $html .= '<div class="color-line"></div>';
     $html .= '<div class="splash-title">';
-    $html .= '<h1>' . $this->view->translate(KleoController::nomeAplicacao) . '</h1>';
+    $html .= '<h1>' . $this->view->translate(KleoController::nomeAplicacaoFormatado) . '</h1>';
     $html .= '<div class="spinner">'; 
     $html .= '<div class="rect1"></div>'; 
     $html .= '<div class="rect2"></div>'; 

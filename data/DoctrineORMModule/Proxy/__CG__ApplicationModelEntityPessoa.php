@@ -792,6 +792,50 @@ class Pessoa extends \Application\Model\Entity\Pessoa implements \Doctrine\ORM\P
     /**
      * {@inheritDoc}
      */
+    public function getPonteProspectoPonte()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getPonteProspectoPonte', array());
+
+        return parent::getPonteProspectoPonte();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setPonteProspectoPonte($ponteProspectoPonte)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setPonteProspectoPonte', array($ponteProspectoPonte));
+
+        return parent::setPonteProspectoPonte($ponteProspectoPonte);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getPonteProspectoProspectos()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getPonteProspectoProspectos', array());
+
+        return parent::getPonteProspectoProspectos();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setPonteProspectoProspectos($ponteProspectoProspectos)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setPonteProspectoProspectos', array($ponteProspectoProspectos));
+
+        return parent::setPonteProspectoProspectos($ponteProspectoProspectos);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function setDataEHoraDeCriacao($date = NULL)
     {
 

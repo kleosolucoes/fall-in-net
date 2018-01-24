@@ -24,6 +24,7 @@ class KleoController extends AbstractActionController {
   private $repositorio;
 
   const nomeAplicacao = 'URSA';
+  const nomeAplicacaoFormatado = 'U.R.S.A.';
   const nomeAplicacaoDescricao = 'Unidade de Relacionamento e Supervisão Avançada';
   const idResponsavelAdmin = 1;
   const stringFormulario = 'formulario';
