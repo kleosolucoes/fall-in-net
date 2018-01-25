@@ -25,13 +25,13 @@ use Application\View\Helper\Botao;
       <p>
         <?php
         if($this->token != -1){
-          echo '<a class="btn btn-success btn-sm" href="/adm/-1"> << Ciclo Anterior</a>&nbsp;';
+          echo '<a class="btn btn-success btn-sm" onclick="mudarPaginaComLoader(\'/adm/-1\');"><i class="icon wb-chevron-left" aria-hidden="true"></i></a>&nbsp;';
         }
         if($this->token != 0){
-          echo '<a class="btn btn-success btn-sm" href="/adm">Ciclo Atual</a>&nbsp;';
+           echo '<a class="btn btn-success btn-sm" onclick="mudarPaginaComLoader(\'/adm\');"><i class="icon wb-home" aria-hidden="true"></i></a>&nbsp;';
         }
         if($this->token != 1){
-          echo '<a class="btn btn-success btn-sm" href="/adm/1"> >> Ciclo A frente</a>';
+          echo '<a class="btn btn-success btn-sm" onclick="mudarPaginaComLoader(\'/adm/1\');"><i class="icon wb-chevron-right" aria-hidden="true"></i></a>&nbsp;';
         }
         ?>
       </p>
