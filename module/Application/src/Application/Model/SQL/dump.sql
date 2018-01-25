@@ -1,7 +1,8 @@
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
 
-CREATE TABLE IF NOT EXISTS `evento` (
+DROP TABLE IF EXISTS `evento`;
+CREATE TABLE `evento` (
   `id` int(6) unsigned NOT NULL AUTO_INCREMENT,
   `data_criacao` date NOT NULL,
   `hora_criacao` time NOT NULL,
@@ -15,7 +16,8 @@ CREATE TABLE IF NOT EXISTS `evento` (
   KEY `evento_tipo_id` (`evento_tipo_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
 
-CREATE TABLE IF NOT EXISTS `evento_frequencia` (
+DROP TABLE IF EXISTS `evento_frequencia`;
+CREATE TABLE `evento_frequencia` (
   `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT,
   `data_criacao` date NOT NULL,
   `hora_criacao` time NOT NULL,
@@ -30,7 +32,8 @@ CREATE TABLE IF NOT EXISTS `evento_frequencia` (
   KEY `index_evento_frequencia_pessoa_id` (`pessoa_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
-CREATE TABLE IF NOT EXISTS `evento_tipo` (
+DROP TABLE IF EXISTS `evento_tipo`;
+CREATE TABLE `evento_tipo` (
   `id` int(6) unsigned NOT NULL AUTO_INCREMENT,
   `nome` varchar(30) NOT NULL,
   `data_criacao` date NOT NULL,
@@ -40,22 +43,25 @@ CREATE TABLE IF NOT EXISTS `evento_tipo` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
 
-CREATE TABLE IF NOT EXISTS `fato_ciclo` (
+DROP TABLE IF EXISTS `fato_ciclo`;
+CREATE TABLE `fato_ciclo` (
   `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT,
   `data_criacao` date NOT NULL,
   `hora_criacao` time NOT NULL,
   `data_inativacao` date DEFAULT NULL,
   `hora_inativacao` time DEFAULT NULL,
-  `ligacao` int(6) NOT NULL,
-  `mensagem` int(6) NOT NULL,
-  `ponte` int(6) NOT NULL,
-  `prospecto` int(6) NOT NULL,
-  `frequencia` int(6) NOT NULL,
-  `numero_identificador` varchar(160) NOT NULL,
+  `ligacao` int(1) NULL,
+  `mensagem` int(1) NULL,
+  `ponte` int(1) NULL,
+  `prospecto` int(1) NULL,
+  `cliqueLigacao` int(1) NULL,
+  `cliqueMensagem` int(1) NULL,
+  `numero_identificador` varchar(400) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
-CREATE TABLE IF NOT EXISTS `grupo` (
+DROP TABLE IF EXISTS `grupo`;
+CREATE TABLE `grupo` (
   `id` int(6) unsigned NOT NULL AUTO_INCREMENT,
   `data_criacao` date NOT NULL,
   `hora_criacao` time NOT NULL,
@@ -64,7 +70,8 @@ CREATE TABLE IF NOT EXISTS `grupo` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
 
-CREATE TABLE IF NOT EXISTS `grupo_evento` (
+DROP TABLE IF EXISTS `grupo_evento`;
+CREATE TABLE `grupo_evento` (
   `id` int(6) unsigned NOT NULL AUTO_INCREMENT,
   `data_criacao` date NOT NULL,
   `hora_criacao` time NOT NULL,
@@ -77,7 +84,8 @@ CREATE TABLE IF NOT EXISTS `grupo_evento` (
   KEY `index_grupo_evento_evento_id` (`evento_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
 
-CREATE TABLE IF NOT EXISTS `grupo_pai_filho` (
+DROP TABLE IF EXISTS `grupo_pai_filho`;
+CREATE TABLE `grupo_pai_filho` (
   `id` int(6) unsigned NOT NULL AUTO_INCREMENT,
   `data_criacao` date NOT NULL,
   `hora_criacao` time NOT NULL,
@@ -90,7 +98,8 @@ CREATE TABLE IF NOT EXISTS `grupo_pai_filho` (
   KEY `index_grupo_pai_filho_filho_id` (`filho_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
 
-CREATE TABLE IF NOT EXISTS `grupo_pessoa` (
+DROP TABLE IF EXISTS `grupo_pessoa`;
+CREATE TABLE `grupo_pessoa` (
   `id` int(6) unsigned NOT NULL AUTO_INCREMENT,
   `data_criacao` date NOT NULL,
   `hora_criacao` time NOT NULL,
@@ -103,9 +112,10 @@ CREATE TABLE IF NOT EXISTS `grupo_pessoa` (
   KEY `index_grupo_pessoa_grupo_id` (`grupo_id`),
   KEY `index_grupo_pessoa_pessoa_id` (`pessoa_id`),
   KEY `index_grupo_pessoa_grupo_pessoa_tipo_id` (`grupo_pessoa_tipo_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=48 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=52 ;
 
-CREATE TABLE IF NOT EXISTS `grupo_pessoa_tipo` (
+DROP TABLE IF EXISTS `grupo_pessoa_tipo`;
+CREATE TABLE `grupo_pessoa_tipo` (
   `id` int(1) unsigned NOT NULL AUTO_INCREMENT,
   `data_criacao` date NOT NULL,
   `hora_criacao` time NOT NULL,
@@ -115,7 +125,8 @@ CREATE TABLE IF NOT EXISTS `grupo_pessoa_tipo` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
 
-CREATE TABLE IF NOT EXISTS `grupo_responsavel` (
+DROP TABLE IF EXISTS `grupo_responsavel`;
+CREATE TABLE `grupo_responsavel` (
   `id` int(6) unsigned NOT NULL AUTO_INCREMENT,
   `data_criacao` date NOT NULL,
   `hora_criacao` time NOT NULL,
@@ -128,7 +139,8 @@ CREATE TABLE IF NOT EXISTS `grupo_responsavel` (
   KEY `index_grupo_responsavel_grupo_id` (`grupo_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
 
-CREATE TABLE IF NOT EXISTS `hierarquia` (
+DROP TABLE IF EXISTS `hierarquia`;
+CREATE TABLE `hierarquia` (
   `id` int(1) unsigned NOT NULL AUTO_INCREMENT,
   `data_criacao` date NOT NULL,
   `hora_criacao` time NOT NULL,
@@ -138,7 +150,8 @@ CREATE TABLE IF NOT EXISTS `hierarquia` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
 
-CREATE TABLE IF NOT EXISTS `pessoa` (
+DROP TABLE IF EXISTS `pessoa`;
+CREATE TABLE `pessoa` (
   `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT,
   `nome` varchar(150) NOT NULL,
   `telefone` bigint(11) unsigned NOT NULL,
@@ -149,9 +162,10 @@ CREATE TABLE IF NOT EXISTS `pessoa` (
   `data_inativacao` date DEFAULT NULL,
   `hora_inativacao` time DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=52 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=59 ;
 
-CREATE TABLE IF NOT EXISTS `pessoa_hierarquia` (
+DROP TABLE IF EXISTS `pessoa_hierarquia`;
+CREATE TABLE `pessoa_hierarquia` (
   `id` int(6) unsigned NOT NULL AUTO_INCREMENT,
   `data_criacao` date NOT NULL,
   `hora_criacao` time NOT NULL,
@@ -164,7 +178,8 @@ CREATE TABLE IF NOT EXISTS `pessoa_hierarquia` (
   KEY `index_pessoa_hierarquia_hierarquia_id` (`hierarquia_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
 
-CREATE TABLE IF NOT EXISTS `ponte_prospecto` (
+DROP TABLE IF EXISTS `ponte_prospecto`;
+CREATE TABLE `ponte_prospecto` (
   `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT,
   `ponte_id` bigint(11) unsigned NOT NULL,
   `prospecto_id` bigint(11) unsigned NOT NULL,
@@ -175,9 +190,10 @@ CREATE TABLE IF NOT EXISTS `ponte_prospecto` (
   PRIMARY KEY (`id`),
   KEY `index_pronte_prospecto_ponte_id` (`ponte_id`),
   KEY `index_ponte_prospecto_prospecto_id` (`prospecto_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=10 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
 
-CREATE TABLE IF NOT EXISTS `tarefa` (
+DROP TABLE IF EXISTS `tarefa`;
+CREATE TABLE `tarefa` (
   `id` int(1) unsigned NOT NULL AUTO_INCREMENT,
   `data_criacao` date NOT NULL,
   `hora_criacao` time NOT NULL,
@@ -186,14 +202,15 @@ CREATE TABLE IF NOT EXISTS `tarefa` (
   `tarefa_tipo_id` int(1) unsigned NOT NULL,
   `pessoa_id` bigint(11) unsigned NOT NULL,
   `realizada` enum('S','N') NOT NULL DEFAULT 'N',
-  `data_alteracao` date NOT NULL,
-  `hora_alteracao` time NOT NULL,
+  `data_alteracao` date DEFAULT NULL,
+  `hora_alteracao` time DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `index_tarefa_tarefa_tipo_id` (`tarefa_tipo_id`),
   KEY `index_tarefa_pessoa_id` (`pessoa_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=194 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=207 ;
 
-CREATE TABLE IF NOT EXISTS `tarefa_tipo` (
+DROP TABLE IF EXISTS `tarefa_tipo`;
+CREATE TABLE `tarefa_tipo` (
   `id` int(1) unsigned NOT NULL AUTO_INCREMENT,
   `data_criacao` date NOT NULL,
   `hora_criacao` time NOT NULL,

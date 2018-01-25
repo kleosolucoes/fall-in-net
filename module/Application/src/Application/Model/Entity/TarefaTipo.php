@@ -14,34 +14,35 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="tarefa_tipo")
  */
 class TarefaTipo extends KleoEntity {
+  const LIGAR = 1;
+  const MENSAGEM = 2;
 
-
-    /**
+  /**
      * @ORM\OneToMany(targetEntity="Tarefa", mappedBy="tarefaTipo") 
      */
-    protected $tarefa;
+  protected $tarefa;
 
-    public function __construct() {
-        $this->tarefa = new ArrayCollection();
-    }
+  public function __construct() {
+    $this->tarefa = new ArrayCollection();
+  }
 
-    /** @ORM\Column(type="string") */
-    protected $nome;
+  /** @ORM\Column(type="string") */
+  protected $nome;
 
-    function getNome() {
-        return $this->nome;
-    }
+  function getNome() {
+    return $this->nome;
+  }
 
-    function setNome($nome) {
-        $this->nome = $nome;
-    }
+  function setNome($nome) {
+    $this->nome = $nome;
+  }
 
-    function getTarefa() {
-        return $this->tarefa;
-    }
+  function getTarefa() {
+    return $this->tarefa;
+  }
 
-    function setTarefa($tarefa) {
-        $this->tarefa = $tarefa;
-    }
+  function setTarefa($tarefa) {
+    $this->tarefa = $tarefa;
+  }
 
 }

@@ -1,7 +1,10 @@
 <?php
+
+use Application\Model\Entity\TarefaTipo;
 use Application\Model\Entity\Tarefa;
 use Application\Model\Entity\Evento;
 use Application\Model\Entity\GrupoPessoaTipo;
+use Application\Model\Entity\FatoCiclo;
 use Application\Form\KleoForm;
 use Application\Controller\KleoController;
 use Application\View\Helper\Botao;
@@ -50,11 +53,11 @@ use Application\View\Helper\Botao;
           if($this->agenda[$indiceDias][0] instanceof Tarefa || $this->agenda[$indiceDias][0] instanceof Evento){
             foreach($this->agenda[$indiceDias] as $elemento){
               if($elemento instanceof Tarefa){
-                if($elemento->getTarefaTipo()->getId() === Tarefa::LIGAR){
+                if($elemento->getTarefaTipo()->getId() === TarefaTipo::LIGAR){
                   $corTarefa = 'info';
                   $icone = 'fa-phone';
                 }
-                if($elemento->getTarefaTipo()->getId() === Tarefa::MENSAGEM){
+                if($elemento->getTarefaTipo()->getId() === TarefaTipo::MENSAGEM){
                   $corTarefa = 'success';
                   $icone = 'fa-envelope';
                 }
@@ -73,11 +76,11 @@ use Application\View\Helper\Botao;
                 if(count($elemento->getPessoa()->getPonteProspectoPonte())>0){
                   echo ' prospecto de '.$elemento->getPessoa()->getPonteProspectoPonte()[0]->getPonteProspectoPonte()->getNome();
                 }
-                if($elemento->getTarefaTipo()->getId() === Tarefa::LIGAR){
-                  echo '<p><a class="btn btn-primary btn-sm" href="tel:+55'.$elemento->getPessoa()->getTelefone().'">'.$elemento->getPessoa()->getTelefone().'</a>';
+                if($elemento->getTarefaTipo()->getId() === TarefaTipo::LIGAR){
+                  echo '<p><button class="btn btn-primary btn-sm" onclick="clicarAcao('.FatoCiclo::CLIQUE_LIGACAO.', \''.$elemento->getPessoa()->getTelefone().'\', 0);" >'.$elemento->getPessoa()->getTelefone().'</button>';
                 }
-                if($elemento->getTarefaTipo()->getId() === Tarefa::MENSAGEM){
-                  echo '<p><a class="btn btn-primary btn-sm" target="_blanck" href="https://api.whatsapp.com/send?phone=55'.$elemento->getPessoa()->getTelefone().'&text=Bom%20dia%20'.$elemento->getPessoa()->getNome().'">MSG Whats</a>';
+                if($elemento->getTarefaTipo()->getId() === TarefaTipo::MENSAGEM){
+                  echo '<p><button class="btn btn-primary btn-sm"  onclick="clicarAcao('.FatoCiclo::CLIQUE_MENSAGEM.', \''.$elemento->getPessoa()->getTelefone().'\', \''.$elemento->getPessoa()->getNome().'\');">MSG Whats</button>';
                 } 
                 ?>
                 <button id="botao_<?php echo $elemento->getId(); ?>" 

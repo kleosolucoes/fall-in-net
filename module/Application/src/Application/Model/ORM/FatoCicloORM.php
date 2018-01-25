@@ -3,6 +3,7 @@
 namespace Application\Model\ORM;
 
 use Application\Model\Entity\FatoCiclo;
+use Application\Controller\KleoController;
 use DateTime;
 use Exception;
 use Zend\Session\Container;
@@ -24,7 +25,7 @@ class FatoCicloORM extends KleoORM {
           'data_criacao' => $dia,
         ));
       if (empty($resposta)) {
-        $resposta = $this->criarFatoNoCiclo($numeroIdentificador, $dia, $repositorioORM);
+        $resposta = $this->criarFatoCiclo($numeroIdentificador, $dia, $repositorioORM);
       }
       return $resposta;
     } catch (Exception $exc) {
@@ -98,7 +99,7 @@ class FatoCicloORM extends KleoORM {
     $tamanho = 8;
     $grupoSelecionado = null;
     if ($grupo === null) {
-      $sessao = new Container(Constantes::$NOME_APLICACAO);
+      $sessao = new Container(KleoController::nomeAplicacao);
       $idPessoa = $sessao->idPessoa;
       $pessoaLogada = $repositorioORM->getPessoaORM()->encontrarPorId($idPessoa);
       $grupoSelecionado = $pessoaLogada->getResponsabilidadesAtivas()[0]->getGrupo();
@@ -106,9 +107,10 @@ class FatoCicloORM extends KleoORM {
       $grupoSelecionado = $grupo;
     }
     try {
+      $numeroIdentificador = str_pad($grupoSelecionado->getId(), $tamanho, 0, STR_PAD_LEFT);
       while ($grupoSelecionado->getGrupoPaiFilhoPaiAtivo()) {
-        $numeroIdentificador = str_pad($grupoSelecionado->getId(), $tamanho, 0, STR_PAD_LEFT) . $numeroIdentificador;
         $grupoSelecionado = $grupoSelecionado->getGrupoPaiFilhoPaiAtivo()->getGrupoPaiFilhoPai();
+        $numeroIdentificador = str_pad($grupoSelecionado->getId(), $tamanho, 0, STR_PAD_LEFT).$numeroIdentificador;
       }
       return $numeroIdentificador;
     } catch (Exception $exc) {
@@ -119,13 +121,34 @@ class FatoCicloORM extends KleoORM {
   /**
      * Criar fato ciclo
      */
-  public function criarFatoNoCiclo($numeroIdentificador, $dia, RepositorioORM $repositorioORM) {
-    $fatoCiclo = new FatoCiclo();
+  public function criarFatoCiclo($numeroIdentificador, $campo, $valor) {
     try {
+      $fatoCiclo = new FatoCiclo();
       $fatoCiclo->setNumero_identificador($numeroIdentificador);
-      $fatoCiclo->setDataEHoraDeCriacao();
-      $fatoCiclo->setData_criacao($dia);
-      $this->persistir($fatoCiclo, false);
+      switch($campo){
+        case FatoCiclo::LIGACAO:
+          $fatoCiclo->setLigacao($valor);
+          break;
+        case FatoCiclo::MENSAGEM:
+          $fatoCiclo->setMensagem($valor);
+          break;
+        case FatoCiclo::PONTE:
+          $fatoCiclo->setPonte($valor);
+          break;
+        case FatoCiclo::PROSPECTO:
+          $fatoCiclo->setProspecto($valor);
+          break;
+        case FatoCiclo::FREQUENCIA:
+          $fatoCiclo->setFrequencia($valor);
+          break;
+        case FatoCiclo::CLIQUE_LIGACAO:
+          $fatoCiclo->setClique_ligacao($valor);
+          break;
+        case FatoCiclo::CLIQUE_MENSAGEM:
+          $fatoCiclo->setClique_mensagem($valor);
+          break;
+      }
+      $this->persistir($fatoCiclo);
       return $fatoCiclo;
     } catch (Exception $exc) {
       echo $exc->getMessage();

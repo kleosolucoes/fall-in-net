@@ -59,7 +59,7 @@ class KleoORM {
       $this->getEntityManager()->persist($entidade);
       $this->getEntityManager()->flush($entidade);
     } catch (Exception $exc) {
-      echo $exc->getTraceAsString();
+      echo $exc->getMessage();
     }
   }
 

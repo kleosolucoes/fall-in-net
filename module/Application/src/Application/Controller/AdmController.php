@@ -12,6 +12,8 @@ use Application\Model\Entity\GrupoPessoaTipo;
 use Application\Model\Entity\Tarefa;
 use Application\Model\Entity\EventoFrequencia;
 use Application\Model\Entity\PonteProspecto;
+use Application\Model\Entity\FatoCiclo;
+use Application\Model\Entity\TarefaTipo;
 use Doctrine\ORM\EntityManager;
 use Exception;
 use Zend\View\Model\ViewModel;
@@ -53,7 +55,7 @@ class AdmController extends KleoController {
     }
 
     $diaDoEventoEmRelacaoHoje = 0;
-    for($indiceDia = 0;$indiceDia <= 7;$indiceDia++){
+    for($indiceDia = 0;$indiceDia <= 6;$indiceDia++){
       foreach($grupoEventos as $grupoEvento){
         $diaDaSemana = date('N', strtotime('now +'.$indiceDia.' days')); 
         if($grupoEvento->getEvento()->getDia() == $diaDaSemana){
@@ -92,6 +94,7 @@ class AdmController extends KleoController {
     if(count($arrayPontes)>0){
       $formularioProspecto = new ProspectoForm('Prospecto', $arrayPontes);
     }
+
     return new ViewModel(array(
       self::stringAgenda => $arrayAgenda,
       self::stringGrupoPessoas => $grupoPessoas,
@@ -168,22 +171,31 @@ class AdmController extends KleoController {
             foreach($grupoEventos as $grupoEvento){
               $diaDaSemana = date('N', strtotime('now +'.$indice.' days')); 
               if($grupoEvento->getEvento()->getDia() == $diaDaSemana && $indice !== 0){
-                $this->cadastrarTarefa($pessoa, Tarefa::LIGAR, $indice);
-                $this->cadastrarTarefa($pessoa, Tarefa::MENSAGEM, $indice);
+                $this->cadastrarTarefa($pessoa, TarefaTipo::LIGAR, $indice);
+                $this->cadastrarTarefa($pessoa, TarefaTipo::MENSAGEM, $indice);
                 break;
               }
               if($indice === 0){
                 $diaDaSemanaMais1 = date('N', strtotime('now +'.($indice+1).' days')); 
                 if($grupoEvento->getEvento()->getDia() != $diaDaSemanaMais1){
-                  $this->cadastrarTarefa($pessoa, Tarefa::LIGAR, $indice+1);
+                  $this->cadastrarTarefa($pessoa, TarefaTipo::LIGAR, $indice+1);
                 }
                 $diaDaSemanaMais2 = date('N', strtotime('now +'.($indice+2).' days')); 
                 if($grupoEvento->getEvento()->getDia() != $diaDaSemanaMais2){
-                  $this->cadastrarTarefa($pessoa, Tarefa::MENSAGEM, $indice+2);
+                  $this->cadastrarTarefa($pessoa, TarefaTipo::MENSAGEM, $indice+2);
                 }
               }
             }
           }
+
+          $numeroIdentificador = self::getRepositorio()->getFatoCicloORM()->montarNumeroIdentificador(self::getRepositorio());
+          if($post[KleoForm::inputGrupoPessoaTipo] == GrupoPessoaTipo::PONTE){
+            self::getRepositorio()->getFatoCicloORM()->criarFatoCiclo($numeroIdentificador, FatoCiclo::PONTE, 1);          
+          }
+          if($post[KleoForm::inputGrupoPessoaTipo] == GrupoPessoaTipo::PROSPECTO){
+            self::getRepositorio()->getFatoCicloORM()->criarFatoCiclo($numeroIdentificador, FatoCiclo::PROSPECTO, 1);                
+          }
+
           self::getRepositorio()->fecharTransacao();
 
           return $this->redirect()->toRoute(self::rotaAdm, array(
@@ -192,11 +204,10 @@ class AdmController extends KleoController {
 
         } else {
           self::getRepositorio()->desfazerTransacao();
-          var_dump($formulario->getMessages());
-          //           return $this->forward()->dispatch(self::controllerAdm, array(
-          //             self::stringAction => self::stringIndex,
-          //             self::stringFormulario => $formulario,
-          //           ));
+          return $this->forward()->dispatch(self::controllerAdm, array(
+            self::stringAction => self::stringIndex,
+            self::stringFormulario => $formulario,
+          ));
         }
       } catch (Exception $exc) {
         self::getRepositorio()->desfazerTransacao();
@@ -235,6 +246,14 @@ class AdmController extends KleoController {
         $tarefa->setRealizada($valor);
         $tarefa->setDataEHoraDeAlteracao();
         self::getRepositorio()->getTarefaORM()->persistir($tarefa, $naoMudarDataDeCriacao);
+
+        $numeroIdentificador = self::getRepositorio()->getFatoCicloORM()->montarNumeroIdentificador(self::getRepositorio());
+        if($tarefa->getTarefaTipo()->getId() == TarefaTipo::LIGAR){
+          self::getRepositorio()->getFatoCicloORM()->criarFatoCiclo($numeroIdentificador, FatoCiclo::LIGACAO, 1);          
+        }
+        if($tarefa->getTarefaTipo()->getId() == TarefaTipo::MENSAGEM){
+          self::getRepositorio()->getFatoCicloORM()->criarFatoCiclo($numeroIdentificador, FatoCiclo::MENSAGEM, 1);          
+        }
 
         self::getRepositorio()->fecharTransacao();
         $response->setContent(Json::encode(
@@ -282,6 +301,15 @@ class AdmController extends KleoController {
           $eventoFrequencia->setDia($diaFormatado);
           self::getRepositorio()->getEventoFrequenciaORM()->persistir($eventoFrequencia);
         }
+
+        $numeroIdentificador = self::getRepositorio()->getFatoCicloORM()->montarNumeroIdentificador(self::getRepositorio());
+        if($valor == 'S'){
+          $valor = 1;
+        }else{
+          $valor = -1;
+        }
+        self::getRepositorio()->getFatoCicloORM()->criarFatoCiclo($numeroIdentificador, FatoCiclo::FREQUENCIA, $valor);          
+
         self::getRepositorio()->fecharTransacao();
         $response->setContent(Json::encode(
           array('response' => 'true')
@@ -294,6 +322,39 @@ class AdmController extends KleoController {
     return $response;
   }
 
+   /**
+     * clicar em uma acao
+     * @return Json
+     */
+  public function clicarAction() {
+    $request = $this->getRequest();
+    $response = $this->getResponse();
+    if ($request->isPost()) {
+      try {
+        self::getRepositorio()->iniciarTransacao();       
+        $post_data = $request->getPost();      
+        $tipoClique = $post_data['tipoClique'];
+      
+        $numeroIdentificador = self::getRepositorio()->getFatoCicloORM()->montarNumeroIdentificador(self::getRepositorio());
+        if($tipoClique == FatoCiclo::CLIQUE_LIGACAO){
+          self::getRepositorio()->getFatoCicloORM()->criarFatoCiclo($numeroIdentificador, FatoCiclo::CLIQUE_LIGACAO, 1);          
+        }
+        if($tipoClique == FatoCiclo::CLIQUE_MENSAGEM){
+          self::getRepositorio()->getFatoCicloORM()->criarFatoCiclo($numeroIdentificador, FatoCiclo::CLIQUE_MENSAGEM, 1);          
+        }
+
+        self::getRepositorio()->fecharTransacao();
+        $response->setContent(Json::encode(
+          array('response' => 'true')
+        ));
+      } catch (Exception $exc) {
+        $self::getRepositorio()->desfazerTransacao();
+        echo $exc->getTraceAsString();
+      }
+    }
+    return $response;
+  }
+  
   /**
      * Função que direciona a tela de acesso
      * GET /admSair

@@ -17,8 +17,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Tarefa extends KleoEntity {
 
-  const LIGAR = 1;
-  const MENSAGEM = 2;
+  
   public function __construct() {
     $this->setRealizada('N');
   }

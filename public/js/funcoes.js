@@ -155,3 +155,23 @@ function selecionarPonteProspecto(tipo){
     modalTitle.html('Novo Prospecto');
   }
 }
+
+var tipoLigacao = 6;
+var tipoMensagem = 7;
+function clicarAcao(tipo, telefone, nome){
+  dados = { 
+    tipoClique: tipo,
+  };
+  $.post(
+    "/admClicar",
+    dados,
+    function (data) {
+      if(tipo === tipoLigacao){
+        location.href= 'tel:+55' + telefone;
+      }
+      if(tipo === tipoMensagem){
+        var url = 'https://api.whatsapp.com/send?phone=55' + telefone + '&text=Bom%20dia%20' + nome;
+        window.open(url,'_blank');
+      }
+    }, 'json');
+}

@@ -112,7 +112,7 @@ class RepositorioORM {
      */
     public function getEventoORM() {
         if (is_null($this->_eventoORM)) {
-            $this->_eventoORM = new CircuitoORM($this->getDoctrineORMEntityManager(), 'Application\Model\Entity\Evento');
+            $this->_eventoORM = new KleoORM($this->getDoctrineORMEntityManager(), 'Application\Model\Entity\Evento');
         }
         return $this->_eventoORM;
     }
