@@ -63,9 +63,18 @@ class AdmController extends KleoController {
         }
       }
     }
-
+    
+    $token = $this->getEvent()->getRouteMatch()->getParam(self::stringToken, 0);    
     $inicioDoCiclo = (6 - $diaDoEventoEmRelacaoHoje) * -1;
     $fimDoCiclo = $diaDoEventoEmRelacaoHoje;
+    if($token == 1){
+      $inicioDoCiclo += 7;
+      $fimDoCiclo += 7;
+    }
+    if($token == -1){
+      $inicioDoCiclo -= 7;
+      $fimDoCiclo -= 7;
+    }
 
     $arrayAgenda = array();
     for($j = $inicioDoCiclo;$j <= $fimDoCiclo;$j++){
@@ -103,6 +112,7 @@ class AdmController extends KleoController {
       self::stringFormulario.'Prospecto' => $formularioProspecto,
       'inicioDoCiclo' => $inicioDoCiclo,
       'fimDoCiclo' => $fimDoCiclo,
+      self::stringToken => $token,
     ));
   }
 
@@ -204,6 +214,7 @@ class AdmController extends KleoController {
 
         } else {
           self::getRepositorio()->desfazerTransacao();
+          echo $formulario->getMessages();
           return $this->forward()->dispatch(self::controllerAdm, array(
             self::stringAction => self::stringIndex,
             self::stringFormulario => $formulario,
@@ -322,7 +333,7 @@ class AdmController extends KleoController {
     return $response;
   }
 
-   /**
+  /**
      * clicar em uma acao
      * @return Json
      */
@@ -334,7 +345,7 @@ class AdmController extends KleoController {
         self::getRepositorio()->iniciarTransacao();       
         $post_data = $request->getPost();      
         $tipoClique = $post_data['tipoClique'];
-      
+
         $numeroIdentificador = self::getRepositorio()->getFatoCicloORM()->montarNumeroIdentificador(self::getRepositorio());
         if($tipoClique == FatoCiclo::CLIQUE_LIGACAO){
           self::getRepositorio()->getFatoCicloORM()->criarFatoCiclo($numeroIdentificador, FatoCiclo::CLIQUE_LIGACAO, 1);          
@@ -354,7 +365,7 @@ class AdmController extends KleoController {
     }
     return $response;
   }
-  
+
   /**
      * Função que direciona a tela de acesso
      * GET /admSair

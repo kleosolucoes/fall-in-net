@@ -22,6 +22,19 @@ use Application\View\Helper\Botao;
       <?php 
       echo KleoController::diaDaSemanaPorDia(date('N'),1).'<br />';
       echo KleoController::mesPorExtenso(date('m'),1).' '. date('d'); ?>
+      <p>
+        <?php
+        if($this->token != -1){
+          echo '<a class="btn btn-success btn-sm" href="/adm/-1"> << Ciclo Anterior</a>&nbsp;';
+        }
+        if($this->token != 0){
+          echo '<a class="btn btn-success btn-sm" href="/adm">Ciclo Atual</a>&nbsp;';
+        }
+        if($this->token != 1){
+          echo '<a class="btn btn-success btn-sm" href="/adm/1"> >> Ciclo A frente</a>';
+        }
+        ?>
+      </p>
     </h2>
   </div>
   <div class="panel-body">
@@ -33,7 +46,7 @@ use Application\View\Helper\Botao;
           if(date('d', strtotime('now +'.$indiceDias.' days')) == 1){
             echo '<tr class="bg-primary text-center"><td colspan="2"><p>'.KleoController::mesPorExtenso(date('m', strtotime('now +'.$indiceDias.' days')),1).'</p></td></tr>';       
           }
-          
+
           $idAncora = '';
           if($indiceDias === 0){
             $idAncora = 'ancora';
@@ -89,68 +102,77 @@ use Application\View\Helper\Botao;
                   <i class="icon fa-thumbs-<?php echo $iconeTarefaRealizada; ?>" aria-hidden="true"></i>
                 </button>
                 </p>
-              </div>
             </div>
-            <?php
+      </div>
+        <?php
               }
               if($elemento instanceof Evento){
                 $ocorreuEvento = true;
-            ?>
-            <div class="row px-10">
-              <div class="alert alert-danger w-full" role="alert">
-                <?php 
+        ?>
+        <div class="row px-10">
+          <div class="alert alert-danger w-full" role="alert">
+            <?php 
                 echo $elemento->getNome(); 
                 if($this->grupoPessoas){
                   foreach($this->grupoPessoas as $grupoPessoa){
-                    echo '<p>'.$grupoPessoa->getPessoa()->getNome();
-                    if(count($grupoPessoa->getPessoa()->getPonteProspectoPonte())>0){
-                      echo ' prospecto de '.$grupoPessoa->getPessoa()->getPonteProspectoPonte()[0]->getPonteProspectoPonte()->getNome();
-                    }
+                    $mostrar = true;
                     $diaRealDoEvento = date('Y-m-d', strtotime('now +'.$indiceDias.' days'));
-                    $eventosFiltrado = $grupoPessoa->getPessoa()->getEventoFrequenciaFiltradoPorEventoEDia($elemento->getId(), $diaRealDoEvento);
-                    $iconeTarefaRealizada = 'down';
-                    $corTarefaRealizada = 'default';
-                    if($eventosFiltrado){
-                      if($eventosFiltrado->getFrequencia() === "S"){
-                        $iconeTarefaRealizada = 'up';
-                        $corTarefaRealizada = 'primary';
-                      }  
+                    if($grupoPessoa->getData_criacaoFormatoBandoDeDados() >= $diaRealDoEvento){
+                      $mostrar = false;
+                    }                    
+                    if($mostrar){
+                      echo '<p>'.$grupoPessoa->getPessoa()->getNome();
+                      if(count($grupoPessoa->getPessoa()->getPonteProspectoPonte())>0){
+                        echo ' prospecto de '.$grupoPessoa->getPessoa()->getPonteProspectoPonte()[0]->getPonteProspectoPonte()->getNome();
+                      }
+
+                      $eventosFiltrado = $grupoPessoa->getPessoa()->getEventoFrequenciaFiltradoPorEventoEDia($elemento->getId(), $diaRealDoEvento);
+                      $iconeTarefaRealizada = 'down';
+                      $corTarefaRealizada = 'default';
+                      if($eventosFiltrado){
+                        if($eventosFiltrado->getFrequencia() === "S"){
+                          $iconeTarefaRealizada = 'up';
+                          $corTarefaRealizada = 'primary';
+                        }  
+                      }
+
+            ?>
+            <button id="botao_<?php echo $elemento->getId().'_'.$grupoPessoa->getPessoa()->getId(); ?>" 
+                    onclick="mudarFrequencia(2,0, <?php echo $elemento->getId() . ',' . $grupoPessoa->getPessoa()->getId() . ', \'' .  $diaRealDoEvento . '\'' ?>);"
+                    type="button" class="float-right btn btn-sm btn-<?php echo $corTarefaRealizada; ?>" >
+              <i class="icon fa-thumbs-<?php echo $iconeTarefaRealizada; ?>" aria-hidden="true"></i>
+            </button>
+            <?php
+                      echo '</p>';
                     }
 
-                ?>
-                <button id="botao_<?php echo $elemento->getId().'_'.$grupoPessoa->getPessoa()->getId(); ?>" 
-                        onclick="mudarFrequencia(2,0, <?php echo $elemento->getId() . ',' . $grupoPessoa->getPessoa()->getId() . ', \'' .  $diaRealDoEvento . '\'' ?>);"
-                        type="button" class="float-right btn btn-sm btn-<?php echo $corTarefaRealizada; ?>" >
-                  <i class="icon fa-thumbs-<?php echo $iconeTarefaRealizada; ?>" aria-hidden="true"></i>
-                </button>
-                <?php
-                    echo '</p>';
                   }
                 }
-                ?>
-              </div>
-            </div>
-            <?php
+            ?>
+          </div>
+        </div>
+        <?php
               }
             }
             /* fim foreach */
           }else{
             echo $this->agenda[$indiceDias][0];
           }
-            ?>
-          </td>
-        </tr>
-        <?php 
+        ?>
+      </td>
+    </tr>
+  <?php 
           if($ocorreuEvento){
             break;
           }
         } 
-        ?>
-      </tbody>
-    </table>
-  </div>
+  ?>
+  </tbody>
+</table>
+</div>
 </div>
 <!-- Site Action -->
+<?php if($this->token == 0){ ?>
 <div id="divSiteAction" class="site-action" data-plugin="actionBtn">
   <button onclick="$('#divSiteAction').toggleClass('active');" type="button" class="site-action-toggle btn-raised btn btn-success btn-floating">
     <i class="front-icon wb-plus animation-scale-up" aria-hidden="true"></i>
@@ -169,6 +191,7 @@ use Application\View\Helper\Botao;
     <?php } ?>
   </div>
 </div>
+<?php } ?>
 <!-- End Site Action -->
 <?php
 ?>

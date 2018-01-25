@@ -32,7 +32,7 @@ return array(
                     'route' => '/adm[:action][/:token]',
                     'constraints' => array(
                         'action' => '[a-zA-Z]+',
-                        'token' => '[a-zA-Z0-9]+',
+                        'token' => '[a-zA-Z-0-9]+',
                     ),
                     'defaults' => array(
                         'controller' => 'Application\Controller\Adm',
