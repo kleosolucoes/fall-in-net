@@ -39,28 +39,4 @@ class Splash extends AbstractHelper {
     return $html;
   }
 
-  function getLabel() {
-    return $this->label;
-  }
-
-  function setLabel($label) {
-    $this->label = $label;
-  }
-
-  function getInput() {
-    return $this->input;
-  }
-
-  function setInput($input) {
-    $this->input = $input;
-  }
-
-  function getTamanhoGrid() {
-    return $this->tamanhoGrid;
-  }
-
-  function setTamanhoGrid($tamanhoGrid) {
-    $this->tamanhoGrid = $tamanhoGrid;
-  }
-
 }

@@ -32,7 +32,8 @@ $versao = '?v=2.2';
 		<?php
 		echo $this
 			->headLink(array('rel' => 'shortcut icon', 'type' => 'image/vnd.microsoft.icon', 'href' => $this->basePath() . '/img/favicon.jpeg'))               
-			->prependStylesheet($this->basePath() . '/css/splash.css' . $versao)
+			->prependStylesheet($this->basePath() . '/css/splash.css' . $versao)			
+			->prependStylesheet($this->basePath() . '/global/vendor/ladda/ladda.min.css')
 			->prependStylesheet($this->basePath() . '/global/fonts/web-icons/web-icons.min.css')
 			->prependStylesheet($this->basePath() . '/global/fonts/font-awesome/font-awesome.min.css')
 			->prependStylesheet($this->basePath() . '/global/vendor/slidepanel/slidePanel.css')
@@ -77,7 +78,7 @@ $versao = '?v=2.2';
 			<div class="page-content container-fluid">
 				<?php
 				echo $this->content;
-				?>      
+				?>
 			</div>
 		</div>
 		<!-- End Page -->
@@ -90,7 +91,9 @@ $versao = '?v=2.2';
 		echo $this
 			->headScript()
 			->prependFile($this->basePath() . '/js/validacoes.js' . $versao)
-			->prependFile($this->basePath() . '/js/funcoes.js' . $versao)
+			->prependFile($this->basePath() . '/js/funcoes.js' . $versao)			
+			->prependFile($this->basePath() . '/global/vendor/ladda/ladda.min.js')
+			->prependFile($this->basePath() . '/global/vendor/ladda/spin.min.js')
 			->prependFile($this->basePath() . '/assets/js/config/tour.js')
 			->prependFile($this->basePath() . '/global/js/config/colors.js')
 			->prependFile($this->basePath() . '/assets/js/Plugin/menu.js')
@@ -117,7 +120,14 @@ $versao = '?v=2.2';
 		<script>Config.set('assets', '../../../assets');</script>
 
 		<script type="text/javascript">
-
+			  jQuery(document).ready(function () {
+                "use strict";
+              
+                // Init Ladda Plugin on buttons
+                Ladda.bind('.ladda-button', {
+                    timeout: 1000
+                });					
+				});
 		</script>
 		<!-- END: PAGE SCRIPTS -->
 	</body>

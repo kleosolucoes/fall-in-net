@@ -167,11 +167,11 @@ function clicarAcao(tipo, telefone, nome){
     dados,
     function (data) {
       if(tipo === tipoLigacao){
-        location.href= 'tel:+55' + telefone;
+        location.href = 'tel:+55' + telefone;
       }
       if(tipo === tipoMensagem){
         var url = 'https://api.whatsapp.com/send?phone=55' + telefone + '&text=Bom%20dia%20' + nome;
-        window.open(url,'_blank');
+         location.href = url;
       }
     }, 'json');
 }

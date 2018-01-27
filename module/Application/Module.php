@@ -17,6 +17,9 @@ use Application\View\Helper\FuncaoOnClickSubmeterFormulario;
 use Application\View\Helper\Splash;
 use Application\View\Helper\CabecalhoPagina;
 use Application\View\Helper\Menu;
+use Application\View\Helper\CabecalhoDePeriodos;
+use Application\View\Helper\Agenda;
+use Application\View\Helper\CadastroDePonteEProspecto;
 use Application\Controller\KleoController;
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
@@ -97,38 +100,47 @@ class Module {
 	public function getAutoloaderConfig() {
 		return array(
 			'Zend\Loader\StandardAutoloader' => array(
-			'namespaces' => array(
-			__NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
-		),
-		),
+				'namespaces' => array(
+					__NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
+				),
+			),
 		);
 	}
 
 	public function getViewHelperConfig() {
 		return array(
 			'factories' => array(
-			'inputFormulario' => function($sm) {
-			return new InputFormulario();
-		},
-			'botao' => function($sm) {
-			return new Botao();
-		},
-			'funcaoOnClick' => function($sm) {
-			return new FuncaoOnClick();
-		},
-			'funcaoOnClickSubmeterFormulario' => function($sm) {
-			return new FuncaoOnClickSubmeterFormulario();
-		},
-			'splash' => function($sm) {
-			return new Splash();
-		},
-			'cabecalhoPagina' => function($sm) {
-			return new CabecalhoPagina();
-		},
-			'menu' => function($sm) {
-			return new Menu();
-		},
-		)
+				'inputFormulario' => function($sm) {
+					return new InputFormulario();
+				},
+				'botao' => function($sm) {
+					return new Botao();
+				},
+				'funcaoOnClick' => function($sm) {
+					return new FuncaoOnClick();
+				},
+				'funcaoOnClickSubmeterFormulario' => function($sm) {
+					return new FuncaoOnClickSubmeterFormulario();
+				},
+				'splash' => function($sm) {
+					return new Splash();
+				},
+				'cabecalhoPagina' => function($sm) {
+					return new CabecalhoPagina();
+				},
+				'menu' => function($sm) {
+					return new Menu();
+				},
+				'cabecalhoDePeriodos' => function($sm) {
+					return new CabecalhoDePeriodos();
+				},
+				'agenda' => function($sm) {
+					return new Agenda();
+				},
+				'cadastroDePonteEProspecto' => function($sm) {
+					return new cadastroDePonteEProspecto();
+				},			
+			)
 		);
 	}
 
@@ -143,10 +155,10 @@ class Module {
 	public function getServiceConfig() {
 		return array(
 			'factories' => array(
-			'Zend\Authentication\AuthenticationService' => function($serviceManager) {
-			return $serviceManager->get('doctrine.authenticationservice.orm_default');
-		}
-		),
+				'Zend\Authentication\AuthenticationService' => function($serviceManager) {
+					return $serviceManager->get('doctrine.authenticationservice.orm_default');
+				}
+			),
 		);
 	}
 
