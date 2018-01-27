@@ -63,7 +63,7 @@ class AdmController extends KleoController {
         }
       }
     }
-    
+
     $token = $this->getEvent()->getRouteMatch()->getParam(self::stringToken, 0);    
     $inicioDoCiclo = (6 - $diaDoEventoEmRelacaoHoje) * -1;
     $fimDoCiclo = $diaDoEventoEmRelacaoHoje;
@@ -110,8 +110,8 @@ class AdmController extends KleoController {
       self::stringPontes => $arrayPontes,
       self::stringFormulario.'Ponte' => $formularioPonte,
       self::stringFormulario.'Prospecto' => $formularioProspecto,
-      'inicioDoCiclo' => $inicioDoCiclo,
-      'fimDoCiclo' => $fimDoCiclo,
+      self::stringInicioDoCiclo => $inicioDoCiclo,
+      self::stringFimDoCiclo => $fimDoCiclo,
       self::stringToken => $token,
     ));
   }
@@ -364,6 +364,19 @@ class AdmController extends KleoController {
       }
     }
     return $response;
+  }
+
+  public function relatorioAction(){
+
+    $numeroIdentificador = self::getRepositorio()->getFatoCicloORM()->montarNumeroIdentificador(self::getRepositorio());
+    $tipoComparacao = 1; 
+    $dataIncial = '2018-01-01'; 
+    $dataFinal = '2018-01-31';
+    $relatorio = self::getRepositorio()->getFatoCicloORM()->montarRelatorioPorNumeroIdentificador($numeroIdentificador, $tipoComparacao, $dataIncial, $dataFinal);          
+    
+    return new ViewModel(array(
+      self::stringRelatorio => $relatorio,
+    ));
   }
 
   /**

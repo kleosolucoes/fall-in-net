@@ -37,6 +37,9 @@ class KleoController extends AbstractActionController {
   const stringAgenda = 'agenda';
   const stringPontes = 'pontes';
   const stringGrupoPessoas = 'grupoPessoas';
+  const stringInicioDoCiclo = 'inicioDoCiclo';
+  const stringFimDoCiclo = 'fimDoCiclo';
+  const stringRelatorio = 'relatorio';
   const controllerPub = 'Application\Controller\Pub';
   const controllerAdm = 'Application\Controller\Adm';
   const rotaPub = 'pub';

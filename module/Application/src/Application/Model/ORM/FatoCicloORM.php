@@ -15,46 +15,24 @@ use Zend\Session\Container;
  */
 class FatoCicloORM extends KleoORM {
 
-  public function encontrarPorNumeroIdentificadorEDataCriacao($numeroIdentificador, $dia, RepositorioORM $repositorioORM) {
-    try {
-      $resposta = $this->getEntityManager()
-        ->getRepository($this->getEntity())
-        ->findOneBy(
-        array(
-          'numero_identificador' => $numeroIdentificador,
-          'data_criacao' => $dia,
-        ));
-      if (empty($resposta)) {
-        $resposta = $this->criarFatoCiclo($numeroIdentificador, $dia, $repositorioORM);
-      }
-      return $resposta;
-    } catch (Exception $exc) {
-      echo $exc->getTraceAsString();
-    }
-  }
-
   /**
      * Localizar fato_ciclo por numeroIdentificador
-     * @param string $numeroIdentificador
-     * @param int $periodo
-     * @param int $tipoComparacao
      * @return array
      */
-  public function montarRelatorioPorNumeroIdentificador($numeroIdentificador, $periodoInicial, $tipoComparacao, $periodoFinal = null) {
-    $dimensaoTipoCelula = 1;
-    $dimensaoTipoDomingo = 4;
+  public function montarRelatorioPorNumeroIdentificador($numeroIdentificador, $tipoComparacao, $dataIncial, $dataFinal) {
     $dqlBase = "SELECT "
-      . "SUM(d.lider) lideres, "
-      . "SUM(d.visitante) visitantes, "
-      . "SUM(d.consolidacao) consolidacoes, "
-      . "SUM(d.membro) membros "
-      . "FROM  " . Constantes::$ENTITY_FATO_CICLO . " fc "
-        . "JOIN fc.dimensao d "
-        . "WHERE "
-        . "d.dimensaoTipo = #dimensaoTipo "
-        . "AND fc.numero_identificador #tipoComparacao ?1 "
-        . "AND fc.data_inativacao is null "
-        . "#data";
+      . "SUM(fc.ponte) ponte, "
+      . "SUM(fc.prospecto) prospecto, "
+      . "SUM(fc.ligacao) ligacao, "
+      . "SUM(fc.mensagem) mensagem, "
+      . "SUM(fc.frequencia) frequencia, "
+      . "SUM(fc.clique_ligacao) clique_ligacao, "
+      . "SUM(fc.clique_mensagem) clique_mensagem "
+      . "FROM Application\Model\Entity\FatoCiclo fc "
+      . "WHERE "
+      . " fc.numero_identificador #tipoComparacao ?1 "
+      . " AND fc.data_inativacao is null "
+      . " AND fc.data_criacao >= ?2 AND fc.data_criacao <= ?3 ";
     try {
 
       if ($tipoComparacao == 1) {
@@ -65,29 +43,16 @@ class FatoCicloORM extends KleoORM {
         $numeroIdentificador .= '%';
       }
 
-      $resultadoPeriodo = Funcoes::montaPeriodo($periodoInicial);
-      $dataDoPeriodo = $resultadoPeriodo[3] . '-' . $resultadoPeriodo[2] . '-' . $resultadoPeriodo[1];
-      $dataDoPeriodoFormatada = DateTime::createFromFormat('Y-m-d', $dataDoPeriodo);
-
-      if ($periodoFinal === null) {
-        $dqlAjustadaTipoComparacao = str_replace('#data', 'AND fc.data_criacao = ?2 ', $dqlAjustadaTipoComparacao);
-      } else {
-        $resultadoPeriodoFinal = Funcoes::montaPeriodo($periodoFinal);
-        $dataDoPeriodoFinal = $resultadoPeriodoFinal[6] . '-' . $resultadoPeriodoFinal[5] . '-' . $resultadoPeriodoFinal[4];
-        $stringDatas = "AND fc.data_criacao >= ?2 AND fc.data_criacao <= '$dataDoPeriodoFinal' ";
-        $dqlAjustadaTipoComparacao = str_replace('#data', $stringDatas, $dqlAjustadaTipoComparacao);
-        $dataDoPeriodoFormatada = $dataDoPeriodo;
-      }
-      for ($indice = $dimensaoTipoCelula; $indice <= $dimensaoTipoDomingo; $indice++) {
-        $dqlAjustada = str_replace('#dimensaoTipo', $indice, $dqlAjustadaTipoComparacao);
-        $result[$indice] = $this->getEntityManager()->createQuery($dqlAjustada)
-          ->setParameter(1, $numeroIdentificador)
-          ->setParameter(2, $dataDoPeriodoFormatada)
-          ->getResult();
-      }
+      $dataInicialFormatada = DateTime::createFromFormat('Y-m-d', $dataIncial);
+      $dataFinalFormatada = DateTime::createFromFormat('Y-m-d', $dataFinal);
+      $result = $this->getEntityManager()->createQuery($dqlAjustadaTipoComparacao)
+        ->setParameter(1, $numeroIdentificador)
+        ->setParameter(2, $dataInicialFormatada)
+        ->setParameter(3, $dataFinalFormatada)
+        ->getResult();
       return $result;
     } catch (Exception $exc) {
-      echo $exc->getTraceAsString();
+      echo $exc->getMessage();
     }
   }
 
@@ -154,37 +119,4 @@ class FatoCicloORM extends KleoORM {
       echo $exc->getMessage();
     }
   }
-
-  public function verificaFrequenciasPorCelulaEPeriodo($periodoInicial, $eventoId, $periodoFinal = 0) {
-    $resultadoPeriodoInicial = Funcoes::montaPeriodo($periodoInicial);
-    $dataDoPeriodoInicial = $resultadoPeriodoInicial[3] . '-' . $resultadoPeriodoInicial[2] . '-' . $resultadoPeriodoInicial[1];
-
-    $resultadoPeriodoFinal = Funcoes::montaPeriodo($periodoFinal);
-    $dataDoPeriodoFinal = $resultadoPeriodoFinal[6] . '-' . $resultadoPeriodoFinal[5] . '-' . $resultadoPeriodoFinal[4];
-
-    $dataDoInicioFormatada = DateTime::createFromFormat('Y-m-d', $dataDoPeriodoInicial);
-    $dataDoFimFormatada = DateTime::createFromFormat('Y-m-d', $dataDoPeriodoFinal);
-
-    $dqlBase = "SELECT "
-      . "ef.frequencia "
-      . "FROM  " . Constantes::$ENTITY_EVENTO_FREQUENCIA . " ef "
-        . "WHERE "
-        . "ef.evento_id = ?1 AND "
-        . "ef.dia >= ?2 AND ef.dia <= ?3 ";
-
-    $resultados = $this->getEntityManager()->createQuery($dqlBase)
-      ->setParameter(1, (int) $eventoId)
-      ->setParameter(2, $dataDoInicioFormatada)
-      ->setParameter(3, $dataDoFimFormatada)
-      ->getResult();
-
-    $somaResultado = 0;
-    foreach ($resultados as $resultado) {
-      if ($resultado['frequencia'] == 'S') {
-        $somaResultado++;
-      }
-    }
-    return $somaResultado;
-  }
-
 }
