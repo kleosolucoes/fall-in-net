@@ -93,9 +93,13 @@ class Agenda extends AbstractHelper {
               $html .= '<div class="float-left">';
               $html .= $this->view->botao($label, $extra, Botao::botaoMuitoPequenoImportante);
               $html .= '</div>';
-            }                 
+            }
+            $idPonte = 0;
+            if(count($elemento->getPessoa()->getPonteProspectoPonte())>0){
+              $idPonte = $elemento->getPessoa()->getPonteProspectoPonte()[0]->getPonteProspectoPonte()->getId();
+            }
             $label = '<i class="icon fa-thumbs-' . $iconeTarefaRealizada . '" aria-hidden="true"></i>';
-            $extra = 'id="botao_' . $elemento->getId() . '" onclick="mudarFrequencia(1, ' . $elemento->getId() . ',0,0,0);"';
+            $extra = 'id="botao_' . $elemento->getId() . '" onclick="mudarFrequencia(1, ' . $elemento->getId() . ',0,0,0,'.$idPonte.');"';
             $html .= '<div class="float-right">';
             $html .= $this->view->botao($label, $extra, $corTarefaRealizada);
             $html .= '</div>';
@@ -137,9 +141,12 @@ class Agenda extends AbstractHelper {
                       $corTarefaRealizada = Botao::botaoMuitoPequenoImportante;
                     }  
                   }
-
+                  $idPonte = 0;
+                  if(count($grupoPessoa->getPessoa()->getPonteProspectoPonte())>0){
+                    $idPonte = $grupoPessoa->getPessoa()->getPonteProspectoPonte()[0]->getPonteProspectoPonte()->getId();
+                  }
                   $label = '<i class="icon fa-thumbs-' . $iconeTarefaRealizada . '" aria-hidden="true"></i>';
-                  $extra = 'id="botao_' . $elemento->getId().'_'.$grupoPessoa->getPessoa()->getId() .'" onclick="mudarFrequencia(2,0, ' . $elemento->getId() . ',' . $grupoPessoa->getPessoa()->getId() . ', \'' .  $diaRealDoEvento . '\'' . ');"';
+                  $extra = 'id="botao_' . $elemento->getId().'_'.$grupoPessoa->getPessoa()->getId() .'" onclick="mudarFrequencia(2,0, ' . $elemento->getId() . ',' . $grupoPessoa->getPessoa()->getId() . ', \'' .  $diaRealDoEvento . '\'' . ', '.$idPonte.');"';
                   $html .= '<div class="col-2">';
                   $html .= $this->view->botao($label, $extra, $corTarefaRealizada);
                   $html .= '</div>';

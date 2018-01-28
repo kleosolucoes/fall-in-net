@@ -71,7 +71,7 @@ $(window).bind("load", function () {
 
 var tipoTarefa = 1;
 var tipoFrequencia = 2;
-function mudarFrequencia(tipo, idTarefa, idEvento, idPessoa, diaRealDoEvento) {
+function mudarFrequencia(tipo, idTarefa, idEvento, idPessoa, diaRealDoEvento, idPonte) {
   var faThumbsDown = 'fa-thumbs-down';
   var faThumbsUp = 'fa-thumbs-up';
   var disabled = 'disabled';
@@ -133,6 +133,16 @@ function mudarFrequencia(tipo, idTarefa, idEvento, idPessoa, diaRealDoEvento) {
           botao.html(iconefaThumbsDown);
         }
         botao.removeClass(disabled);
+        
+        if(idPonte !== 0){
+          var valorAdicionarABarraDeProgresso = 0;
+          if (valor == "S") {
+            valorAdicionarABarraDeProgresso = '6.25';
+          } else {
+            valorAdicionarABarraDeProgresso = -'6.25';
+          }
+          atualizarBarraDeProgresso(idPonte, valorAdicionarABarraDeProgresso);
+        }
       }
     }, 'json');
 }
@@ -171,7 +181,22 @@ function clicarAcao(tipo, telefone, nome){
       }
       if(tipo === tipoMensagem){
         var url = 'https://api.whatsapp.com/send?phone=55' + telefone + '&text=Bom%20dia%20' + nome;
-         location.href = url;
+        location.href = url;
       }
     }, 'json');
+}
+
+
+function pegaValorBarraDeProgresso(id) {
+  return $('#divBarraDeProgresso_'+id).attr("aria-valuenow");
+}
+function atualizarBarraDeProgresso(id, valorParaSomar) {
+  valorParaSomar = parseFloat(valorParaSomar);
+  var valorAtualDaBarraDeProgresso = pegaValorBarraDeProgresso(id);
+  var valorAtualizadoDaBarraDeProgresso = parseFloat(valorAtualDaBarraDeProgresso) + valorParaSomar;
+  var stringPercentual = '%';
+  $('#divBarraDeProgresso_'+id)
+    .attr("aria-valuenow", valorAtualizadoDaBarraDeProgresso)
+    .html(valorAtualizadoDaBarraDeProgresso + stringPercentual)
+    .css('width', valorAtualizadoDaBarraDeProgresso + stringPercentual);
 }

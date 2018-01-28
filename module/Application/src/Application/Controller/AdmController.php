@@ -141,7 +141,7 @@ class AdmController extends KleoController {
         }
         if($post[KleoForm::inputGrupoPessoaTipo] == GrupoPessoaTipo::PROSPECTO){
           $nomeFromulario = 'Prospecto';
-          $grupoPessoas = self::getGrupo()->getGrupoPessoaAtivasNoPeriodoDe1Semanas();
+          $grupoPessoas = self::getGrupo()->getGrupoPessoa();
           $arrayPontes = array();
           if($grupoPessoas){
             foreach($grupoPessoas as $grupoPessoa){

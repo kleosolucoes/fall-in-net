@@ -1,12 +1,7 @@
 <?php
 use Application\Controller\KleoController;
+echo $this->performancePontes();
 ?>
-<?php if(count($this->pontes) == 0 && $this->token == 0){ ?>
-<div class="alert alert-icon alert-info w-full" role="alert">
-  <i class="icon wb-alert" aria-hidden="true"></i>
-  <p>Vamos começar cadastrando uma Ponte.</p>
-</div>
-<?php } ?>
 <!-- Panel -->
 <div class="panel">
   <div class="panel-heading">

@@ -308,17 +308,6 @@ class Grupo extends \Application\Model\Entity\Grupo implements \Doctrine\ORM\Pro
     /**
      * {@inheritDoc}
      */
-    public function getGrupoPessoasNoPeriodo($periodo)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getGrupoPessoasNoPeriodo', array($periodo));
-
-        return parent::getGrupoPessoasNoPeriodo($periodo);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function setGrupoEvento($grupoEvento)
     {
 

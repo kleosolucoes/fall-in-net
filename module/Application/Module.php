@@ -20,6 +20,7 @@ use Application\View\Helper\Menu;
 use Application\View\Helper\CabecalhoDePeriodos;
 use Application\View\Helper\Agenda;
 use Application\View\Helper\CadastroDePonteEProspecto;
+use Application\View\Helper\PerformancePontes;
 use Application\Controller\KleoController;
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
@@ -140,6 +141,9 @@ class Module {
 				'cadastroDePonteEProspecto' => function($sm) {
 					return new cadastroDePonteEProspecto();
 				},			
+				'performancePontes' => function($sm) {
+					return new PerformancePontes();
+				},
 			)
 		);
 	}

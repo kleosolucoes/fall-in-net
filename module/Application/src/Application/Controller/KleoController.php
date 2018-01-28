@@ -40,11 +40,11 @@ class KleoController extends AbstractActionController {
   const stringInicioDoCiclo = 'inicioDoCiclo';
   const stringFimDoCiclo = 'fimDoCiclo';
   const stringRelatorio = 'relatorio';
+  const stringMensagem = 'mensagem';
   const controllerPub = 'Application\Controller\Pub';
   const controllerAdm = 'Application\Controller\Adm';
   const rotaPub = 'pub';
   const rotaAdm = 'adm';
-  const stringMensagem = 'mensagem';
 
   /**
      * Contrutor sobrecarregado com os serviços de ORM
