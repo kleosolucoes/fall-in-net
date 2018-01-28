@@ -40,19 +40,6 @@ class AdmController extends KleoController {
 
   public function indexAction() {
     $grupoEventos = self::getGrupo()->getGrupoEventoAcima();
-    $arrayTarefas = array();
-    $grupoPessoas = self::getGrupo()->getGrupoPessoaAtivasNoPeriodoDe1Semanas();
-    $arrayPontes = array();
-    if($grupoPessoas){
-      foreach($grupoPessoas as $grupoPessoa){
-        if($grupoPessoa->getGrupoPessoaTipo()->getId() === GrupoPessoaTipo::PONTE){
-          $arrayPontes[] = $grupoPessoa;
-        }
-        foreach($grupoPessoa->getPessoa()->getTarefa() as $tarefa){
-          $arrayTarefas[] = $tarefa;
-        }
-      }
-    }
 
     $diaDoEventoEmRelacaoHoje = 0;
     for($indiceDia = 0;$indiceDia <= 6;$indiceDia++){
@@ -75,6 +62,21 @@ class AdmController extends KleoController {
       $inicioDoCiclo -= 7;
       $fimDoCiclo -= 7;
     }
+
+    $grupoPessoas = self::getGrupo()->getGrupoPessoaAtivasNoPeriodo($inicioDoCiclo,$fimDoCiclo);
+    $arrayTarefas = array();
+    $arrayPontes = array();
+    if($grupoPessoas){
+      foreach($grupoPessoas as $grupoPessoa){
+        if($grupoPessoa->getGrupoPessoaTipo()->getId() === GrupoPessoaTipo::PONTE){
+          $arrayPontes[] = $grupoPessoa;
+        }
+        foreach($grupoPessoa->getPessoa()->getTarefa() as $tarefa){
+          $arrayTarefas[] = $tarefa;
+        }
+      }
+    }
+
 
     $arrayAgenda = array();
     for($j = $inicioDoCiclo;$j <= $fimDoCiclo;$j++){
@@ -258,12 +260,18 @@ class AdmController extends KleoController {
         $tarefa->setDataEHoraDeAlteracao();
         self::getRepositorio()->getTarefaORM()->persistir($tarefa, $naoMudarDataDeCriacao);
 
+        if($valor == 'S'){
+          $valor = 1;
+        }else{
+          $valor = -1;
+        }
+
         $numeroIdentificador = self::getRepositorio()->getFatoCicloORM()->montarNumeroIdentificador(self::getRepositorio());
         if($tarefa->getTarefaTipo()->getId() == TarefaTipo::LIGAR){
-          self::getRepositorio()->getFatoCicloORM()->criarFatoCiclo($numeroIdentificador, FatoCiclo::LIGACAO, 1);          
+          self::getRepositorio()->getFatoCicloORM()->criarFatoCiclo($numeroIdentificador, FatoCiclo::LIGACAO, $valor);          
         }
         if($tarefa->getTarefaTipo()->getId() == TarefaTipo::MENSAGEM){
-          self::getRepositorio()->getFatoCicloORM()->criarFatoCiclo($numeroIdentificador, FatoCiclo::MENSAGEM, 1);          
+          self::getRepositorio()->getFatoCicloORM()->criarFatoCiclo($numeroIdentificador, FatoCiclo::MENSAGEM, $valor);          
         }
 
         self::getRepositorio()->fecharTransacao();
@@ -373,7 +381,7 @@ class AdmController extends KleoController {
     $dataIncial = '2018-01-01'; 
     $dataFinal = '2018-01-31';
     $relatorio = self::getRepositorio()->getFatoCicloORM()->montarRelatorioPorNumeroIdentificador($numeroIdentificador, $tipoComparacao, $dataIncial, $dataFinal);          
-    
+
     return new ViewModel(array(
       self::stringRelatorio => $relatorio,
     ));

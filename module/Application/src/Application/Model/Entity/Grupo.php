@@ -360,20 +360,22 @@ class Grupo extends KleoEntity {
      * Retorna o grupo pessoa ativas no mes infomado
      * @return GrupoPessoa
      */
-  function getGrupoPessoaAtivasNoPeriodoDe1Semanas() {
+  function getGrupoPessoaAtivasNoPeriodo($inicioDoCiclo, $fimDoCiclo) {
     $pessoas = null;
-    $dataDePeriodoValido = strtotime('now -7 days'); 
+    $inicioDoCiclo--;
     if (!empty($this->getGrupoPessoa())) {
       foreach ($this->getGrupoPessoa() as $grupoPessoa) {
-        /* Condição para data de cadastro */
         $verificacaoData = false;
-        $dataCriacao = strtotime($grupoPessoa->getData_criacaoFormatoBandoDeDados());
-        if($dataCriacao >= $dataDePeriodoValido){
-          $verificacaoData = true;
+        $dataCriacao = $grupoPessoa->getData_criacaoFormatoBandoDeDados();
+
+        for($indiceDias = $inicioDoCiclo;$indiceDias <= $fimDoCiclo;$indiceDias++){
+          $diaParaComparar = date('Y-m-d', strtotime('now +'.$indiceDias.' days'));
+          if($dataCriacao == $diaParaComparar){
+            $verificacaoData = true;
+          }
         }
 
-        $condicao[1] = ($grupoPessoa->verificarSeEstaAtivo() && $verificacaoData);
-        if ($condicao[1]) {
+        if ($grupoPessoa->verificarSeEstaAtivo() && $verificacaoData) {
           $pessoas[] = $grupoPessoa;
         }
       }

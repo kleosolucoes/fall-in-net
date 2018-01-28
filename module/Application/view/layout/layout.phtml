@@ -69,7 +69,9 @@ $versao = '?v=2.2';
 <![endif]-->
 		<?php
 		$uri = $_SERVER['REQUEST_URI'];
-		if ($this->mostrarMenu !== 0 && $uri != '/') {
+		if ($this->mostrarMenu !== 0 && 
+				$uri != '/' &&
+				$uri != '/login') {
 			echo $this->menu();
 		}
 		?> 
@@ -120,14 +122,14 @@ $versao = '?v=2.2';
 		<script>Config.set('assets', '../../../assets');</script>
 
 		<script type="text/javascript">
-			  jQuery(document).ready(function () {
-                "use strict";
-              
-                // Init Ladda Plugin on buttons
-                Ladda.bind('.ladda-button', {
-                    timeout: 1000
-                });					
-				});
+			jQuery(document).ready(function () {
+				"use strict";
+
+				// Init Ladda Plugin on buttons
+				Ladda.bind('.ladda-button', {
+					timeout: 1000
+				});					
+			});
 		</script>
 		<!-- END: PAGE SCRIPTS -->
 	</body>
