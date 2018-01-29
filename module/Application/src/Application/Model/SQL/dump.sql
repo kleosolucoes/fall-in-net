@@ -14,7 +14,7 @@ CREATE TABLE `evento` (
   `evento_tipo_id` int(1) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   KEY `evento_tipo_id` (`evento_tipo_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `evento_frequencia`;
 CREATE TABLE `evento_frequencia` (
@@ -41,7 +41,7 @@ CREATE TABLE `evento_tipo` (
   `data_inativacao` date DEFAULT NULL,
   `hora_inativacao` time DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `fato_ciclo`;
 CREATE TABLE `fato_ciclo` (
@@ -68,7 +68,7 @@ CREATE TABLE `grupo` (
   `data_inativacao` date DEFAULT NULL,
   `hora_inativacao` time DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `grupo_evento`;
 CREATE TABLE `grupo_evento` (
@@ -82,7 +82,7 @@ CREATE TABLE `grupo_evento` (
   PRIMARY KEY (`id`),
   KEY `index_grupo_evento_grupo_id` (`grupo_id`),
   KEY `index_grupo_evento_evento_id` (`evento_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `grupo_pai_filho`;
 CREATE TABLE `grupo_pai_filho` (
@@ -96,7 +96,7 @@ CREATE TABLE `grupo_pai_filho` (
   PRIMARY KEY (`id`),
   KEY `index_grupo_pai_filho_pai_id` (`pai_id`),
   KEY `index_grupo_pai_filho_filho_id` (`filho_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `grupo_pessoa`;
 CREATE TABLE `grupo_pessoa` (
@@ -112,7 +112,7 @@ CREATE TABLE `grupo_pessoa` (
   KEY `index_grupo_pessoa_grupo_id` (`grupo_id`),
   KEY `index_grupo_pessoa_pessoa_id` (`pessoa_id`),
   KEY `index_grupo_pessoa_grupo_pessoa_tipo_id` (`grupo_pessoa_tipo_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=52 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `grupo_pessoa_tipo`;
 CREATE TABLE `grupo_pessoa_tipo` (
@@ -123,7 +123,7 @@ CREATE TABLE `grupo_pessoa_tipo` (
   `hora_inativacao` time DEFAULT NULL,
   `nome` varchar(30) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `grupo_responsavel`;
 CREATE TABLE `grupo_responsavel` (
@@ -137,7 +137,7 @@ CREATE TABLE `grupo_responsavel` (
   PRIMARY KEY (`id`),
   KEY `index_grupo_responsavel_pessoa_id` (`pessoa_id`),
   KEY `index_grupo_responsavel_grupo_id` (`grupo_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `hierarquia`;
 CREATE TABLE `hierarquia` (
@@ -148,7 +148,7 @@ CREATE TABLE `hierarquia` (
   `hora_inativacao` time DEFAULT NULL,
   `nome` varchar(30) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `pessoa`;
 CREATE TABLE `pessoa` (
@@ -162,7 +162,7 @@ CREATE TABLE `pessoa` (
   `data_inativacao` date DEFAULT NULL,
   `hora_inativacao` time DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=59 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `pessoa_hierarquia`;
 CREATE TABLE `pessoa_hierarquia` (
@@ -176,7 +176,7 @@ CREATE TABLE `pessoa_hierarquia` (
   PRIMARY KEY (`id`),
   KEY `index_pessoa_hierarquia_pessoa_id` (`pessoa_id`),
   KEY `index_pessoa_hierarquia_hierarquia_id` (`hierarquia_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `ponte_prospecto`;
 CREATE TABLE `ponte_prospecto` (
@@ -190,7 +190,7 @@ CREATE TABLE `ponte_prospecto` (
   PRIMARY KEY (`id`),
   KEY `index_pronte_prospecto_ponte_id` (`ponte_id`),
   KEY `index_ponte_prospecto_prospecto_id` (`prospecto_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `tarefa`;
 CREATE TABLE `tarefa` (
@@ -207,7 +207,7 @@ CREATE TABLE `tarefa` (
   PRIMARY KEY (`id`),
   KEY `index_tarefa_tarefa_tipo_id` (`tarefa_tipo_id`),
   KEY `index_tarefa_pessoa_id` (`pessoa_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=207 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `tarefa_tipo`;
 CREATE TABLE `tarefa_tipo` (
@@ -218,7 +218,7 @@ CREATE TABLE `tarefa_tipo` (
   `hora_inativacao` time DEFAULT NULL,
   `nome` varchar(30) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 
 ALTER TABLE `evento`
