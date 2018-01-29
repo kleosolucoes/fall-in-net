@@ -29,18 +29,23 @@ class CadastroDePonteEProspecto extends AbstractHelper {
 
     if($this->view->token == 0){
       $html .= '<div id="divSiteAction" class="site-action" data-plugin="actionBtn">';
-      $html .= '<button onclick="$(\'#divSiteAction\').toggleClass(\'active\');" type="button" class="site-action-toggle btn-raised btn btn-success btn-floating">';
+      $html .= '<button onclick="$(\'#divSiteAction\').toggleClass(\'active\');" type="button" 
+                  class="site-action-toggle btn-raised btn btn-success btn-floating">';
       $html .= '<i class="front-icon wb-plus animation-scale-up" aria-hidden="true"></i>';
       $html .= '<i class="back-icon wb-close animation-scale-up" aria-hidden="true"></i>';
       $html .= '</button>';
       $html .= '<div class="site-action-buttons">';
       if(count($this->view->pontes) < 2){ 
-        $html .= '<button onclick="selecionarPonteProspecto(' . GrupoPessoaTipo::PONTE . ');" type="button" data-toggle="modal" data-target="#addStageFrom" class="btn-raised btn btn-success btn-floating animation-slide-bottom">';
+        $html .= '<button onclick="selecionarPonteProspecto(' . GrupoPessoaTipo::PONTE . ');" 
+        type="button" data-toggle="modal" data-target="#addStageFrom" 
+        class="btn-raised btn btn-success btn-floating animation-slide-bottom">';
         $html .= '<i class="icon wb-user" aria-hidden="true"></i>';
         $html .= '</button>';
       } 
-      if(count($this->view->pontes) > 0){ 
-        $html .= '<button onclick="selecionarPonteProspecto(' . GrupoPessoaTipo::PROSPECTO . ');" type="button" data-toggle="modal" data-target="#addStageFrom" class="btn-raised btn btn-success btn-floating animation-slide-bottom">';
+      if(count($this->view->pontesParaCadastro) > 0){ 
+        $html .= '<button onclick="selecionarPonteProspecto(' . GrupoPessoaTipo::PROSPECTO . ');" 
+        type="button" data-toggle="modal" data-target="#addStageFrom" 
+        class="btn-raised btn btn-success btn-floating animation-slide-bottom">';
         $html .= '<i class="icon wb-users" aria-hidden="true"></i>';
         $html .= '</button>';
       } 

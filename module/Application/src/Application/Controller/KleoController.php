@@ -11,6 +11,7 @@ use Zend\File\Transfer\Adapter\Http;
 use Application\Model\Entity\KleoEntity;
 use Application\Form\KleoForm;
 use Application\Model\ORM\RepositorioORM;
+use Exception;
 
 /**
  * Nome: KleoController.php
@@ -23,7 +24,7 @@ class KleoController extends AbstractActionController {
   private $sessao;
   private $repositorio;
 
-  
+
   const nomeAFabrica = 'AFábrica';
   const nomeAplicacao = 'URSA';
   const nomeAplicacaoFormatado = 'U.R.S.A.';
@@ -36,6 +37,7 @@ class KleoController extends AbstractActionController {
   const stringIndex = 'index';
   const stringAgenda = 'agenda';
   const stringPontes = 'pontes';
+  const stringPontesParaCadastro = 'pontesParaCadastro';
   const stringGrupoPessoas = 'grupoPessoas';
   const stringInicioDoCiclo = 'inicioDoCiclo';
   const stringFimDoCiclo = 'fimDoCiclo';

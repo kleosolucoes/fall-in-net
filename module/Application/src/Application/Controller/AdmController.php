@@ -66,10 +66,15 @@ class AdmController extends KleoController {
     $grupoPessoas = self::getGrupo()->getGrupoPessoaAtivasNoPeriodo($inicioDoCiclo,$fimDoCiclo);
     $arrayTarefas = array();
     $arrayPontes = array();
+    $arrayPontesParaCadastro = array();
     if($grupoPessoas){
       foreach($grupoPessoas as $grupoPessoa){
         if($grupoPessoa->getGrupoPessoaTipo()->getId() === GrupoPessoaTipo::PONTE){
           $arrayPontes[] = $grupoPessoa;
+          $prospectosDaPonte = $grupoPessoa->getPessoa()->getPonteProspectoProspectos();
+          if(count($prospectosDaPonte) < 4){
+           $arrayPontesParaCadastro[] = $grupoPessoa; 
+          }
         }
         foreach($grupoPessoa->getPessoa()->getTarefa() as $tarefa){
           $arrayTarefas[] = $tarefa;
@@ -103,13 +108,14 @@ class AdmController extends KleoController {
     $formularioPonte = new PonteForm('Ponte');
     $formularioProspecto = null;
     if(count($arrayPontes)>0){
-      $formularioProspecto = new ProspectoForm('Prospecto', $arrayPontes);
+      $formularioProspecto = new ProspectoForm('Prospecto', $arrayPontesParaCadastro);
     }
 
     return new ViewModel(array(
       self::stringAgenda => $arrayAgenda,
       self::stringGrupoPessoas => $grupoPessoas,
       self::stringPontes => $arrayPontes,
+      self::stringPontesParaCadastro => $arrayPontesParaCadastro,
       self::stringFormulario.'Ponte' => $formularioPonte,
       self::stringFormulario.'Prospecto' => $formularioProspecto,
       self::stringInicioDoCiclo => $inicioDoCiclo,
