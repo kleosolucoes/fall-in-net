@@ -99,7 +99,7 @@ class Agenda extends AbstractHelper {
               $idPonte = $elemento->getPessoa()->getPonteProspectoPonte()[0]->getPonteProspectoPonte()->getId();
             }
             $label = '<i class="icon fa-thumbs-' . $iconeTarefaRealizada . '" aria-hidden="true"></i>';
-            $extra = 'id="botao_' . $elemento->getId() . '" onclick="mudarFrequencia(1, ' . $elemento->getId() . ',0,0,0,'.$idPonte.');"';
+            $extra = 'id="botao_' . $elemento->getId() . '" onclick="mudarFrequencia(1, ' . $elemento->getId() . ','.$elemento->getTarefaTipo()->getId().','.$elemento->getPessoa()->getId().',0,'.$idPonte.');"';
             $html .= '<div class="float-right">';
             $html .= $this->view->botao($label, $extra, $corTarefaRealizada);
             $html .= '</div>';

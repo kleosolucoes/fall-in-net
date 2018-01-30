@@ -44,14 +44,19 @@ class PerformancePontes extends AbstractHelper {
               $contadorDeLigacao = 0;
               $contadorDeMensagem = 0;
               foreach($proscpecto->getTarefa() as $tarefa){
-                if($contadorDeLigacao === 0 && $tarefa->getTarefaTipo()->getId() === TarefaTipo::LIGAR &&
+                if($tarefa->getTarefaTipo()->getId() === TarefaTipo::LIGAR &&
                    $tarefa->getRealizada() == 'S'){
-                  $performance += $valorCadaRealizacao;
+                  if($contadorDeLigacao === 0){
+                    $performance += $valorCadaRealizacao;
+                  } 
                   $contadorDeLigacao++;
                 }
-                if($contadorDeMensagem === 0 && $tarefa->getTarefaTipo()->getId() === TarefaTipo::MENSAGEM &&
+
+                if($tarefa->getTarefaTipo()->getId() === TarefaTipo::MENSAGEM &&
                    $tarefa->getRealizada() == 'S'){
-                  $performance += $valorCadaRealizacao;
+                  if($contadorDeMensagem === 0){
+                    $performance += $valorCadaRealizacao;
+                  }
                   $contadorDeMensagem++;
                 }
               }
@@ -63,8 +68,12 @@ class PerformancePontes extends AbstractHelper {
                 }  
               }
             }
+
+            $html .= '<input type="hidden" id="contador_ligacao_'.$proscpecto->getId().'" value="'.$contadorDeLigacao.'">';
+            $html .= '<input type="hidden" id="contador_mensagem_'.$proscpecto->getId().'" value="'.$contadorDeMensagem.'">';
           }
         }
+
         $performance *= 100;
         $html .= '<div class="col-6">';
         $html .= '<div class="card card-block p-30">';

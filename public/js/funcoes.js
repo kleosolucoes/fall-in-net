@@ -71,7 +71,7 @@ $(window).bind("load", function () {
 
 var tipoTarefa = 1;
 var tipoFrequencia = 2;
-function mudarFrequencia(tipo, idTarefa, idEvento, idPessoa, diaRealDoEvento, idPonte) {
+function mudarFrequencia(tipo, idTarefa, idEventoOuTipoTarefa, idPessoa, diaRealDoEvento, idPonte) {
   var faThumbsDown = 'fa-thumbs-down';
   var faThumbsUp = 'fa-thumbs-up';
   var disabled = 'disabled';
@@ -86,7 +86,7 @@ function mudarFrequencia(tipo, idTarefa, idEvento, idPessoa, diaRealDoEvento, id
     botao = $('#botao_' + idTarefa);
   }
   if(tipo === tipoFrequencia){
-    botao = $('#botao_' + idEvento + '_' + idPessoa);
+    botao = $('#botao_' + idEventoOuTipoTarefa + '_' + idPessoa);
   }
 
   var valor = 'N';
@@ -111,7 +111,7 @@ function mudarFrequencia(tipo, idTarefa, idEvento, idPessoa, diaRealDoEvento, id
   if(tipo === tipoFrequencia){
     dados = { 
       valor: valor,
-      idEvento: idEvento,
+      idEvento: idEventoOuTipoTarefa,
       idPessoa: idPessoa,
       diaRealDoEvento: diaRealDoEvento,
     };
@@ -133,7 +133,7 @@ function mudarFrequencia(tipo, idTarefa, idEvento, idPessoa, diaRealDoEvento, id
           botao.html(iconefaThumbsDown);
         }
         botao.removeClass(disabled);
-        
+
         if(idPonte !== 0){
           var valorAdicionarABarraDeProgresso = 0;
           if (valor == "S") {
@@ -141,7 +141,30 @@ function mudarFrequencia(tipo, idTarefa, idEvento, idPessoa, diaRealDoEvento, id
           } else {
             valorAdicionarABarraDeProgresso = -'6.25';
           }
-          atualizarBarraDeProgresso(idPonte, valorAdicionarABarraDeProgresso);
+          var elementoContador;
+          // tarefa ligar
+          if(idEventoOuTipoTarefa == 1){
+            elementoContador = $('#contador_ligacao_'+idPessoa);
+          }
+          // tarefa mensagem
+          if(idEventoOuTipoTarefa == 2){
+            elementoContador = $('#contador_mensagem_'+idPessoa);
+          }
+          if(parseInt(elementoContador.val()) === 1 && valor == "S"){
+            elementoContador.val(2);
+          }
+          if(parseInt(elementoContador.val()) === 1 && valor == "N"){
+            atualizarBarraDeProgresso(idPonte, valorAdicionarABarraDeProgresso);  
+            elementoContador.val(0);
+          }
+          if(parseInt(elementoContador.val()) === 2 && valor == "N"){
+            elementoContador.val(1);
+          }
+          if(parseInt(elementoContador.val()) === 0 && valor == "S"){
+            atualizarBarraDeProgresso(idPonte, valorAdicionarABarraDeProgresso);  
+            elementoContador.val(1);
+          }
+
         }
       }
     }, 'json');

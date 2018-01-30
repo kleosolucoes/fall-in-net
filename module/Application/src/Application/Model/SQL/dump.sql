@@ -54,8 +54,9 @@ CREATE TABLE `fato_ciclo` (
   `mensagem` int(1) NULL,
   `ponte` int(1) NULL,
   `prospecto` int(1) NULL,
-  `cliqueLigacao` int(1) NULL,
-  `cliqueMensagem` int(1) NULL,
+  `frequencia` int(1) NULL,
+  `clique_ligacao` int(1) NULL,
+  `clique_mensagem` int(1) NULL,
   `numero_identificador` varchar(400) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
