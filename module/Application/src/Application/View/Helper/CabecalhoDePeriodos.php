@@ -12,32 +12,40 @@ use Application\View\Helper\Botao;
  */
 class CabecalhoDePeriodos extends AbstractHelper {
 
+  private $pagina;
   public function __construct() {
 
   }
 
-  public function __invoke() {   
+  public function __invoke($pagina = '') {
+    $this->setPagina($pagina);
     return $this->renderHtml();
   }
 
   public function renderHtml() {
     $html = '';
     if($this->view->token != -1){
-      $extra = 'onclick="mudarPaginaComLoader(\'/adm/-1\');"';
+      $extra = 'onclick="mudarPaginaComLoader(\'/adm'.$this->getPagina().'/-1\');"';
       $html .= $this->view->botao('<i class="icon wb-chevron-left-mini" aria-hidden="true"></i>', $extra,Botao::botaoMuitoPequenoSucesso);
       $html .=  '&nbsp;';
     }
     if($this->view->token != 0){
-      $extra = 'onclick="mudarPaginaComLoader(\'/adm\');"';
+      $extra = 'onclick="mudarPaginaComLoader(\'/adm'.$this->getPagina().'\');"';
       $html .=  $this->view->botao('<i class="icon wb-home" aria-hidden="true"></i>', $extra,Botao::botaoMuitoPequenoSucesso);
       $html .=  '&nbsp;';      
     }
     if($this->view->token != 1){
-      $extra = 'onclick="mudarPaginaComLoader(\'/adm/1\');"';
+      $extra = 'onclick="mudarPaginaComLoader(\'/adm'.$this->getPagina().'/1\');"';
       $html .=  $this->view->botao('<i class="icon wb-chevron-right-mini" aria-hidden="true"></i>', $extra,Botao::botaoMuitoPequenoSucesso);
     }
     return $html;
   }
 
+  function getPagina() {
+    return $this->pagina;
+  }
+  function setPagina($pagina) {
+    $this->pagina = $pagina;
+  }
 
 }

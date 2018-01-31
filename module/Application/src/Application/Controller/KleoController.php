@@ -47,6 +47,8 @@ class KleoController extends AbstractActionController {
   const controllerAdm = 'Application\Controller\Adm';
   const rotaPub = 'pub';
   const rotaAdm = 'adm';
+  const metaPonte = 1;
+  const metaProspecto = 4;
 
   /**
      * Contrutor sobrecarregado com os serviços de ORM

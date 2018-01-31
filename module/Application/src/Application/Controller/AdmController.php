@@ -40,30 +40,12 @@ class AdmController extends KleoController {
 
   public function indexAction() {
     $grupoEventos = self::getGrupo()->getGrupoEventoAcima();
-
-    $diaDoEventoEmRelacaoHoje = 0;
-    for($indiceDia = 0;$indiceDia <= 6;$indiceDia++){
-      foreach($grupoEventos as $grupoEvento){
-        $diaDaSemana = date('N', strtotime('now +'.$indiceDia.' days')); 
-        if($grupoEvento->getEvento()->getDia() == $diaDaSemana){
-          $diaDoEventoEmRelacaoHoje = $indiceDia;
-        }
-      }
-    }
-
     $token = $this->getEvent()->getRouteMatch()->getParam(self::stringToken, 0);    
-    $inicioDoCiclo = (6 - $diaDoEventoEmRelacaoHoje) * -1;
-    $fimDoCiclo = $diaDoEventoEmRelacaoHoje;
-    if($token == 1){
-      $inicioDoCiclo += 7;
-      $fimDoCiclo += 7;
-    }
-    if($token == -1){
-      $inicioDoCiclo -= 7;
-      $fimDoCiclo -= 7;
-    }
-
-    $grupoPessoas = self::getGrupo()->getGrupoPessoaAtivasNoPeriodo($inicioDoCiclo,$fimDoCiclo);
+    $arrayPeriodo = self::montaPeriodoPeloToken($grupoEventos, $token);
+    $inicioDoCiclo = $arrayPeriodo[0];
+    $fimDoCiclo = $arrayPeriodo[1];
+    
+    $grupoPessoas = self::getGrupo()->getGrupoPessoaAtivasNoPeriodo($inicioDoCiclo, $fimDoCiclo);
     $arrayTarefas = array();
     $arrayPontes = array();
     $arrayPontesParaCadastro = array();
@@ -73,7 +55,7 @@ class AdmController extends KleoController {
           $arrayPontes[] = $grupoPessoa;
           $prospectosDaPonte = $grupoPessoa->getPessoa()->getPonteProspectoProspectos();
           if(count($prospectosDaPonte) < 4){
-           $arrayPontesParaCadastro[] = $grupoPessoa; 
+            $arrayPontesParaCadastro[] = $grupoPessoa; 
           }
         }
         foreach($grupoPessoa->getPessoa()->getTarefa() as $tarefa){
@@ -122,6 +104,32 @@ class AdmController extends KleoController {
       self::stringFimDoCiclo => $fimDoCiclo,
       self::stringToken => $token,
     ));
+  }
+  
+  public function montaPeriodoPeloToken($grupoEventos, $token){
+    $diaDoEventoEmRelacaoHoje = 0;
+    for($indiceDia = 0;$indiceDia <= 6;$indiceDia++){
+      foreach($grupoEventos as $grupoEvento){
+        $diaDaSemana = date('N', strtotime('now +'.$indiceDia.' days')); 
+        if($grupoEvento->getEvento()->getDia() == $diaDaSemana){
+          $diaDoEventoEmRelacaoHoje = $indiceDia;
+        }
+      }
+    }
+    $inicioDoCiclo = (6 - $diaDoEventoEmRelacaoHoje) * -1;
+    $fimDoCiclo = $diaDoEventoEmRelacaoHoje;
+    if($token == 1){
+      $inicioDoCiclo += 7;
+      $fimDoCiclo += 7;
+    }
+    if($token == -1){
+      $inicioDoCiclo -= 7;
+      $fimDoCiclo -= 7;
+    }
+    $arrayPeriodo[0] = $inicioDoCiclo;
+    $arrayPeriodo[1] = $fimDoCiclo;
+    
+    return $arrayPeriodo;
   }
 
   /**
@@ -381,16 +389,33 @@ class AdmController extends KleoController {
   }
 
   public function relatorioAction(){
-
+    $grupoEventos = self::getGrupo()->getGrupoEventoAcima();
+    $token = $this->getEvent()->getRouteMatch()->getParam(self::stringToken, 0);    
+    $arrayPeriodo = self::montaPeriodoPeloToken($grupoEventos, $token);
+    $inicioDoCiclo = $arrayPeriodo[0];
+    $fimDoCiclo = $arrayPeriodo[1];
+    
     $numeroIdentificador = self::getRepositorio()->getFatoCicloORM()->montarNumeroIdentificador(self::getRepositorio());
     $tipoComparacao = 1; 
-    $dataIncial = '2018-01-01'; 
-    $dataFinal = '2018-01-31';
-    $relatorio = self::getRepositorio()->getFatoCicloORM()->montarRelatorioPorNumeroIdentificador($numeroIdentificador, $tipoComparacao, $dataIncial, $dataFinal);          
+    $dataIncial = date('Y-m-n', strtotime('now +'.$inicioDoCiclo.' days'));  
+    $dataFinal = date('Y-m-n', strtotime('now +'.$fimDoCiclo.' days'));
+    $relatorio = self::montaRelatorio(self::getRepositorio(), $numeroIdentificador, $dataIncial, $dataFinal, $tipoComparacao);          
 
     return new ViewModel(array(
       self::stringRelatorio => $relatorio,
+      self::stringToken => $token,
     ));
+  }
+
+  public static function montaRelatorio($repositorioORM, $numeroIdentificador, $dataIncial, $dataFinal, $tipoComparacao) {
+    unset($relatorio);
+    $relatorio = $repositorioORM->getFatoCicloORM()->montarRelatorioPorNumeroIdentificador($numeroIdentificador, $dataIncial, $dataFinal, $tipoComparacao);          
+    $relatorio[0]['pontePerformance'] = $relatorio[0]['ponte'] / self::metaPonte * 100;
+    $relatorio[0]['prospectoPerformance'] = $relatorio[0]['prospecto'] / self::metaProspecto * 100;
+    $relatorio[0]['ligacaoPerformance'] = $relatorio[0]['ligacao'] / self::metaProspecto * 100;
+    $relatorio[0]['mensagemPerformance'] = $relatorio[0]['mensagem'] / self::metaProspecto * 100;
+
+    return $relatorio;
   }
 
   /**

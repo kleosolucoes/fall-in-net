@@ -19,7 +19,7 @@ class FatoCicloORM extends KleoORM {
      * Localizar fato_ciclo por numeroIdentificador
      * @return array
      */
-  public function montarRelatorioPorNumeroIdentificador($numeroIdentificador, $tipoComparacao, $dataIncial, $dataFinal) {
+  public function montarRelatorioPorNumeroIdentificador($numeroIdentificador, $dataIncial, $dataFinal, $tipoComparacao) {
     $dqlBase = "SELECT "
       . "SUM(fc.ponte) ponte, "
       . "SUM(fc.prospecto) prospecto, "
