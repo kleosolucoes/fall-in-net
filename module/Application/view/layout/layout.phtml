@@ -3,7 +3,7 @@
 use Application\Controller\KleoController;
 
 echo $this->doctype();
-$versao = '?v=2.9';
+$versao = '?v=3.0';
 ?>
 <html class="no-js css-menubar" lang="pt-BR">
 	<head>
@@ -37,6 +37,7 @@ $versao = '?v=2.9';
 			->prependStylesheet($this->basePath() . '/global/fonts/web-icons/web-icons.min.css')
 			->prependStylesheet($this->basePath() . '/global/fonts/font-awesome/font-awesome.min.css')
 			->prependStylesheet($this->basePath() . '/global/vendor/slidepanel/slidePanel.css')
+			->prependStylesheet($this->basePath() . '/global/vendor/intro-js/introjs.min.css')
 			->prependStylesheet($this->basePath() . '/global/vendor/switchery/switchery.css')
 			->prependStylesheet($this->basePath() . '/global/vendor/asscrollable/asScrollable.css')
 			->prependStylesheet($this->basePath() . '/global/vendor/animsition/animsition.css')
@@ -62,7 +63,7 @@ $versao = '?v=2.9';
 <script src="../../global/vendor/respond/respond.min.js"></script>
 <![endif]-->
 	</head>
-	<body class="">
+	<body class="site-menubar-unfold site-menubar-keep">
 		<?php echo $this->splash(); ?>
 		<!--[if lt IE 8]>
 <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
@@ -74,7 +75,7 @@ $versao = '?v=2.9';
 				$uri != '/login') {
 			echo $this->menu();
 		}
-		?> 
+		?>		
 		<!-- Page -->
 		<div class="page">
 			<div class="page-content container-fluid">

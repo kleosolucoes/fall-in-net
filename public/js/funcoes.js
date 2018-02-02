@@ -59,7 +59,7 @@ $(window).bind("load", function () {
   $('.splash').css('display', 'none');
 
 
-  if($('#ancora')){
+  if($('#ancora').offset()){
     targetOffset = $('#ancora').offset().top;
 
     $('html, body').animate({ 

@@ -58,11 +58,9 @@ class Agenda extends AbstractHelper {
           if($elemento instanceof Tarefa){
             if($elemento->getTarefaTipo()->getId() === TarefaTipo::LIGAR){
               $corTarefa = 'info';
-              $icone = 'fa-phone';
             }
             if($elemento->getTarefaTipo()->getId() === TarefaTipo::MENSAGEM){
               $corTarefa = 'success';
-              $icone = 'fa-envelope';
             }
             $iconeTarefaRealizada = 'down';
             $corTarefaRealizada = Botao::botaoMuitoPequenoMenosImportante;
@@ -71,9 +69,8 @@ class Agenda extends AbstractHelper {
               $corTarefaRealizada = Botao::botaoMuitoPequenoImportante;
             }
 
-            $html .= '<div class="row px-10">';
-            $html .= '<div class="alert alert-icon alert-' . $corTarefa . ' w-full" role="alert">';
-            $html .= '<i class="icon ' . $icone . '" aria-hidden="true"></i>';
+            $html .= '<div class="row px-5">';
+            $html .= '<div class="alert alert-' . $corTarefa . ' w-full" role="alert">';
 
             $html .= $elemento->getTarefaTipo()->getNome() . ' para ' . $elemento->getPessoa()->getNome(); 
             if(count($elemento->getPessoa()->getPonteProspectoPonte())>0){
@@ -111,7 +108,7 @@ class Agenda extends AbstractHelper {
           }
           if($elemento instanceof Evento){
             $ocorreuEvento = true;
-            $html .= '<div class="row px-10">';
+            $html .= '<div class="row px-5">';
             $html .= '<div class="alert alert-danger w-full" role="alert">';
 
             $html .= '<div class="p-5 row">';
@@ -125,8 +122,8 @@ class Agenda extends AbstractHelper {
                   $mostrar = false;
                 }                    
                 if($mostrar){
-                  $html .= '<div class="mt-5 px-10 row">';
-                  $html .= '<div class="col-10">';
+                  $html .= '<div class="mt-5 row">';
+                  $html .= '<div class="col-8">';
                   $html .= $grupoPessoa->getPessoa()->getNome();
                   if(count($grupoPessoa->getPessoa()->getPonteProspectoPonte())>0){
                     $html .= ' prospecto de '.$grupoPessoa->getPessoa()->getPonteProspectoPonte()[0]->getPonteProspectoPonte()->getNome();
@@ -147,7 +144,7 @@ class Agenda extends AbstractHelper {
                   }
                   $label = '<i class="icon fa-thumbs-' . $iconeTarefaRealizada . '" aria-hidden="true"></i>';
                   $extra = 'id="botao_' . $elemento->getId().'_'.$grupoPessoa->getPessoa()->getId() .'" onclick="mudarFrequencia(2,0, ' . $elemento->getId() . ',' . $grupoPessoa->getPessoa()->getId() . ', \'' .  $diaRealDoEvento . '\'' . ', '.$idPonte.');"';
-                  $html .= '<div class="col-2">';
+                  $html .= '<div class="col-4">';
                   $html .= $this->view->botao($label, $extra, $corTarefaRealizada);
                   $html .= '</div>';
                   $html .= '</div>';

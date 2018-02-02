@@ -75,12 +75,12 @@ class PerformancePontes extends AbstractHelper {
         }
 
         $performance *= 100;
-        $html .= '<div class="col-6">';
+        $html .= '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 col-xxl-6">';
         $html .= '<div class="card card-block p-30">';
         $html .= '<div class="counter counter-md text-left">';
         $html .= '<div class="counter-label text-uppercase mb-5">'.KleoForm::traducaoPonte.'</div>';
         $html .= '<div class="counter-number-group mb-10">';
-        $html .= '<span class="counter-number">'.$ponte->getPessoa()->getNome().'</span>';
+        $html .= '<span class="counter-number font-size-20">'.$ponte->getPessoa()->getNome().'</span>';
         $html .= '</div>';
         $html .= '<div class="counter-label">';
         $html .= '<div class="progress progress-lg mb-10">';
