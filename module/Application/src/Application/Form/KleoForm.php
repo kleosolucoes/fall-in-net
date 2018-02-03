@@ -22,6 +22,10 @@ class KleoForm extends Form {
   const inputRepetirEmail = 'inputRepetirEmail';
   const inputSenha = 'inputSenha';
   const inputRepetirSenha = 'inputRepetirSenha';
+  const inputDocumento = 'inputDocumento';
+  const inputDia = 'inputDia';
+  const inputMes = 'inputMes';
+  const inputAno = 'inputAno';
 
   const inputId = 'inputId';
   const inputCSRF = 'inputCSRF';
@@ -46,6 +50,10 @@ class KleoForm extends Form {
   const traducaoRepetirSenha = 'Repetir Senha';
   const traducaoSelecione = 'Selecione';
   const traducaoPonte = 'Ponte';
+  const traducaoDocumento = 'C.P.F.';
+  const traducaoDia = 'Dia';
+  const traducaoMes = 'Mês';
+  const traducaoAno = 'Ano';
   
   public function __construct($name = null) {
 

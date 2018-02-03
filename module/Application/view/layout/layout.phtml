@@ -36,6 +36,8 @@ $versao = '?v=3.0';
 			->prependStylesheet($this->basePath() . '/global/vendor/ladda/ladda.min.css')
 			->prependStylesheet($this->basePath() . '/global/fonts/web-icons/web-icons.min.css')
 			->prependStylesheet($this->basePath() . '/global/fonts/font-awesome/font-awesome.min.css')
+			->prependStylesheet($this->basePath() . '/global/vendor/formvalidation/formValidation.min.css')
+			->prependStylesheet($this->basePath() . '/global/vendor/jquery-wizard/jquery-wizard.min.css')
 			->prependStylesheet($this->basePath() . '/global/vendor/slidepanel/slidePanel.css')
 			->prependStylesheet($this->basePath() . '/global/vendor/intro-js/introjs.min.css')
 			->prependStylesheet($this->basePath() . '/global/vendor/switchery/switchery.css')
@@ -63,7 +65,7 @@ $versao = '?v=3.0';
 <script src="../../global/vendor/respond/respond.min.js"></script>
 <![endif]-->
 	</head>
-	<body class="site-menubar-unfold site-menubar-keep">
+	<body class="">
 		<?php echo $this->splash(); ?>
 		<!--[if lt IE 8]>
 <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
@@ -94,16 +96,17 @@ $versao = '?v=3.0';
 		echo $this
 			->headScript()
 			->prependFile($this->basePath() . '/js/validacoes.js' . $versao)
-			->prependFile($this->basePath() . '/js/funcoes.js' . $versao)			
+			->prependFile($this->basePath() . '/js/funcoes.js' . $versao)
+			->prependFile($this->basePath() . '/global/vendor/matchheight/jquery.matchHeight-min.js')
+			->prependFile($this->basePath() . '/global/vendor/formvalidation/framework/bootstrap.min.js')
+			->prependFile($this->basePath() . '/global/vendor/formvalidation/formValidation.min.js')
+			->prependFile($this->basePath() . '/global/vendor/jquery-wizard/jquery-wizard.min.js')
 			->prependFile($this->basePath() . '/global/vendor/ladda/ladda.min.js')
 			->prependFile($this->basePath() . '/global/vendor/ladda/spin.min.js')
 			->prependFile($this->basePath() . '/assets/js/config/tour.js')
 			->prependFile($this->basePath() . '/global/js/config/colors.js')
-			->prependFile($this->basePath() . '/assets/js/Plugin/menu.js')
 			->prependFile($this->basePath() . '/assets/js/Section/PageAside.js')
 			->prependFile($this->basePath() . '/assets/js/Section/Sidebar.js')
-			->prependFile($this->basePath() . '/assets/js/Section/GridMenu.js')
-			->prependFile($this->basePath() . '/assets/js/Section/Menubar.js')
 			->prependFile($this->basePath() . '/global/js/Config.js')
 			->prependFile($this->basePath() . '/global/js/Plugin.js')
 			->prependFile($this->basePath() . '/global/js/Base.js')
@@ -125,6 +128,101 @@ $versao = '?v=3.0';
 		<script type="text/javascript">
 			jQuery(document).ready(function () {
 				"use strict";
+
+				var formValidacao = $('#exampleFormContainer').formValidation({
+					framework: 'bootstrap',
+					fields: {
+						username: {
+							validators: {
+								notEmpty: {
+									message: 'The username is required'
+								}
+							}
+						},
+						password: {
+							validators: {
+								notEmpty: {
+									message: 'The password is required'
+								}
+							}
+						},
+						number: {
+							validators: {
+								notEmpty: {
+									message: 'The credit card number is not valid'
+								}
+							}
+						},
+						cvv: {
+							validators: {
+								notEmpty: {
+									message: 'The CVV number is required'
+								}
+							}
+						}
+					},
+					err: {
+						clazz: 'invalid-feedback'
+					},
+					control: {
+						// The CSS class for valid control
+						valid: 'is-valid',
+
+						// The CSS class for invalid control
+						invalid: 'is-invalid'
+					},
+					row: {
+						invalid: 'has-danger'
+					}
+				});
+				var opcoes = Plugin.getDefaults("wizard");
+				opcoes.step = '.wizard-pane'; 
+				opcoes.buttonsAppendTo = '.panel-body';
+				opcoes.templates = {
+					buttons: function() {
+						const options = this.options;
+						return `<div class="wizard-buttons"><a class="btn btn-default btn-outline wizard-back float-left" href="#${this.id}" data-wizard="back" role="button">${options.buttonLabels.back}</a><a id="botaoProximo" class="btn btn-primary btn-outline wizard-next float-right" href="#${this.id}" data-wizard="next" role="button">${options.buttonLabels.next}</a><a id="botaoConcluir" class="btn btn-success hidden-xs-up btn-outline wizard-finish float-right" href="#${this.id}" data-wizard="finish" role="button">${options.buttonLabels.finish}</a></div>`;
+					}
+				};
+// 				opcoes.validator = function validator() {
+// 					var fv = $('#exampleFormContainer').data('formValidation');
+
+// 					var $this = $(this);
+
+// 					// Validate the container
+// 					fv.validateContainer($this);
+
+// 					var isValidStep = fv.isValidContainer($this);
+// 					if (isValidStep === false || isValidStep === null) {
+// 						return false;
+// 					}
+
+// 					return true;
+// 				};
+				opcoes.buttonLabels = {
+					next: 'Próximo',
+					back: 'Voltar',
+					finish: 'Concluir'
+				};
+				opcoes.onAfterChange = function onAfterChange(prev, step) {
+					switch(step.index){
+						case 0: 
+							$('#passo2').removeClass('current');
+							break;
+						case 1: 
+							$('#passo2').addClass('current');
+							$('#passo3').removeClass('current');
+							$('#botaoProximo').removeClass('hidden-xs-up');
+							$('#botaoConcluir').addClass('hidden-xs-up');
+							break;
+						case 2: 
+							$('#passo3').addClass('current');
+							$('#botaoProximo').addClass('hidden-xs-up');
+							$('#botaoConcluir').removeClass('hidden-xs-up');
+							break;
+					}
+				};
+				$('#exampleWizardFormContainer').wizard(opcoes); 
 
 				// Init Ladda Plugin on buttons
 				Ladda.bind('.ladda-button', {

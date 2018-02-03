@@ -22,9 +22,8 @@ echo $this->formHidden($formulario->get(KleoForm::inputCSRF));
         echo '<p class="alert alert-danger">' . $this->error . '</p>';
       }
       echo $this->inputFormulario(KleoForm::traducaoEmail, $formulario->get(KleoForm::inputEmail));
-      ?>  
-      <?php echo $this->inputFormulario(KleoForm::traducaoSenha, $formulario->get(KleoForm::inputSenha)); ?>
-      <?php echo $this->botao('Entrar', $this->funcaoOnClickSubmeterFormulario()); ?>
+      echo $this->inputFormulario(KleoForm::traducaoSenha, $formulario->get(KleoForm::inputSenha)); 
+      echo $this->botao('Entrar', $this->funcaoOnClickSubmeterFormulario()); ?>
   </div>
 </div>
 <?php

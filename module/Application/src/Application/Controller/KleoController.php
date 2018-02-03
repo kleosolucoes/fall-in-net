@@ -49,6 +49,17 @@ class KleoController extends AbstractActionController {
   const rotaAdm = 'adm';
   const metaPonte = 1;
   const metaProspecto = 4;
+  const relatorioPonte = 'ponte';
+  const relatorioPontePerformance = 'pontePerformance';
+  const relatorioProspecto = 'prospecto';
+  const relatorioProspectoPerformance = 'prospectoPerformance';
+  const relatorioLigacao = 'ligacao';
+  const relatorioLigacaoPerformance = 'ligacaoPerformance';
+  const relatorioMensagem = 'mensagem';
+  const relatorioMensagemPerformance = 'mensagemPerformance';
+  const relatorioFrequencia = 'frequencia';
+  const relatorioCliqueLigacao = 'cliqueLigacao';
+  const relatorioCliqueMensagem = 'cliqueMensagem';
 
   /**
      * Contrutor sobrecarregado com os serviços de ORM

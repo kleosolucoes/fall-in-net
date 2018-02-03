@@ -9,26 +9,26 @@ for($indice = 1;$indice <= 4; $indice++){
   switch($indice){
     case 1: 
       $label = 'Performance Ponte';
-      $performance = $this->relatorio[0]['pontePerformance'];
-      $valor = $this->relatorio[0]['ponte'];
+      $performance = $this->relatorio[0][KleoController::relatorioPontePerformance];
+      $valor = $this->relatorio[0][KleoController::relatorioPonte];
       $meta = KleoController::metaPonte;
       break;
     case 2: 
       $label = 'Performance Prospecto';
-      $performance = $this->relatorio[0]['prospectoPerformance'];
-      $valor = $this->relatorio[0]['prospecto'];
+      $performance = $this->relatorio[0][KleoController::relatorioProspectoPerformance];
+      $valor = $this->relatorio[0][KleoController::relatorioProspecto];
       $meta = KleoController::metaProspecto;
       break;
     case 3: 
       $label = 'Performance Ligacao';
-      $performance = $this->relatorio[0]['ligacaoPerformance'];
-      $valor = $this->relatorio[0]['ligacao'];
+      $performance = $this->relatorio[0][KleoController::relatorioLigacaoPerformance];
+      $valor = $this->relatorio[0][KleoController::relatorioLigacao];
       $meta = KleoController::metaProspecto;
       break;
     case 4: 
       $label = 'Performance Mensagem';
-      $performance = $this->relatorio[0]['mensagemPerformance'];
-      $valor = $this->relatorio[0]['mensagem'];
+      $performance = $this->relatorio[0][KleoController::relatorioMensagemPerformance];
+      $valor = $this->relatorio[0][KleoController::relatorioMensagem];
       $meta = KleoController::metaProspecto;
       break;
   }

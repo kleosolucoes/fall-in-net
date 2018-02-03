@@ -5,6 +5,7 @@ namespace Application\Controller;
 use Application\Form\KleoForm;
 use Application\Form\PonteForm;
 use Application\Form\ProspectoForm;
+use Application\Form\GrupoForm;
 use Application\Model\ORM\RepositorioORM;
 use Application\Model\Entity\Pessoa;
 use Application\Model\Entity\GrupoPessoa;
@@ -44,7 +45,7 @@ class AdmController extends KleoController {
     $arrayPeriodo = self::montaPeriodoPeloToken($grupoEventos, $token);
     $inicioDoCiclo = $arrayPeriodo[0];
     $fimDoCiclo = $arrayPeriodo[1];
-    
+
     $grupoPessoas = self::getGrupo()->getGrupoPessoaAtivasNoPeriodo($inicioDoCiclo, $fimDoCiclo);
     $arrayTarefas = array();
     $arrayPontes = array();
@@ -105,7 +106,7 @@ class AdmController extends KleoController {
       self::stringToken => $token,
     ));
   }
-  
+
   public function montaPeriodoPeloToken($grupoEventos, $token){
     $diaDoEventoEmRelacaoHoje = 0;
     for($indiceDia = 0;$indiceDia <= 6;$indiceDia++){
@@ -128,7 +129,7 @@ class AdmController extends KleoController {
     }
     $arrayPeriodo[0] = $inicioDoCiclo;
     $arrayPeriodo[1] = $fimDoCiclo;
-    
+
     return $arrayPeriodo;
   }
 
@@ -394,7 +395,7 @@ class AdmController extends KleoController {
     $arrayPeriodo = self::montaPeriodoPeloToken($grupoEventos, $token);
     $inicioDoCiclo = $arrayPeriodo[0];
     $fimDoCiclo = $arrayPeriodo[1];
-    
+
     $numeroIdentificador = self::getRepositorio()->getFatoCicloORM()->montarNumeroIdentificador(self::getRepositorio());
     $tipoComparacao = 1; 
     $dataIncial = date('Y-m-n', strtotime('now +'.$inicioDoCiclo.' days'));  
@@ -407,13 +408,34 @@ class AdmController extends KleoController {
     ));
   }
 
+  public function ativoAction(){
+    $formulario = new GrupoForm('grupo');
+    
+    return new ViewModel(array(
+      self::stringFormulario => $formulario,
+    ));
+  }
+
   public static function montaRelatorio($repositorioORM, $numeroIdentificador, $dataIncial, $dataFinal, $tipoComparacao) {
     unset($relatorio);
-    $relatorio = $repositorioORM->getFatoCicloORM()->montarRelatorioPorNumeroIdentificador($numeroIdentificador, $dataIncial, $dataFinal, $tipoComparacao);          
-    $relatorio[0]['pontePerformance'] = $relatorio[0]['ponte'] / self::metaPonte * 100;
-    $relatorio[0]['prospectoPerformance'] = $relatorio[0]['prospecto'] / self::metaProspecto * 100;
-    $relatorio[0]['ligacaoPerformance'] = $relatorio[0]['ligacao'] / self::metaProspecto * 100;
-    $relatorio[0]['mensagemPerformance'] = $relatorio[0]['mensagem'] / self::metaProspecto * 100;
+    $relatorio = $repositorioORM->getFatoCicloORM()->montarRelatorioPorNumeroIdentificador($numeroIdentificador, $dataIncial, $dataFinal, $tipoComparacao);
+    if(!$relatorio[0][self::relatorioPonte]){
+      $relatorio[0][self::relatorioPonte] = 0;
+    }
+    if(!$relatorio[0][self::relatorioProspecto]){
+      $relatorio[0][self::relatorioProspecto] = 0;
+    }
+    if(!$relatorio[0][self::relatorioLigacao]){
+      $relatorio[0][self::relatorioLigacao] = 0;
+    }
+    if(!$relatorio[0][self::relatorioMensagem]){
+      $relatorio[0][self::relatorioMensagem] = 0;
+    }
+
+    $relatorio[0][self::relatorioPontePerformance] = $relatorio[0][self::relatorioPonte] / self::metaPonte * 100;
+    $relatorio[0][self::relatorioProspectoPerformance] = $relatorio[0][self::relatorioProspecto] / self::metaProspecto * 100;
+    $relatorio[0][self::relatorioLigacaoPerformance] = $relatorio[0][self::relatorioLigacao] / self::metaProspecto * 100;
+    $relatorio[0][self::relatorioMensagemPerformance] = $relatorio[0][self::relatorioMensagem] / self::metaProspecto * 100;
 
     return $relatorio;
   }
