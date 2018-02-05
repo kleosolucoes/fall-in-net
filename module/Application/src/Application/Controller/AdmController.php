@@ -15,6 +15,11 @@ use Application\Model\Entity\EventoFrequencia;
 use Application\Model\Entity\PonteProspecto;
 use Application\Model\Entity\FatoCiclo;
 use Application\Model\Entity\TarefaTipo;
+use Application\Model\Entity\Hierarquia;
+use Application\Model\Entity\Grupo;
+use Application\Model\Entity\PessoaHierarquia;
+use Application\Model\Entity\GrupoResponsavel;
+use Application\Model\Entity\GrupoPaiFilho;
 use Doctrine\ORM\EntityManager;
 use Exception;
 use Zend\View\Model\ViewModel;
@@ -408,14 +413,6 @@ class AdmController extends KleoController {
     ));
   }
 
-  public function ativoAction(){
-    $formulario = new GrupoForm('grupo');
-    
-    return new ViewModel(array(
-      self::stringFormulario => $formulario,
-    ));
-  }
-
   public static function montaRelatorio($repositorioORM, $numeroIdentificador, $dataIncial, $dataFinal, $tipoComparacao) {
     unset($relatorio);
     $relatorio = $repositorioORM->getFatoCicloORM()->montarRelatorioPorNumeroIdentificador($numeroIdentificador, $dataIncial, $dataFinal, $tipoComparacao);
@@ -453,6 +450,104 @@ class AdmController extends KleoController {
     return $this->redirect()->toRoute(self::rotaPub, array(
       self::stringAction => self::stringLogin,
     ));
+  }
+
+
+  public function ativoAction(){
+    $formulario = new GrupoForm('grupo');
+
+    return new ViewModel(array(
+      self::stringFormulario => $formulario,
+    ));
+  }
+
+
+  /**
+     * Tela com confrmação de cadastro de grupo
+     * POST /cadastroAtivoFinalizar
+     */
+  public function ativoFinalizarAction() {
+    //CircuitoController::verificandoSessao(new Container(Constantes::$NOME_APLICACAO), $this);
+    $request = $this->getRequest();
+    if ($request->isPost()) {
+      try {
+        self::getRepositorio()->iniciarTransacao();
+
+        $post = array_merge_recursive(
+          $request->getPost()->toArray(), $request->getFiles()->toArray()
+        );
+
+        $pessoa = new Pessoa();
+        $formulario = new GrupoForm();
+        $formulario->setInputFilter($pessoa->getInputFilterCadastrarAtivo());
+        $formulario->setData($post);
+
+        /* validação */
+        if ($formulario->isValid()) {
+          $validatedData = $formulario->getData();
+          $pessoa->exchangeArray($formulario->getData());
+
+          /* Criar Grupo */
+          $grupoNovo = new Grupo();
+          $this->getRepositorio()->getGrupoORM()->persistir($grupoNovo);
+          /* Pessoa */
+          $tokenDeAgora = $pessoa->gerarToken();
+          $pessoa->setToken($tokenDeAgora);
+          $this->getRepositorio()->getPessoaORM()->persistir($pessoa);
+          /* Criar hierarquia */
+          $hierarquia = $this->getRepositorio()->getHierarquiaORM()->encontrarPorId(Hierarquia::ATIVO_SEM_REUNIAO);
+          $pessoaHierarquia = new PessoaHierarquia();
+          $pessoaHierarquia->setPessoa($pessoa);
+          $pessoaHierarquia->setHierarquia($hierarquia);
+          $this->getRepositorio()->getPessoaHierarquiaORM()->persistir($pessoaHierarquia);
+          /* Criar Grupo_Responsavel */
+          $grupoResponsavelNovo = new GrupoResponsavel();
+          $grupoResponsavelNovo->setPessoa($pessoa);
+          $grupoResponsavelNovo->setGrupo($grupoNovo);
+          $this->getRepositorio()->getGrupoResponsavelORM()->persistir($grupoResponsavelNovo);
+          /* Criar Grupo_Pai_Filho */
+          $grupoAtualSelecionado = self::getGrupo();
+          $grupoPaiFilhoNovo = new GrupoPaiFilho();
+          $grupoPaiFilhoNovo->setGrupoPaiFilhoPai($grupoAtualSelecionado);
+          $grupoPaiFilhoNovo->setGrupoPaiFilhoFilho($grupoNovo);
+          $this->getRepositorio()->getGrupoPaiFilhoORM()->persistir($grupoPaiFilhoNovo);
+
+          $this->getRepositorio()->fecharTransacao();
+
+          $cpf = $validatedData[KleoForm::inputDocumento];
+          $pessoa = $this->getRepositorio()->getPessoaORM()->encontrarPorCPF($cpf);
+          /* Enviar Email */
+          $sessao = self::getSessao();
+          self::enviarEmailParaCompletarOsDados($this->getRepositorio(), $sessao->idPessoa, $tokenDeAgora, $pessoa);
+
+        }else{
+          self::getRepositorio()->desfazerTransacao();
+          self::mostrarMensagensDeErroFormulario($formulario->getMessages());
+          return $this->forward()->dispatch(self::controllerAdm, array(
+            self::stringAction => self::stringIndex,
+            self::stringFormulario => $formulario,
+          ));
+        }
+      } catch (Exception $exc) {
+        $this->getRepositorio()->desfazerTransacao();
+        echo $exc->getTraceAsString();
+        $this->direcionaErroDeCadastro($exc->getMessage());
+        self::direcionandoAoLogin($this);
+      }
+
+    }
+  }
+
+  public static function enviarEmailParaCompletarOsDados($repositorio, $idPessoaLogada, $tokenDeAgora, $pessoa) {
+    $pessoaLogada = $repositorio->getPessoaORM()->encontrarPorId($idPessoaLogada);
+
+    $subject = 'A Fabrica';
+    $toEmail[] = $pessoa->getEmail();
+    $content = '<p>Bem vindo a Fábrica</p>';
+    $content .= '<p>Para finalizar seu cadastro clique no link abaixo.</p>';
+    $content .= '<p><a href="www.afabricaoficial.com.br/novaSenha/'.$tokenDeAgora.'">Clique Aqui!</a></p>';
+
+    self::enviarEmail($toEmail, $subject, $content);
   }
 
   public function getGrupo() {

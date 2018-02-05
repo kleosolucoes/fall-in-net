@@ -7,28 +7,25 @@ $formulario = $this->formulario;
 $formulario->prepare();
 
 $formulario->setAttribute(KleoForm::stringAction, 'admAtivoFinalizar');
+$formulario->setAttribute(KleoForm::stringId, 'form');
 echo $this->form()->openTag($formulario);
 echo $this->formHidden($formulario->get(KleoForm::inputCSRF));
 ?>
 <!-- Panel Wizard Form Container -->
-<div class="panel" id="exampleWizardFormContainer">
+<div class="panel" id="panelWizard">
   <div class="panel-heading">
-    <h3 class="panel-title">Novo Downline</h3>
+    <h3 class="panel-title">Novo Ativo</h3>
   </div>
   <div class="panel-body">
     <!-- Steps -->
     <div class="pearls row">
-      <div id="passo1" class="pearl current col-4">
+      <div id="passo1" class="pearl current col-6">
         <div class="pearl-icon"><i class="icon wb-user" aria-hidden="true"></i></div>
         <span class="pearl-title">Dados Pessoais</span>
       </div>
-      <div id="passo2" class="pearl col-4">
+      <div id="passo2" class="pearl col-6">
         <div class="pearl-icon"><i class="icon wb-envelope" aria-hidden="true"></i></div>
         <span class="pearl-title">Email</span>
-      </div>
-      <div id="passo3" class="pearl col-4">
-        <div class="pearl-icon"><i class="icon wb-check" aria-hidden="true"></i></div>
-        <span class="pearl-title">Confirmação</span>
       </div>
     </div>
     <!-- End Steps -->
@@ -39,6 +36,10 @@ echo $this->formHidden($formulario->get(KleoForm::inputCSRF));
         <div class="wizard-pane active" id="exampleAccountOne" role="tabpanel">
           <?php
           echo '<div class="row">';
+          echo $this->inputFormulario(KleoForm::traducaoNomeCompleto, $formulario->get(KleoForm::inputNome));
+          echo '</div>';
+
+          echo '<div class="row">';
           echo $this->inputFormulario(KleoForm::traducaoDocumento, $formulario->get(KleoForm::inputDocumento));
           echo '</div>';
 
@@ -46,6 +47,10 @@ echo $this->formHidden($formulario->get(KleoForm::inputCSRF));
           echo $this->inputFormulario(KleoForm::traducaoDia, $formulario->get(KleoForm::inputDia),4);
           echo $this->inputFormulario(KleoForm::traducaoMes, $formulario->get(KleoForm::inputMes),4);
           echo $this->inputFormulario(KleoForm::traducaoAno, $formulario->get(KleoForm::inputAno),4);
+          echo '</div>';
+
+          echo '<div class="row">';
+          echo $this->inputFormulario(KleoForm::traducaoSexo, $formulario->get(KleoForm::inputSexo));
           echo '</div>';
           ?>
         </div>
@@ -58,11 +63,6 @@ echo $this->formHidden($formulario->get(KleoForm::inputCSRF));
           echo $this->inputFormulario(KleoForm::traducaoRepetirEmail, $formulario->get(KleoForm::inputRepetirEmail));
           echo '</div>';
           ?>
-        </div>
-        <div class="wizard-pane" id="exampleGettingOne" role="tabpanel">
-          <div class="text-center my-20">
-            <h4>Em breve seu downline receberá um email para continuar o cadastro.</h4>
-          </div>
         </div>
       </div>
     </form>

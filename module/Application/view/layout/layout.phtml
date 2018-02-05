@@ -3,7 +3,7 @@
 use Application\Controller\KleoController;
 
 echo $this->doctype();
-$versao = '?v=3.0';
+$versao = '?v=3.8.0';
 ?>
 <html class="no-js css-menubar" lang="pt-BR">
 	<head>
@@ -31,7 +31,7 @@ $versao = '?v=3.0';
 		<!-- Styles -->
 		<?php
 		echo $this
-			->headLink(array('rel' => 'shortcut icon', 'type' => 'image/vnd.microsoft.icon', 'href' => $this->basePath() . '/img/favicon.jpeg'))               
+			->headLink(array('rel' => 'shortcut icon', 'type' => 'image/vnd.microsoft.icon', 'href' => $this->basePath() . '/img/favicon.ico'))               
 			->prependStylesheet($this->basePath() . '/css/splash.css' . $versao)			
 			->prependStylesheet($this->basePath() . '/global/vendor/ladda/ladda.min.css')
 			->prependStylesheet($this->basePath() . '/global/fonts/web-icons/web-icons.min.css')
@@ -128,101 +128,6 @@ $versao = '?v=3.0';
 		<script type="text/javascript">
 			jQuery(document).ready(function () {
 				"use strict";
-
-				var formValidacao = $('#exampleFormContainer').formValidation({
-					framework: 'bootstrap',
-					fields: {
-						username: {
-							validators: {
-								notEmpty: {
-									message: 'The username is required'
-								}
-							}
-						},
-						password: {
-							validators: {
-								notEmpty: {
-									message: 'The password is required'
-								}
-							}
-						},
-						number: {
-							validators: {
-								notEmpty: {
-									message: 'The credit card number is not valid'
-								}
-							}
-						},
-						cvv: {
-							validators: {
-								notEmpty: {
-									message: 'The CVV number is required'
-								}
-							}
-						}
-					},
-					err: {
-						clazz: 'invalid-feedback'
-					},
-					control: {
-						// The CSS class for valid control
-						valid: 'is-valid',
-
-						// The CSS class for invalid control
-						invalid: 'is-invalid'
-					},
-					row: {
-						invalid: 'has-danger'
-					}
-				});
-				var opcoes = Plugin.getDefaults("wizard");
-				opcoes.step = '.wizard-pane'; 
-				opcoes.buttonsAppendTo = '.panel-body';
-				opcoes.templates = {
-					buttons: function() {
-						const options = this.options;
-						return `<div class="wizard-buttons"><a class="btn btn-default btn-outline wizard-back float-left" href="#${this.id}" data-wizard="back" role="button">${options.buttonLabels.back}</a><a id="botaoProximo" class="btn btn-primary btn-outline wizard-next float-right" href="#${this.id}" data-wizard="next" role="button">${options.buttonLabels.next}</a><a id="botaoConcluir" class="btn btn-success hidden-xs-up btn-outline wizard-finish float-right" href="#${this.id}" data-wizard="finish" role="button">${options.buttonLabels.finish}</a></div>`;
-					}
-				};
-// 				opcoes.validator = function validator() {
-// 					var fv = $('#exampleFormContainer').data('formValidation');
-
-// 					var $this = $(this);
-
-// 					// Validate the container
-// 					fv.validateContainer($this);
-
-// 					var isValidStep = fv.isValidContainer($this);
-// 					if (isValidStep === false || isValidStep === null) {
-// 						return false;
-// 					}
-
-// 					return true;
-// 				};
-				opcoes.buttonLabels = {
-					next: 'Próximo',
-					back: 'Voltar',
-					finish: 'Concluir'
-				};
-				opcoes.onAfterChange = function onAfterChange(prev, step) {
-					switch(step.index){
-						case 0: 
-							$('#passo2').removeClass('current');
-							break;
-						case 1: 
-							$('#passo2').addClass('current');
-							$('#passo3').removeClass('current');
-							$('#botaoProximo').removeClass('hidden-xs-up');
-							$('#botaoConcluir').addClass('hidden-xs-up');
-							break;
-						case 2: 
-							$('#passo3').addClass('current');
-							$('#botaoProximo').addClass('hidden-xs-up');
-							$('#botaoConcluir').removeClass('hidden-xs-up');
-							break;
-					}
-				};
-				$('#exampleWizardFormContainer').wizard(opcoes); 
 
 				// Init Ladda Plugin on buttons
 				Ladda.bind('.ladda-button', {

@@ -60,6 +60,10 @@ class KleoController extends AbstractActionController {
   const relatorioFrequencia = 'frequencia';
   const relatorioCliqueLigacao = 'cliqueLigacao';
   const relatorioCliqueMensagem = 'cliqueMensagem';
+  
+  const traducaoAtivoFinalizar = 'Novo ativo cadastrado com sucesso!';
+  const traducaoAtivoFinalizarPrecisaFinalizar = '<small>Mas <strong>NÃO ESTÁ FINALIZADO</strong> em poucos minutos o ativo receberá um email com as instruções de finalização.</small>';
+  const traducaoPronto = 'Pronto';
 
   /**
      * Contrutor sobrecarregado com os serviços de ORM

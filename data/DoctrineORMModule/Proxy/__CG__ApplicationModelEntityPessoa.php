@@ -64,10 +64,10 @@ class Pessoa extends \Application\Model\Entity\Pessoa implements \Doctrine\ORM\P
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'inputFilter', 'inputFilterCadastrarPonteProspecto', 'grupoResponsavel', 'eventoFrequencia', 'grupoPessoa', 'pessoaHierarquia', 'tarefa', 'ponteProspectoProspectos', 'ponteProspectoPonte', 'nome', 'telefone', 'email', 'senha', 'id', 'data_criacao', 'hora_criacao', 'data_inativacao', 'hora_inativacao');
+            return array('__isInitialized__', 'inputFilter', 'inputFilterCadastrarPonteProspecto', 'inputFilterCadastrarAtivo', 'grupoResponsavel', 'eventoFrequencia', 'grupoPessoa', 'pessoaHierarquia', 'tarefa', 'ponteProspectoProspectos', 'ponteProspectoPonte', 'nome', 'telefone', 'email', 'senha', 'data_nascimento', 'documento', 'token', 'token_data', 'token_hora', 'foto', 'sexo', 'id', 'data_criacao', 'hora_criacao', 'data_inativacao', 'hora_inativacao');
         }
 
-        return array('__isInitialized__', 'inputFilter', 'inputFilterCadastrarPonteProspecto', 'grupoResponsavel', 'eventoFrequencia', 'grupoPessoa', 'pessoaHierarquia', 'tarefa', 'ponteProspectoProspectos', 'ponteProspectoPonte', 'nome', 'telefone', 'email', 'senha', 'id', 'data_criacao', 'hora_criacao', 'data_inativacao', 'hora_inativacao');
+        return array('__isInitialized__', 'inputFilter', 'inputFilterCadastrarPonteProspecto', 'inputFilterCadastrarAtivo', 'grupoResponsavel', 'eventoFrequencia', 'grupoPessoa', 'pessoaHierarquia', 'tarefa', 'ponteProspectoProspectos', 'ponteProspectoPonte', 'nome', 'telefone', 'email', 'senha', 'data_nascimento', 'documento', 'token', 'token_data', 'token_hora', 'foto', 'sexo', 'id', 'data_criacao', 'hora_criacao', 'data_inativacao', 'hora_inativacao');
     }
 
     /**
@@ -193,6 +193,17 @@ class Pessoa extends \Application\Model\Entity\Pessoa implements \Doctrine\ORM\P
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getInputFilterCadastrarPonteProspecto', array($nomeFormulario));
 
         return parent::getInputFilterCadastrarPonteProspecto($nomeFormulario);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getInputFilterCadastrarAtivo()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getInputFilterCadastrarAtivo', array());
+
+        return parent::getInputFilterCadastrarAtivo();
     }
 
     /**
@@ -627,28 +638,6 @@ class Pessoa extends \Application\Model\Entity\Pessoa implements \Doctrine\ORM\P
     /**
      * {@inheritDoc}
      */
-    public function getIdGrupoPessoa()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getIdGrupoPessoa', array());
-
-        return parent::getIdGrupoPessoa();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setIdGrupoPessoa($idGrupoPessoa)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setIdGrupoPessoa', array($idGrupoPessoa));
-
-        return parent::setIdGrupoPessoa($idGrupoPessoa);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function getPessoaHierarquiaAtivo()
     {
 
@@ -699,17 +688,6 @@ class Pessoa extends \Application\Model\Entity\Pessoa implements \Doctrine\ORM\P
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getInputFilter', array());
 
         return parent::getInputFilter();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getInputFilterPessoaFrequencia()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getInputFilterPessoaFrequencia', array());
-
-        return parent::getInputFilterPessoaFrequencia();
     }
 
     /**

@@ -64,8 +64,8 @@ class InputFormulario extends AbstractHelper {
     if ($this->getInput() instanceOf Date) {
       $html .= $this->view->formDate($this->getInput());
     }
-    $idDivMEnsagemDeErro = 'mensagemErro'.$this->getInput()->getName(); 
-    $html .= '<div id="'.$idDivMEnsagemDeErro.'"></div>';
+    $idDivMensagemDeErro = 'mensagemErro'.$this->getInput()->getName(); 
+    $html .= '<div id="'.$idDivMensagemDeErro.'"></div>';
     $html .=  $this->view->formElementErrors()
       ->setMessageOpenFormat('<div><p class="text-danger"><small>')
       ->setMessageSeparatorString('</small></p><p class="text-danger"><small>')

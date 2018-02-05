@@ -32,7 +32,7 @@ class Menu extends AbstractHelper {
 					<i class="icon wb-more-horizontal" aria-hidden="true"></i>
 				</button>
 				<div class="navbar-brand navbar-brand-center site-gridmenu-toggle" data-toggle="gridmenu">
-					<img class="navbar-brand-logo" src="../assets/images/logo.png" title="Remark">
+					<img class="navbar-brand-logo" width="32px" heigth="32px" src="../img/logoursa.png" title="Remark">
 					<span class="navbar-brand-text">'.KleoController::nomeAplicacaoFormatado.'</span>
 				</div>
 			</div>
@@ -63,6 +63,7 @@ class Menu extends AbstractHelper {
 															<i class="wb-dashboard" aria-hidden="true"></i>
 															<a href="/admRelatorio">Dashboard</a>
 														</li>
+													
 													</ul>
 												</li>
 											</ul>
@@ -80,7 +81,7 @@ class Menu extends AbstractHelper {
 							<a class="nav-link navbar-avatar" data-toggle="dropdown" href="#" aria-expanded="false"
 								 data-animation="scale-up" role="button">
 								<span class="avatar avatar-online">
-									<img src="../../global/portraits/5.jpg" alt="...">
+									<img src="../img/avatars/placeholder.png" alt="...">
 									<i></i>
 								</span>
 							</a>

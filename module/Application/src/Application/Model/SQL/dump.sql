@@ -257,3 +257,12 @@ ALTER TABLE `ponte_prospecto`
 ALTER TABLE `tarefa`
   ADD CONSTRAINT `fk_tarefa_pessoa_id` FOREIGN KEY (`pessoa_id`) REFERENCES `pessoa` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_tarefa_tarefa_tipo_id` FOREIGN KEY (`tarefa_tipo_id`) REFERENCES `tarefa_tipo` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE pessoa ADD COLUMN data_nascimento DATE NULL ;
+ALTER TABLE pessoa ADD COLUMN documento BIGINT( 11 ) NULL ;
+ALTER TABLE pessoa ADD COLUMN token VARCHAR( 120 ) NULL ;
+ALTER TABLE pessoa ADD COLUMN token_data DATE NULL ;
+ALTER TABLE pessoa ADD COLUMN token_hora TIME NULL ;
+ALTER TABLE pessoa ADD COLUMN foto VARCHAR( 30 ) NULL ;
+ALTER TABLE pessoa ADD COLUMN sexo ENUM('M','F') NULL ;
+ALTER TABLE  `pessoa` CHANGE  `telefone`  `telefone` BIGINT( 11 ) UNSIGNED NULL ;

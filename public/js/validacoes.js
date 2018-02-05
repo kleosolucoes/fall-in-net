@@ -21,7 +21,7 @@ function validacoesFormulario(campo){
       }
       break;
     case 'inputRepetirEmail':
-      if(campo.value.length === 0 || campo.value != document.getElementById(inputEmail).value){
+      if(campo.value.length === 0 || campo.value != document.getElementById('inputEmail').value){
         temErro = true;
         mensagemDeErro = 'Repita o email corretamente';
       }
@@ -38,7 +38,38 @@ function validacoesFormulario(campo){
         mensagemDeErro = 'Repita a senha';
       }
       break;
-    default: break;
+    case 'inputDocumento':
+      if(campo.value.length === 0 || !isCPF(campo.value)){
+        temErro = true;
+        mensagemDeErro = 'Preencha o CPF corretamente';
+      }
+      break;
+    case 'inputDia':
+      if(parseInt(campo.value) === 0){
+        temErro = true;
+        mensagemDeErro = 'Selecione o Dia';
+      }
+      break;
+    case 'inputMes':
+      if(parseInt(campo.value) === 0){
+        temErro = true;
+        mensagemDeErro = 'Selecione o Mês';
+      }
+      break;
+    case 'inputAno':
+      if(parseInt(campo.value) === 0){
+        temErro = true;
+        mensagemDeErro = 'Selecione o Ano';
+      }
+      break;
+    case 'inputSexo':
+      if(parseInt(campo.value) === 0){
+        temErro = true;
+        mensagemDeErro = 'Selecione o Sexo';
+      }
+      break;
+    default: 
+      break;
   }
   if(temErro){
     escreveMensagemDeErro(campo.id, mensagemDeErro);

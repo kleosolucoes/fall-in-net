@@ -13,16 +13,17 @@ use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping as ORM;
-use Entidade\Entity\Entidade;
 use Entidade\Entity\EventoFrequencia;
 use Entidade\Entity\GrupoPessoa;
 use Entidade\Entity\GrupoResponsavel;
 use Entidade\Entity\PessoaHierarquia;
-use Entidade\Entity\TurmaAluno;
 use Exception;
 use Zend\InputFilter\InputFilter;
 use Zend\InputFilter\InputFilterAwareInterface;
 use Zend\InputFilter\InputFilterInterface;
+use Zend\InputFilter\Input;
+use Zend\Validator;
+use Zend\Validator\Digits;
 
 /**
  * @ORM\Entity 
@@ -32,7 +33,9 @@ class Pessoa extends KleoEntity implements InputFilterAwareInterface {
 
   protected $inputFilter;
   protected $inputFilterCadastrarPonteProspecto;
+  protected $inputFilterCadastrarAtivo;
   const EMAIL = 'email';
+  const DOCUMENTO = 'documento';
 
   /**
      * @ORM\OneToMany(targetEntity="GrupoResponsavel", mappedBy="pessoa") 
@@ -92,30 +95,34 @@ class Pessoa extends KleoEntity implements InputFilterAwareInterface {
   /** @ORM\Column(type="string") */
   protected $senha;
 
-  //     /** @ORM\Column(type="string") */
-  //     protected $data_nascimento;
+  /** @ORM\Column(type="string") */
+  protected $data_nascimento;
 
-  //     /** @ORM\Column(type="string") */
-  //     protected $documento;
+  /** @ORM\Column(type="string") */
+  protected $documento;
 
-  //     /** @ORM\Column(type="string") */
-  //     protected $token;
+  /** @ORM\Column(type="string") */
+  protected $token;
 
-  //     /** @ORM\Column(type="string") */
-  //     protected $token_data;
+  /** @ORM\Column(type="string") */
+  protected $token_data;
 
-  //     /** @ORM\Column(type="string") */
-  //     protected $token_hora;
+  /** @ORM\Column(type="string") */
+  protected $token_hora;
 
-  //     /** @ORM\Column(type="string") */
-  //     protected $foto;
+  /** @ORM\Column(type="string") */
+  protected $foto;
 
-  //     /** @ORM\Column(type="string") */
-  //     protected $sexo;
+  /** @ORM\Column(type="string") */
+  protected $sexo;
 
   public function exchangeArray($data, $nomeFromulario = '') {
     $this->nome = (!empty($data[KleoForm::inputNome.$nomeFromulario]) ? strtoupper($data[KleoForm::inputNome.$nomeFromulario]) : null);
     $this->telefone = (!empty($data[KleoForm::inputTelefone.$nomeFromulario]) ? $data[KleoForm::inputTelefone.$nomeFromulario] : null);
+    $this->documento = (!empty($data[KleoForm::inputDocumento]) ? $data[KleoForm::inputDocumento] : null);
+    $this->email = (!empty($data[KleoForm::inputEmail]) ? $data[KleoForm::inputEmail] : null);
+    $this->data_nascimento = (!empty($data[KleoForm::inputDia]) ? $data[KleoForm::inputAno].'-'.$data[KleoForm::inputMes].'-'.$data[KleoForm::inputDia] : null);
+    $this->sexo = (!empty($data[KleoForm::inputSexo]) ? $data[KleoForm::inputSexo] : null);
   }
 
   public function getInputFilterCadastrarPonteProspecto($nomeFormulario) {
@@ -181,7 +188,63 @@ class Pessoa extends KleoEntity implements InputFilterAwareInterface {
     }
     return $this->inputFilterCadastrarPonteProspecto;
   }
+  public function getInputFilterCadastrarAtivo() {
+    if (!$this->inputFilterCadastrarAtivo) {
+      $inputFilter = new InputFilter();
+      $inputFilter->add(array(
+        'name' => KleoForm::inputNome,
+        'required' => true,
+        'filter' => array(
+          array('name' => 'StripTags'), // removel xml e html string
+          array('name' => 'StringTrim'), // removel espaco do inicio e do final da string
+          array('name' => 'StringToUpper'), // transforma em maiusculo
+        ),
+        'validators' => array(
+          array(
+            'name' => 'NotEmpty',
+          ),
+          array(
+            'name' => 'StringLength',
+            'options' => array(
+              'encoding' => 'UTF-8',
+              'min' => 3,
+              'max' => 150,
+            ),
+          ),
+        ),
+      ));
+      $inputFilter->add(array(
+        'name' => KleoForm::inputDocumento,
+        'required' => true,
+        'filter' => array(
+          array('name' => 'StripTags'), // removel xml e html string
+          array('name' => 'StringTrim'), // removel espaco do inicio e do final da string
+          array('name' => 'Int'), // transforma string para inteiro
+        ),
+        'validators' => array(
+          array(
+            'name' => 'NotEmpty',
+          ),
+          array(
+            'name' => 'StringLength',
+            'options' => array(
+              'encoding' => 'UTF-8',
+              'min' => 11,
+              'max' => 11,
+            ),
+          ),
+        ),
+      ));
 
+      $email = new Input(KleoForm::inputEmail);
+      $email->getValidatorChain()
+        ->attach(new Validator\EmailAddress());
+      $inputFilter->add($email);
+
+      $this->inputFilterCadastrarAtivo = $inputFilter;
+    }
+    return $this->inputFilterCadastrarAtivo;
+  }
 
   /**
      * Recupera as Responsabilidades ativas
@@ -438,14 +501,6 @@ class Pessoa extends KleoEntity implements InputFilterAwareInterface {
     $this->foto = $foto;
   }
 
-  function getIdGrupoPessoa() {
-    return $this->idGrupoPessoa;
-  }
-
-  function setIdGrupoPessoa($idGrupoPessoa) {
-    $this->idGrupoPessoa = $idGrupoPessoa;
-  }
-
   /**
      * Retorna a pessoa hierarquia ativo
      * @return PessoaHierarquia
@@ -492,80 +547,6 @@ class Pessoa extends KleoEntity implements InputFilterAwareInterface {
 
   }
 
-  public function getInputFilterPessoaFrequencia() {
-    if (!$this->inputFilterPessoaFrequencia) {
-      $inputFilter = new InputFilter();
-      $inputFilter->add(array(
-        'name' => 'nome',
-        'required' => true,
-        'filter' => array(
-          array('name' => 'StripTags'), // removel xml e html string
-          array('name' => 'StringTrim'), // removel espaco do inicio e do final da string
-          array('name' => 'StringToUpper'), // transforma em maiusculo
-        ),
-        'validators' => array(
-          array(
-            'name' => 'NotEmpty',
-          ),
-          array(
-            'name' => 'StringLength',
-            'options' => array(
-              'encoding' => 'UTF-8',
-              'min' => 3,
-              'max' => 80,
-            ),
-          ),
-        ),
-      ));
-      $inputFilter->add(array(
-        'name' => 'ddd',
-        'required' => true,
-        'filter' => array(
-          array('name' => 'StripTags'), // removel xml e html string
-          array('name' => 'StringTrim'), // removel espaco do inicio e do final da string
-          array('name' => 'Int'), // transforma string para inteiro
-        ),
-        'validators' => array(
-          array(
-            'name' => 'NotEmpty',
-          ),
-          array(
-            'name' => 'StringLength',
-            'options' => array(
-              'encoding' => 'UTF-8',
-              'min' => 2,
-              'max' => 2,
-            ),
-          ),
-        ),
-      ));
-      $inputFilter->add(array(
-        'name' => 'telefone',
-        'required' => true,
-        'filter' => array(
-          array('name' => 'StripTags'), // removel xml e html string
-          array('name' => 'StringTrim'), // removel espaco do inicio e do final da string
-          array('name' => 'Int'), // transforma string para inteiro
-        ),
-        'validators' => array(
-          array(
-            'name' => 'NotEmpty',
-          ),
-          array(
-            'name' => 'StringLength',
-            'options' => array(
-              'encoding' => 'UTF-8',
-              'min' => 8, # xx xxxx-xxxx
-              'max' => 9, # xx xxxx-xxxxx
-            ),
-          ),
-        ),
-      ));
-      $this->inputFilterPessoaFrequencia = $inputFilter;
-    }
-    return $this->inputFilterPessoaFrequencia;
-  }
-
   /**
      * @param InputFilterInterface $inputFilter
      * @throws Exception
@@ -605,7 +586,7 @@ class Pessoa extends KleoEntity implements InputFilterAwareInterface {
   function setSexo($sexo) {
     $this->sexo = $sexo;
   }
-  
+
   function getPonteProspectoPonte() {
     return $this->ponteProspectoPonte;
   }
@@ -613,7 +594,7 @@ class Pessoa extends KleoEntity implements InputFilterAwareInterface {
   function setPonteProspectoPonte($ponteProspectoPonte) {
     $this->ponteProspectoPonte = $ponteProspectoPonte;
   }
-  
+
   function getPonteProspectoProspectos() {
     return $this->ponteProspectoProspectos;
   }

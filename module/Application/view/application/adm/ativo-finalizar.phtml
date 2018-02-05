@@ -1,0 +1,19 @@
+<?php
+
+use Application\Controller\KleoController;
+use Application\View\Helper\Botao;
+?>
+<div class="panel-body bg-light text-center">
+    <h1><span class = "text-success"><?php echo $this->translate(KleoController::traducaoAtivoFinalizar); ?></span></h1>
+    <?php echo $this->translate(KleoController::traducaoAtivoFinalizarPrecisaFinalizar); ?>
+
+    <div class = "col-xs-12">
+        <h2 class = "text-default mbn confirmation-header"><i class = "fa fa-check text-success"></i></h2>
+    </div>
+    <div class = "col-xs-12 mt10">
+        <?php 
+      $extra = 'onclick="mudarPaginaComLoader(\'/adm\');"';
+      echo $this->botao(KleoController::traducaoPronto, $extra, Botao::botaoImportante, Botao::posicaoAoCentro); 
+      ?>
+    </div>
+</div>

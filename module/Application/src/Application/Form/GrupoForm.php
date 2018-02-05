@@ -34,7 +34,7 @@ class GrupoForm extends KleoForm {
         self::stringPlaceholder => self::traducaoNome      
       ])
     );
-    
+
     $this->add(
       (new Number())
       ->setName(self::inputDocumento)
@@ -59,6 +59,8 @@ class GrupoForm extends KleoForm {
     $inputSelectDiaDataNascimento->setAttributes(array(  
       self::stringClass => self::stringClassFormControl,
       self::stringId => self::inputDia,
+      self::stringRequired => self::stringRequired,
+      self::stringOnblur => self::stringValidacoesFormulario,
     ));
     $inputSelectDiaDataNascimento->setValueOptions($arrayDiaDataNascimento);
     $this->add($inputSelectDiaDataNascimento);
@@ -75,6 +77,8 @@ class GrupoForm extends KleoForm {
     $inputSelectMesDataNascimento->setAttributes(array(
       self::stringClass => self::stringClassFormControl,
       self::stringId => self::inputMes,
+      self::stringRequired => self::stringRequired,
+      self::stringOnblur => self::stringValidacoesFormulario,
     ));
     $inputSelectMesDataNascimento->setValueOptions($arrayMesDataNascimento);
     $this->add($inputSelectMesDataNascimento);
@@ -91,9 +95,28 @@ class GrupoForm extends KleoForm {
     $inputSelectAnoDataNascimento->setAttributes(array(
       self::stringClass => self::stringClassFormControl,
       self::stringId => self::inputAno,
+      self::stringRequired => self::stringRequired,
+      self::stringOnblur => self::stringValidacoesFormulario,
     ));
     $inputSelectAnoDataNascimento->setValueOptions($arrayAnoDataNascimento);
     $this->add($inputSelectAnoDataNascimento);
+
+    /* Ano da data de nascimento */
+    $arraySexo = array();
+    $arraySexo[0] = self::traducaoSelecione;
+    $arraySexo[self::stringM] = self::traducaoMasculino;
+    $arraySexo[self::stringF] = self::traducaoFeminino;
+
+    $inputSelectSexo = new Select();
+    $inputSelectSexo->setName(self::inputSexo);
+    $inputSelectSexo->setAttributes(array(
+      self::stringClass => self::stringClassFormControl,
+      self::stringId => self::inputSexo,
+      self::stringRequired => self::stringRequired,
+      self::stringOnblur => self::stringValidacoesFormulario,
+    ));
+    $inputSelectSexo->setValueOptions($arraySexo);
+    $this->add($inputSelectSexo);
 
     /* Email */
     $this->add(

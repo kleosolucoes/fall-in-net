@@ -1,5 +1,5 @@
 function kleo(action, id) {
-  $(".splash").css("display", "block");
+  mostrarSplash();
   $.post(
     '/admKleo',
     {
@@ -23,13 +23,18 @@ function validarExclusao(action, id) {
 }
 
 function mudarPaginaComLoader(url) {
-  $(".splash").css("display", "block");
+  mostrarSplash();
   location.href = url;
 }
 
 function submeterFormulario(form) {
   var temErros = false;
-  var inputs = form.elements;
+  var inputs;
+  if(form){
+    inputs = form.elements;
+  }else{
+    inputs = document.getElementsByTagName('input');
+  }
   var i;
   for (i = 0; i < inputs.length; i++) {
     if(inputs[i].type == 'text' ||
@@ -40,9 +45,20 @@ function submeterFormulario(form) {
     }
   }
   if(!temErros){
-    $(".splash").css("display", "block");
+    mostrarSplash();
     form.submit();
   }
+}
+
+function validarSePassoTemErros(campos){
+  var temErros = false;
+  for (i = 0; i < campos.length; i++) {
+    var elemento = document.getElementById(campos[i]);
+    if(validacoesFormulario(elemento)){
+      temErros = true;
+    } 
+  }
+  return temErros;
 }
 
 function isEmail(email) {
@@ -53,11 +69,30 @@ function isEmail(email) {
     return true;
   }
 }
+function isCPF(strCPF) {
+  var Soma;
+  var Resto;
+  Soma = 0;
+  if (strCPF == "00000000000") return false;
+
+  for (i=1; i<=9; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (11 - i);
+  Resto = (Soma * 10) % 11;
+
+  if ((Resto == 10) || (Resto == 11))  Resto = 0;
+  if (Resto != parseInt(strCPF.substring(9, 10)) ) return false;
+
+  Soma = 0;
+  for (i = 1; i <= 10; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (12 - i);
+  Resto = (Soma * 10) % 11;
+
+  if ((Resto == 10) || (Resto == 11))  Resto = 0;
+  if (Resto != parseInt(strCPF.substring(10, 11) ) ) return false;
+  return true;
+}
 
 $(window).bind("load", function () {
   // Remove splash screen after load
-  $('.splash').css('display', 'none');
-
+  escondeSplash();
 
   if($('#ancora').offset()){
     targetOffset = $('#ancora').offset().top;
@@ -65,6 +100,52 @@ $(window).bind("load", function () {
     $('html, body').animate({ 
       scrollTop: targetOffset - 100
     }, 1000); 
+  }
+
+  if($('#panelWizard').offset()){
+    var opcoes = Plugin.getDefaults("wizard");
+    opcoes.step = '.wizard-pane'; 
+    opcoes.buttonsAppendTo = '.panel-body';
+    opcoes.templates = {
+      buttons: function() {
+        const options = this.options;
+        return `<div class="wizard-buttons"><a class="btn btn-default btn-outline wizard-back float-left" href="#${this.id}" data-wizard="back" role="button">${options.buttonLabels.back}</a><a id="botaoProximo" class="btn btn-primary btn-outline wizard-next float-right" href="#${this.id}" data-wizard="next" role="button">${options.buttonLabels.next}</a><a id="botaoConcluir" onclick="submeterFormulario(document.getElementById(\'form\'));" class="btn btn-success hidden-xs-up btn-outline wizard-finish float-right" href="#${this.id}" data-wizard="finish" role="button">${options.buttonLabels.finish}</a></div>`;
+      }
+    };
+    opcoes.buttonLabels = {
+      next: 'Próximo',
+      back: 'Voltar',
+      finish: 'Concluir'
+    };
+    opcoes.onNext = function onNext(prev, step) {
+      mostrarSplash();
+      switch(step.index){
+        case 1:
+          var camposDadosPessoais = ['inputNome', 'inputDocumento', 'inputDia', 'inputMes', 'inputAno', 'inputSexo'];
+          var passoDadosPessoaisValido = validarSePassoTemErros(camposDadosPessoais);
+          if(passoDadosPessoaisValido){
+            $('#panelWizard').wizard('goTo', 0);
+          }else{
+            $('#passo2').addClass('current');
+            $('#botaoProximo').addClass('hidden-xs-up');
+            $('#botaoConcluir').removeClass('hidden-xs-up');
+          }
+          break;
+        case 2:
+          var camposEmail = ['inputEmail', 'inputRepetirEmail'];
+          var passoEmailValido = validarSePassoTemErros(camposEmail);
+          if(passoEmailValido){
+            $('#panelWizard').wizard('goTo', 1);
+          }
+          break;
+      }
+      escondeSplash();
+    }
+    opcoes.onBack = function onBack(prev, step) {
+      $('#botaoProximo').removeClass('hidden-xs-up');
+      $('#botaoConcluir').addClass('hidden-xs-up');
+    }
+    $('#panelWizard').wizard(opcoes); 
   }
 
 });
@@ -209,10 +290,10 @@ function clicarAcao(tipo, telefone, nome){
     }, 'json');
 }
 
-
 function pegaValorBarraDeProgresso(id) {
   return $('#divBarraDeProgresso_'+id).attr("aria-valuenow");
 }
+
 function atualizarBarraDeProgresso(id, valorParaSomar) {
   valorParaSomar = parseFloat(valorParaSomar);
   var valorAtualDaBarraDeProgresso = pegaValorBarraDeProgresso(id);
@@ -222,4 +303,11 @@ function atualizarBarraDeProgresso(id, valorParaSomar) {
     .attr("aria-valuenow", valorAtualizadoDaBarraDeProgresso)
     .html(valorAtualizadoDaBarraDeProgresso + stringPercentual)
     .css('width', valorAtualizadoDaBarraDeProgresso + stringPercentual);
+}
+
+function mostrarSplash(){
+  $('.splash').css('display', 'block');
+}
+function escondeSplash(){
+  $('.splash').css('display', 'none');
 }

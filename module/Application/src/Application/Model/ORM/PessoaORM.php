@@ -2,8 +2,6 @@
 
 namespace Application\Model\ORM;
 
-use Application\Controller\Helper\Constantes;
-use Application\Controller\Helper\Funcoes;
 use Application\Model\Entity\Pessoa;
 use Doctrine\Common\Collections\Criteria;
 use Exception;
@@ -65,7 +63,7 @@ class PessoaORM extends KleoORM {
         try {
             $pessoa = $this->getEntityManager()
                     ->getRepository($this->getEntity())
-                    ->findOneBy(array(Constantes::$ENTITY_PESSOA_DOCUMENTO => $CPF));
+                    ->findOneBy(array(Pessoa::DOCUMENTO => $CPF));
             if ($pessoa) {
                 $resposta = $pessoa;
             }

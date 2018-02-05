@@ -2,7 +2,6 @@
 
 namespace Application\Model\ORM;
 
-use Application\Controller\Helper\Constantes;
 use Doctrine\ORM\EntityManager;
 use Exception;
 
@@ -74,41 +73,41 @@ class RepositorioORM {
     }
 
     /**
-     * Metodo public para obter a instancia do CircuitoORM
-     * @return CircuitoORM
+     * Metodo public para obter a instancia do KleoORM
+     * @return KleoORM
      */
     public function getGrupoResponsavelORM() {
         if (is_null($this->_grupoResponsavelORM)) {
-            $this->_grupoResponsavelORM = new CircuitoORM($this->getDoctrineORMEntityManager(), Constantes::$ENTITY_GRUPO_RESPONSAVEL);
+            $this->_grupoResponsavelORM = new KleoORM($this->getDoctrineORMEntityManager(), 'Application\Model\Entity\GrupoResponsavel');
         }
         return $this->_grupoResponsavelORM;
     }
 
     /**
-     * Metodo public para obter a instancia do CircuitoORM
-     * @return CircuitoORM
+     * Metodo public para obter a instancia do KleoORM
+     * @return KleoORM
      */
     public function getGrupoPaiFilhoORM() {
         if (is_null($this->_grupoPaiFilhoORM)) {
-            $this->_grupoPaiFilhoORM = new CircuitoORM($this->getDoctrineORMEntityManager(), Constantes::$ENTITY_GRUPO_PAI_FILHO);
+            $this->_grupoPaiFilhoORM = new KleoORM($this->getDoctrineORMEntityManager(), 'Application\Model\Entity\GrupoPaiFilho');
         }
         return $this->_grupoPaiFilhoORM;
     }
 
     /**
-     * Metodo public para obter a instancia do CircuitoORM
+     * Metodo public para obter a instancia do KleoORM
      * @return GrupoORM
      */
     public function getGrupoORM() {
         if (is_null($this->_grupoORM)) {
-            $this->_grupoORM = new GrupoORM($this->getDoctrineORMEntityManager(), Constantes::$ENTITY_GRUPO);
+            $this->_grupoORM = new KleoORM($this->getDoctrineORMEntityManager(), 'Application\Model\Entity\Grupo');
         }
         return $this->_grupoORM;
     }
 
     /**
      * Metodo public para obter a instancia do EventoORM
-     * @return CircuitoORM
+     * @return KleoORM
      */
     public function getEventoORM() {
         if (is_null($this->_eventoORM)) {
@@ -119,22 +118,22 @@ class RepositorioORM {
 
     /**
      * Metodo public para obter a instancia do GrupoEventoORM
-     * @return CircuitoORM
+     * @return KleoORM
      */
     public function getGrupoEventoORM() {
         if (is_null($this->_grupoEventoORM)) {
-            $this->_grupoEventoORM = new CircuitoORM($this->getDoctrineORMEntityManager(), Constantes::$ENTITY_GRUPO_EVENTO);
+            $this->_grupoEventoORM = new KleoORM($this->getDoctrineORMEntityManager(), 'Application\Model\Entity\GrupoEvento');
         }
         return $this->_grupoEventoORM;
     }
 
     /**
      * Metodo public para obter a instancia do EventoTipoORM
-     * @return CircuitoORM
+     * @return KleoORM
      */
     public function getEventoTipoORM() {
         if (is_null($this->_eventoTipoORM)) {
-            $this->_eventoTipoORM = new CircuitoORM($this->getDoctrineORMEntityManager(), Constantes::$ENTITY_EVENTO_TIPO);
+            $this->_eventoTipoORM = new KleoORM($this->getDoctrineORMEntityManager(), 'Application\Model\Entity\GrupoEventoTipo');
         }
         return $this->_eventoTipoORM;
     }
@@ -145,25 +144,25 @@ class RepositorioORM {
      */
     public function getHierarquiaORM() {
         if (is_null($this->_hierarquiaORM)) {
-            $this->_hierarquiaORM = new HierarquiaORM($this->getDoctrineORMEntityManager(), Constantes::$ENTITY_HIERAQUIA);
+            $this->_hierarquiaORM = new HierarquiaORM($this->getDoctrineORMEntityManager(), 'Application\Model\Entity\Hierarquia');
         }
         return $this->_hierarquiaORM;
     }
 
     /**
      * Metodo public para obter a instancia do PessoaHierarquiaORM
-     * @return CircuitoORM
+     * @return KleoORM
      */
     public function getPessoaHierarquiaORM() {
         if (is_null($this->_pessoaHierarquiaORM)) {
-            $this->_pessoaHierarquiaORM = new CircuitoORM($this->getDoctrineORMEntityManager(), Constantes::$ENTITY_PESSOA_HIERAQUIA);
+            $this->_pessoaHierarquiaORM = new KleoORM($this->getDoctrineORMEntityManager(), 'Application\Model\Entity\PessoaHierarquia');
         }
         return $this->_pessoaHierarquiaORM;
     }
 
     /**
      * Metodo public para obter a instancia do EventoTipoORM
-     * @return CircuitoORM
+     * @return KleoORM
      */
     public function getEventoFrequenciaORM() {
         if (is_null($this->_eventoFrequenciaORM)) {
@@ -174,7 +173,7 @@ class RepositorioORM {
 
     /**
      * Metodo public para obter a instancia do TarefaTipoORM
-     * @return CircuitoORM
+     * @return KleoORM
      */
     public function getTarefaTipoORM() {
         if (is_null($this->_tarefaTipoORM)) {
@@ -185,7 +184,7 @@ class RepositorioORM {
   
     /**
      * Metodo public para obter a instancia do TarefaORM
-     * @return CircuitoORM
+     * @return KleoORM
      */
     public function getTarefaORM() {
         if (is_null($this->_tarefaORM)) {
@@ -196,7 +195,7 @@ class RepositorioORM {
   
    /**
      * Metodo public para obter a instancia do PonteProspectoORM
-     * @return CircuitoORM
+     * @return KleoORM
      */
     public function getPonteProspectoORM() {
         if (is_null($this->_ponteProspectoORM)) {
