@@ -10,18 +10,23 @@ $formulario->setAttribute(KleoForm::stringAction, 'logar');
 echo $this->form()->openTag($formulario);
 echo $this->formHidden($formulario->get(KleoForm::inputCSRF));
 ?>
+<style type="text/css">
+  .page-content {
+    padding: 0px;
+  }
+</style>
 <div class="page vertical-align text-center" data-animsition-in="fade-in" data-animsition-out="fade-out">>
   <div class="page-content vertical-align-middle animation-slide-top animation-duration-1">
     <div class="brand">
       <img class="brand-img" src="../img/logoursa.png" alt="...">      
     </div>
-      <?php
-      if ($this->error) {
-        echo '<p class="alert alert-danger">' . $this->error . '</p>';
-      }
-      echo $this->inputFormulario(KleoForm::traducaoEmail, $formulario->get(KleoForm::inputEmail));
-      echo $this->inputFormulario(KleoForm::traducaoSenha, $formulario->get(KleoForm::inputSenha)); 
-      echo $this->botao('Entrar', $this->funcaoOnClickSubmeterFormulario()); ?>
+    <?php
+    if ($this->error) {
+      echo '<p class="alert alert-danger">' . $this->error . '</p>';
+    }
+    echo $this->inputFormulario(KleoForm::traducaoEmail, $formulario->get(KleoForm::inputEmail));
+    echo $this->inputFormulario(KleoForm::traducaoSenha, $formulario->get(KleoForm::inputSenha)); 
+    echo $this->botao('Entrar', $this->funcaoOnClickSubmeterFormulario()); ?>
   </div>
 </div>
 <?php
