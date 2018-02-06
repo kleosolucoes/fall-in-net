@@ -3,7 +3,7 @@
 use Application\Controller\KleoController;
 
 echo $this->doctype();
-$versao = '?v=3.8.0';
+$versao = '?v=3.8.2';
 ?>
 <html class="no-js css-menubar" lang="pt-BR">
 	<head>
@@ -74,7 +74,8 @@ $versao = '?v=3.8.0';
 		$uri = $_SERVER['REQUEST_URI'];
 		if ($this->mostrarMenu !== 0 && 
 				$uri != '/' &&
-				$uri != '/login') {
+				$uri != '/login' &&
+				$uri != '/ativoCadastrarSenha') {
 			echo $this->menu();
 		}
 		?>		

@@ -1,0 +1,17 @@
+<?php
+
+use Application\Controller\KleoController;
+use Application\View\Helper\Botao;
+?>
+<div class="panel-body bg-light text-center">
+    <h1><span class = "text-success"><?php echo $this->translate(KleoController::traducaoSenhaCadastradaComSucesso); ?></span></h1>  
+    <div class = "col-xs-12">
+        <h2 class = "text-default mbn confirmation-header"><i class = "fa fa-check text-success"></i></h2>
+    </div>
+    <div class = "col-xs-12 mt10">
+        <?php 
+      $extra = 'onclick="mudarPaginaComLoader(\'/login\');"';
+      echo $this->botao(KleoController::traducaoAcessar, $extra, Botao::botaoImportante, Botao::posicaoAoCentro); 
+      ?>
+    </div>
+</div>

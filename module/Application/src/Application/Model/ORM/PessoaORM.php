@@ -104,7 +104,7 @@ class PessoaORM extends KleoORM {
         try {
             $pessoa = $this->getEntityManager()
                     ->getRepository($this->getEntity())
-                    ->findOneBy(array(Constantes::$ENTITY_PESSOA_TOKEN => $token));
+                    ->findOneBy(array(Pessoa::TOKEN => $token));
             return $pessoa;
         } catch (Exception $exc) {
             echo $exc->getTraceAsString();

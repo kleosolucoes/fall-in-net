@@ -64,10 +64,10 @@ class Pessoa extends \Application\Model\Entity\Pessoa implements \Doctrine\ORM\P
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'inputFilter', 'inputFilterCadastrarPonteProspecto', 'inputFilterCadastrarAtivo', 'grupoResponsavel', 'eventoFrequencia', 'grupoPessoa', 'pessoaHierarquia', 'tarefa', 'ponteProspectoProspectos', 'ponteProspectoPonte', 'nome', 'telefone', 'email', 'senha', 'data_nascimento', 'documento', 'token', 'token_data', 'token_hora', 'foto', 'sexo', 'id', 'data_criacao', 'hora_criacao', 'data_inativacao', 'hora_inativacao');
+            return array('__isInitialized__', 'inputFilter', 'inputFilterCadastrarPonteProspecto', 'inputFilterCadastrarAtivo', 'inputFilterCadastrarSenhaAtivo', 'grupoResponsavel', 'eventoFrequencia', 'grupoPessoa', 'pessoaHierarquia', 'tarefa', 'ponteProspectoProspectos', 'ponteProspectoPonte', 'nome', 'telefone', 'email', 'senha', 'data_nascimento', 'documento', 'token', 'token_data', 'token_hora', 'foto', 'sexo', 'id', 'data_criacao', 'hora_criacao', 'data_inativacao', 'hora_inativacao');
         }
 
-        return array('__isInitialized__', 'inputFilter', 'inputFilterCadastrarPonteProspecto', 'inputFilterCadastrarAtivo', 'grupoResponsavel', 'eventoFrequencia', 'grupoPessoa', 'pessoaHierarquia', 'tarefa', 'ponteProspectoProspectos', 'ponteProspectoPonte', 'nome', 'telefone', 'email', 'senha', 'data_nascimento', 'documento', 'token', 'token_data', 'token_hora', 'foto', 'sexo', 'id', 'data_criacao', 'hora_criacao', 'data_inativacao', 'hora_inativacao');
+        return array('__isInitialized__', 'inputFilter', 'inputFilterCadastrarPonteProspecto', 'inputFilterCadastrarAtivo', 'inputFilterCadastrarSenhaAtivo', 'grupoResponsavel', 'eventoFrequencia', 'grupoPessoa', 'pessoaHierarquia', 'tarefa', 'ponteProspectoProspectos', 'ponteProspectoPonte', 'nome', 'telefone', 'email', 'senha', 'data_nascimento', 'documento', 'token', 'token_data', 'token_hora', 'foto', 'sexo', 'id', 'data_criacao', 'hora_criacao', 'data_inativacao', 'hora_inativacao');
     }
 
     /**
@@ -204,6 +204,17 @@ class Pessoa extends \Application\Model\Entity\Pessoa implements \Doctrine\ORM\P
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getInputFilterCadastrarAtivo', array());
 
         return parent::getInputFilterCadastrarAtivo();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getInputFilterCadastrarSenhaAtivo()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getInputFilterCadastrarSenhaAtivo', array());
+
+        return parent::getInputFilterCadastrarSenhaAtivo();
     }
 
     /**

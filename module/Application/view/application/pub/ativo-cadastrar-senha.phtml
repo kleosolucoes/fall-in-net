@@ -1,0 +1,30 @@
+<?php
+use Application\Form\KleoForm;
+$formulario = $this->formulario;
+$formulario->prepare();
+$formulario->setAttribute(KleoForm::stringAction, '/ativoCadastrarSenhaFinalizar');
+echo $this->form()->openTag($formulario);
+echo $this->formHidden($formulario->get(KleoForm::inputCSRF));
+echo $this->formHidden($formulario->get(KleoForm::inputId));
+?>
+<div class="panel">
+  <div class="panel-heading">
+    <div class="p-30 brand text-center">
+      <img class="brand-img" src="../img/logoursa.png" alt="...">      
+    </div>
+    <h3 class="panel-title"><?php $this->translate(KleoForm::traducaoCadastrarSenha); ?></h3>
+  </div>
+  <div class="panel-body">
+    <div class="text-center">
+      <p><?php echo 'Usuário: '.$this->pessoa->getEmail(); ?></p>
+    </div>
+    <div class="row">                  
+      <?php echo $this->inputFormulario(KleoForm::traducaoSenha, $formulario->get(KleoForm::inputSenha)); ?>
+      <?php echo $this->inputFormulario(KleoForm::traducaoRepetirSenha, $formulario->get(KleoForm::inputRepetirSenha)); ?> 
+    </div>
+  </div>
+  <div class="panel-footer clearfix text-center">
+    <?php echo $this->botao('Cadastrar', $this->funcaoOnClick('submeterFormulario(this.form)')); ?>
+  </div>            
+</div>
+<?php echo $this->form()->closeTag(); 

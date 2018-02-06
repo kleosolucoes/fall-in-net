@@ -5,7 +5,8 @@ namespace Application\Controller;
 use Application\Form\KleoForm;
 use Application\Form\PonteForm;
 use Application\Form\ProspectoForm;
-use Application\Form\GrupoForm;
+use Application\Form\AtivoForm;
+use Application\Form\AtivoCadastrarSenhaForm;
 use Application\Model\ORM\RepositorioORM;
 use Application\Model\Entity\Pessoa;
 use Application\Model\Entity\GrupoPessoa;
@@ -454,7 +455,7 @@ class AdmController extends KleoController {
 
 
   public function ativoAction(){
-    $formulario = new GrupoForm('grupo');
+    $formulario = new AtivoForm('grupo');
 
     return new ViewModel(array(
       self::stringFormulario => $formulario,
@@ -478,7 +479,7 @@ class AdmController extends KleoController {
         );
 
         $pessoa = new Pessoa();
-        $formulario = new GrupoForm();
+        $formulario = new AtivoForm();
         $formulario->setInputFilter($pessoa->getInputFilterCadastrarAtivo());
         $formulario->setData($post);
 
@@ -545,7 +546,7 @@ class AdmController extends KleoController {
     $toEmail[] = $pessoa->getEmail();
     $content = '<p>Bem vindo a Fábrica</p>';
     $content .= '<p>Para finalizar seu cadastro clique no link abaixo.</p>';
-    $content .= '<p><a href="www.afabricaoficial.com.br/novaSenha/'.$tokenDeAgora.'">Clique Aqui!</a></p>';
+    $content .= '<p><a href="www.afabricaoficial.com.br/ativoCadastrarSenha/'.$tokenDeAgora.'">Clique Aqui!</a></p>';
 
     self::enviarEmail($toEmail, $subject, $content);
   }

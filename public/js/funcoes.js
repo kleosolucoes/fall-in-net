@@ -38,7 +38,8 @@ function submeterFormulario(form) {
   var i;
   for (i = 0; i < inputs.length; i++) {
     if(inputs[i].type == 'text' ||
-       inputs[i].type == 'number'){
+       inputs[i].type == 'number' ||
+       inputs[i].type == 'password'){
       if(validacoesFormulario(inputs[i])){
         temErros = true;
       } 
@@ -121,7 +122,8 @@ $(window).bind("load", function () {
       mostrarSplash();
       switch(step.index){
         case 1:
-          var camposDadosPessoais = ['inputNome', 'inputDocumento', 'inputDia', 'inputMes', 'inputAno', 'inputSexo'];
+          var camposDadosPessoais = 
+              ['inputNome', 'inputDocumento', 'inputDia', 'inputMes', 'inputAno', 'inputSexo', 'inputTelefone'];
           var passoDadosPessoaisValido = validarSePassoTemErros(camposDadosPessoais);
           if(passoDadosPessoaisValido){
             $('#panelWizard').wizard('goTo', 0);

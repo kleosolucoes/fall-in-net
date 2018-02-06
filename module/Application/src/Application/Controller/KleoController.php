@@ -25,6 +25,8 @@ class KleoController extends AbstractActionController {
   private $repositorio;
 
 
+  const url = 'http://fall-in-net-falecomleonardopereira890682.codeanyapp.com';
+  //const url = 'www.afabricaoficial.com.br';
   const nomeAFabrica = 'AFábrica';
   const nomeAplicacao = 'URSA';
   const nomeAplicacaoFormatado = 'U.R.S.A.';
@@ -43,6 +45,7 @@ class KleoController extends AbstractActionController {
   const stringFimDoCiclo = 'fimDoCiclo';
   const stringRelatorio = 'relatorio';
   const stringMensagem = 'mensagem';
+  const stringPessoa = 'pessoa';
   const controllerPub = 'Application\Controller\Pub';
   const controllerAdm = 'Application\Controller\Adm';
   const rotaPub = 'pub';
@@ -64,6 +67,9 @@ class KleoController extends AbstractActionController {
   const traducaoAtivoFinalizar = 'Novo ativo cadastrado com sucesso!';
   const traducaoAtivoFinalizarPrecisaFinalizar = '<small>Mas <strong>NÃO ESTÁ FINALIZADO</strong> em poucos minutos o ativo receberá um email com as instruções de finalização.</small>';
   const traducaoPronto = 'Pronto';
+  const traducaoEmailTitulo = 'A Fabrica';
+  const traducaoAcessar = 'Acessar';
+  const traducaoSenhaCadastradaComSucesso = 'Senha cadastrada com sucesso!';
 
   /**
      * Contrutor sobrecarregado com os serviços de ORM

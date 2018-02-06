@@ -34,8 +34,10 @@ class Pessoa extends KleoEntity implements InputFilterAwareInterface {
   protected $inputFilter;
   protected $inputFilterCadastrarPonteProspecto;
   protected $inputFilterCadastrarAtivo;
+  protected $inputFilterCadastrarSenhaAtivo;
   const EMAIL = 'email';
   const DOCUMENTO = 'documento';
+  const TOKEN = 'token';
 
   /**
      * @ORM\OneToMany(targetEntity="GrupoResponsavel", mappedBy="pessoa") 
@@ -123,6 +125,7 @@ class Pessoa extends KleoEntity implements InputFilterAwareInterface {
     $this->email = (!empty($data[KleoForm::inputEmail]) ? $data[KleoForm::inputEmail] : null);
     $this->data_nascimento = (!empty($data[KleoForm::inputDia]) ? $data[KleoForm::inputAno].'-'.$data[KleoForm::inputMes].'-'.$data[KleoForm::inputDia] : null);
     $this->sexo = (!empty($data[KleoForm::inputSexo]) ? $data[KleoForm::inputSexo] : null);
+    $this->senha = md5((!empty($data[KleoForm::inputSenha]) ? $data[KleoForm::inputSenha] : null));
   }
 
   public function getInputFilterCadastrarPonteProspecto($nomeFormulario) {
@@ -244,6 +247,54 @@ class Pessoa extends KleoEntity implements InputFilterAwareInterface {
       $this->inputFilterCadastrarAtivo = $inputFilter;
     }
     return $this->inputFilterCadastrarAtivo;
+  }
+  public function getInputFilterCadastrarSenhaAtivo() {
+    if (!$this->inputFilterCadastrarSenhaAtivo) {
+      $inputFilter = new InputFilter();
+      $inputFilter->add(array(
+        'name' => KleoForm::inputSenha,
+        'required' => true,
+        'filter' => array(
+          array('name' => 'StripTags'), // removel xml e html string
+          array('name' => 'StringTrim'), // removel espaco do inicio e do final da string
+        ),
+        'validators' => array(
+          array(
+            'name' => 'NotEmpty',
+          ),
+          array(
+            'name' => 'StringLength',
+            'options' => array(
+              'encoding' => 'UTF-8',
+              'min' => 1,
+              'max' => 16,
+            ),
+          ),
+        ),
+      ));
+      $inputFilter->add(array(
+        'name' => KleoForm::inputRepetirSenha,
+        'required' => true,
+        'validators' => array(
+          array(
+            'name' => 'NotEmpty',
+          ),
+          array(
+            'name' => 'Identical',
+            'options' => array(
+              'token' => KleoForm::inputSenha,
+              'messages' => array(
+                \Zend\Validator\Identical::NOT_SAME => 'Senha são diferentes',
+                \Zend\Validator\Identical::MISSING_TOKEN => 'Repita a Senha'
+              ),
+            ),
+          ),
+        ),
+      ));
+
+      $this->inputFilterCadastrarSenhaAtivo = $inputFilter;
+    }
+    return $this->inputFilterCadastrarSenhaAtivo;
   }
 
   /**

@@ -9,11 +9,11 @@ use Zend\Form\Element\Select;
 use Zend\Form\Form;
 
 /**
- * Nome: GrupoForm.php
+ * Nome: AtivoForm.php
  * @author Leonardo Pereira Magalhães <falecomleonardopereira@gmail.com>
- * Descricao: Formulario para cadastrar grupo
+ * Descricao: Formulario para cadastrar um ativo
  */
-class GrupoForm extends KleoForm {
+class AtivoForm extends KleoForm {
 
 
   /**
@@ -32,6 +32,18 @@ class GrupoForm extends KleoForm {
         self::stringRequired => self::stringRequired,
         self::stringOnblur => self::stringValidacoesFormulario,
         self::stringPlaceholder => self::traducaoNome      
+      ])
+    );
+    
+    $this->add(
+      (new Number())
+      ->setName(self::inputTelefone)
+      ->setAttributes([
+        self::stringClass => self::stringClassFormControl,
+        self::stringId => self::inputTelefone,
+        self::stringRequired => self::stringRequired,
+        self::stringOnblur => self::stringValidacoesFormulario,
+        self::stringPlaceholder => self::traducaoTelefone .' DDD + Numero'
       ])
     );
 

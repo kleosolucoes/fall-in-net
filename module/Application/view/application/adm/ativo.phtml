@@ -38,6 +38,10 @@ echo $this->formHidden($formulario->get(KleoForm::inputCSRF));
           echo '<div class="row">';
           echo $this->inputFormulario(KleoForm::traducaoNomeCompleto, $formulario->get(KleoForm::inputNome));
           echo '</div>';
+          
+          echo '<div class="row">';
+          echo $this->inputFormulario(KleoForm::traducaoTelefone, $formulario->get(KleoForm::inputTelefone));
+          echo '</div>';
 
           echo '<div class="row">';
           echo $this->inputFormulario(KleoForm::traducaoDocumento, $formulario->get(KleoForm::inputDocumento));
