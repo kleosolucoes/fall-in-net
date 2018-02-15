@@ -36,18 +36,74 @@ function submeterFormulario(form) {
     inputs = document.getElementsByTagName('input');
   }
   var i;
+  var campoEmail = null;
+  var campoCodigoVerificador = null;
   for (i = 0; i < inputs.length; i++) {
     if(inputs[i].type == 'text' ||
        inputs[i].type == 'number' ||
-       inputs[i].type == 'password'){
+       inputs[i].type == 'password' ||
+       inputs[i].type == 'email'){
       if(validacoesFormulario(inputs[i])){
         temErros = true;
       } 
+      if(inputs[i].type == 'email'){
+        campoEmail = inputs[i];
+      }
+      if(inputs[i].id == 'inputCodigoVerificador'){
+        campoCodigoVerificador = inputs[i];
+      }
     }
   }
-  if(!temErros){
-    mostrarSplash();
-    form.submit();
+  /* se tem email verifica na base nao passa */
+  if(campoEmail !== null || campoCodigoVerificador !== null){
+    if(campoEmail !== null && isEmail(campoEmail.value)){
+      dados = {
+        'email':campoEmail.value,
+      };
+      $.post(
+        "/admVerificarEmailCadastrado",
+        dados,
+        function (data) {
+          var temErroEmail = false;
+          if (data.response) {
+            temErroEmail = true;
+            mensagemDeErro = 'Email já utilizado!';
+          }
+          if(temErroEmail){
+            escreveMensagemDeErro(campoEmail.id, mensagemDeErro);
+          }else{
+            limpaAMensagemDeErro(campoEmail.id);
+            mostrarSplash();
+            form.submit();
+          }
+        }, 'json');
+    }
+    if(campoCodigoVerificador.value){
+      var temErroCodigoVerificador = false;
+      var validacao1 = '1658';
+      var validacao2 = '2487';
+      var validacao3 = '3694';
+      var validacao4 = '4851';
+      if (campoCodigoVerificador.value != validacao1 &&
+          campoCodigoVerificador.value != validacao2 &&
+          campoCodigoVerificador.value != validacao3 &&
+          campoCodigoVerificador.value != validacao4) {
+        temErroCodigoVerificador = true;
+        mensagemDeErro = 'Codigo verificador inválido';
+      }
+      if(temErroCodigoVerificador){
+        escreveMensagemDeErro(campoCodigoVerificador.id, mensagemDeErro);
+      }else{
+        limpaAMensagemDeErro(campoCodigoVerificador.id);
+        mostrarSplash();
+        form.submit();
+      }
+    }
+  }else{
+    if(!temErros){
+      mostrarSplash();
+      form.submit();
+    }
   }
 }
 
@@ -70,6 +126,7 @@ function isEmail(email) {
     return true;
   }
 }
+
 function isCPF(strCPF) {
   var Soma;
   var Resto;
@@ -103,53 +160,76 @@ $(window).bind("load", function () {
     }, 1000); 
   }
 
-  if($('#panelWizard').offset()){
+  if($('#panelWizardAtivo').offset() || $('#panelWizardAtivoAtualizacao').offset()){
     var opcoes = Plugin.getDefaults("wizard");
     opcoes.step = '.wizard-pane'; 
-    opcoes.buttonsAppendTo = '.panel-body';
+    opcoes.buttonsAppendTo = '.panel-body'; 
     opcoes.templates = {
       buttons: function() {
         const options = this.options;
-        return `<div class="wizard-buttons"><a class="btn btn-default btn-outline wizard-back float-left" href="#${this.id}" data-wizard="back" role="button">${options.buttonLabels.back}</a><a id="botaoProximo" class="btn btn-primary btn-outline wizard-next float-right" href="#${this.id}" data-wizard="next" role="button">${options.buttonLabels.next}</a><a id="botaoConcluir" onclick="submeterFormulario(document.getElementById(\'form\'));" class="btn btn-success hidden-xs-up btn-outline wizard-finish float-right" href="#${this.id}" data-wizard="finish" role="button">${options.buttonLabels.finish}</a></div>`;
+        return `<div class="wizard-buttons"><a class="btn btn-default btn-outline wizard-back float-left" href="#${this.id}" data-wizard="back" role="button">${options.buttonLabels.back}</a><a id="botaoProximo" class="btn btn-primary btn-outline wizard-next float-right" href="#${this.id}" data-wizard="next" role="button">${options.buttonLabels.next}</a><a id="botaoConcluir" onclick="submeterFormulario(document.getElementById(\'form\'));" class="btn btn-success hidden-xs-up btn-outline wizard-finish float-right" data-wizard="finish" role="button">${options.buttonLabels.finish}</a></div>`;
       }
-    };
+    };  
     opcoes.buttonLabels = {
       next: 'Próximo',
       back: 'Voltar',
       finish: 'Concluir'
     };
-    opcoes.onNext = function onNext(prev, step) {
-      mostrarSplash();
-      switch(step.index){
-        case 1:
-          var camposDadosPessoais = 
-              ['inputNome', 'inputDocumento', 'inputDia', 'inputMes', 'inputAno', 'inputSexo', 'inputTelefone'];
-          var passoDadosPessoaisValido = validarSePassoTemErros(camposDadosPessoais);
-          if(passoDadosPessoaisValido){
-            $('#panelWizard').wizard('goTo', 0);
-          }else{
-            $('#passo2').addClass('current');
-            $('#botaoProximo').addClass('hidden-xs-up');
-            $('#botaoConcluir').removeClass('hidden-xs-up');
-          }
-          break;
-        case 2:
-          var camposEmail = ['inputEmail', 'inputRepetirEmail'];
-          var passoEmailValido = validarSePassoTemErros(camposEmail);
-          if(passoEmailValido){
-            $('#panelWizard').wizard('goTo', 1);
-          }
-          break;
+    if($('#panelWizardAtivo').offset()){
+      opcoes.onNext = function onNext(prev, step) {
+        mostrarSplash();
+        switch(step.index){
+          case 1:
+            var camposDadosPessoais = 
+                ['inputNome', 'inputDia', 'inputMes', 'inputAno', 'inputSexo'];
+            var passoDadosPessoaisValido = validarSePassoTemErros(camposDadosPessoais);
+            if(passoDadosPessoaisValido){
+              $('#panelWizardAtivo').wizard('goTo', 0);
+            }else{
+              $('#passo2').addClass('current');
+              $('#botaoProximo').addClass('hidden-xs-up');
+              $('#botaoConcluir').removeClass('hidden-xs-up');
+            }
+            break;
+        }
+        escondeSplash();
       }
-      escondeSplash();
+      opcoes.onBack = function onBack(prev, step) {
+        $('#passo2').removeClass('current');
+        $('#botaoProximo').removeClass('hidden-xs-up');
+        $('#botaoConcluir').addClass('hidden-xs-up');
+      }
+      $('#panelWizardAtivo').wizard(opcoes); 
     }
-    opcoes.onBack = function onBack(prev, step) {
-      $('#botaoProximo').removeClass('hidden-xs-up');
-      $('#botaoConcluir').addClass('hidden-xs-up');
+    if($('#panelWizardAtivoAtualizacao').offset()){
+      opcoes.onNext = function onNext(prev, step) {
+        switch(step.index){
+          case 1:
+            var camposTelefone = ['inputTelefone'];
+            var passoTelefoneValido = validarSePassoTemErros(camposTelefone);
+            if(passoTelefoneValido){
+              $('#panelWizardAtivoAtualizacao').wizard('goTo', 0);
+            }else{
+              /* Enviar codigo verificador */
+              $.post(
+                "/admEnviarSMS",
+                { inputTelefone: document.getElementById('inputTelefone').value, },
+                function (data) {}, 'json');  
+              $('#passo2').addClass('current');
+              $('#botaoProximo').addClass('hidden-xs-up');
+              $('#botaoConcluir').removeClass('hidden-xs-up');
+            }
+            break;
+        }
+      }
+      opcoes.onBack = function onBack(prev, step) {
+        $('#passo2').removeClass('current');
+        $('#botaoProximo').removeClass('hidden-xs-up');
+        $('#botaoConcluir').addClass('hidden-xs-up');
+      }
+      $('#panelWizardAtivoAtualizacao').wizard(opcoes); 
     }
-    $('#panelWizard').wizard(opcoes); 
   }
-
 });
 
 var tipoTarefa = 1;

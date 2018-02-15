@@ -12,7 +12,7 @@ echo $this->form()->openTag($formulario);
 echo $this->formHidden($formulario->get(KleoForm::inputCSRF));
 ?>
 <!-- Panel Wizard Form Container -->
-<div class="panel" id="panelWizard">
+<div class="panel" id="panelWizardAtivo">
   <div class="panel-heading">
     <h3 class="panel-title">Novo Ativo</h3>
   </div>
@@ -30,46 +30,36 @@ echo $this->formHidden($formulario->get(KleoForm::inputCSRF));
     </div>
     <!-- End Steps -->
 
-    <!-- Wizard Content -->
-    <form id="exampleFormContainer">
-      <div class="wizard-content">
-        <div class="wizard-pane active" id="exampleAccountOne" role="tabpanel">
-          <?php
-          echo '<div class="row">';
-          echo $this->inputFormulario(KleoForm::traducaoNomeCompleto, $formulario->get(KleoForm::inputNome));
-          echo '</div>';
-          
-          echo '<div class="row">';
-          echo $this->inputFormulario(KleoForm::traducaoTelefone, $formulario->get(KleoForm::inputTelefone));
-          echo '</div>';
+    <!-- Wizard Content -->   
+    <div class="wizard-content">
+      <div class="wizard-pane active" id="" role="tabpanel">
+        <?php
+        echo '<div class="row">';
+        echo $this->inputFormulario(KleoForm::traducaoNomeCompleto, $formulario->get(KleoForm::inputNome));
+        echo '</div>';
 
-          echo '<div class="row">';
-          echo $this->inputFormulario(KleoForm::traducaoDocumento, $formulario->get(KleoForm::inputDocumento));
-          echo '</div>';
+        echo '<div class="row">';
+        echo $this->inputFormulario(KleoForm::traducaoDia, $formulario->get(KleoForm::inputDia),4);
+        echo $this->inputFormulario(KleoForm::traducaoMes, $formulario->get(KleoForm::inputMes),4);
+        echo $this->inputFormulario(KleoForm::traducaoAno, $formulario->get(KleoForm::inputAno),4);
+        echo '</div>';
 
-          echo '<div class="row">';
-          echo $this->inputFormulario(KleoForm::traducaoDia, $formulario->get(KleoForm::inputDia),4);
-          echo $this->inputFormulario(KleoForm::traducaoMes, $formulario->get(KleoForm::inputMes),4);
-          echo $this->inputFormulario(KleoForm::traducaoAno, $formulario->get(KleoForm::inputAno),4);
-          echo '</div>';
-
-          echo '<div class="row">';
-          echo $this->inputFormulario(KleoForm::traducaoSexo, $formulario->get(KleoForm::inputSexo));
-          echo '</div>';
-          ?>
-        </div>
-        <div class="wizard-pane" id="exampleBillingOne" role="tabpanel">
-          <?php
-          echo '<div class="row">';
-          echo $this->inputFormulario(KleoForm::traducaoEmail, $formulario->get(KleoForm::inputEmail));
-          echo '</div>';
-          echo '<div class="row">';
-          echo $this->inputFormulario(KleoForm::traducaoRepetirEmail, $formulario->get(KleoForm::inputRepetirEmail));
-          echo '</div>';
-          ?>
-        </div>
+        echo '<div class="row">';
+        echo $this->inputFormulario(KleoForm::traducaoSexo, $formulario->get(KleoForm::inputSexo));
+        echo '</div>';
+        ?>
       </div>
-    </form>
+      <div class="wizard-pane" id="" role="tabpanel">
+        <?php
+        echo '<div class="row">';
+        echo $this->inputFormulario(KleoForm::traducaoEmail, $formulario->get(KleoForm::inputEmail));
+        echo '</div>';
+        echo '<div class="row">';
+        echo $this->inputFormulario(KleoForm::traducaoRepetirEmail, $formulario->get(KleoForm::inputRepetirEmail));
+        echo '</div>';
+        ?>
+      </div>
+    </div>
     <!-- Wizard Content -->
   </div>
 </div>

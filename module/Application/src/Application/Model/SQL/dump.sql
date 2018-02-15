@@ -266,3 +266,5 @@ ALTER TABLE pessoa ADD COLUMN token_hora TIME NULL ;
 ALTER TABLE pessoa ADD COLUMN foto VARCHAR( 30 ) NULL ;
 ALTER TABLE pessoa ADD COLUMN sexo ENUM('M','F') NULL ;
 ALTER TABLE  `pessoa` CHANGE  `telefone`  `telefone` BIGINT( 11 ) UNSIGNED NULL ;
+
+ALTER TABLE pessoa ADD COLUMN atualizar_dados ENUM('S','N') NULL ;

@@ -73,12 +73,12 @@ class PubController extends KleoController {
         $formulario->setData($post_data);
 
         if ($formulario->isValid()) {
-           $validatedData = $formulario->getData();
+          $validatedData = $formulario->getData();
           $pessoa->setSenha($validatedData[KleoForm::inputSenha]);
           $pessoa->setToken(null);
 
           self::getRepositorio()->getPessoaORM()->persistir($pessoa);
-         
+
           $emails[] = $pessoa->getEmail();
           $titulo = self::traducaoEmailTitulo;
           $mensagem = '';
@@ -91,7 +91,7 @@ class PubController extends KleoController {
           self::getRepositorio()->fecharTransacao();         
         } else {
           self::getRepositorio()->desfazerTransacao();
-           self::mostrarMensagensDeErroFormulario($formulario->getMessages());
+          self::mostrarMensagensDeErroFormulario($formulario->getMessages());
           return $this->forward()->dispatch(self::controllerPub, array(
             self::stringAction => 'ativoCadastrarSenha',
             self::stringFormulario => $formulario,
@@ -142,9 +142,16 @@ class PubController extends KleoController {
         $sessao = $this->getSessao();
         $sessao->idPessoa = $pessoa->getId();
 
-        return $this->redirect()->toRoute(self::rotaAdm, array(
-          self::stringAction => self::stringIndex,
-        ));
+        if ($pessoa->getAtualizar_dados() === 'S') {
+          return $this->redirect()->toRoute(self::rotaAdm, array(
+            self::stringAction => self::stringAtivoAtualizacao,
+          ));
+        } else {/* Precisa atualizar dados */
+          return $this->redirect()->toRoute(self::rotaAdm, array(
+            self::stringAction => self::stringIndex,
+          ));
+        }
+
       } else {
         return $this->forward()->dispatch(self::controllerPub, array(
           self::stringAction => self::stringLogin,

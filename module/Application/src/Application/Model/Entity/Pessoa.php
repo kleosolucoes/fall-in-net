@@ -118,7 +118,11 @@ class Pessoa extends KleoEntity implements InputFilterAwareInterface {
   /** @ORM\Column(type="string") */
   protected $sexo;
 
+  /** @ORM\Column(type="string") */
+  protected $atualizar_dados;
+
   public function exchangeArray($data, $nomeFromulario = '') {
+    setlocale (LC_ALL, 'pt_BR');
     $this->nome = (!empty($data[KleoForm::inputNome.$nomeFromulario]) ? strtoupper($data[KleoForm::inputNome.$nomeFromulario]) : null);
     $this->telefone = (!empty($data[KleoForm::inputTelefone.$nomeFromulario]) ? $data[KleoForm::inputTelefone.$nomeFromulario] : null);
     $this->documento = (!empty($data[KleoForm::inputDocumento]) ? $data[KleoForm::inputDocumento] : null);
@@ -216,28 +220,7 @@ class Pessoa extends KleoEntity implements InputFilterAwareInterface {
           ),
         ),
       ));
-      $inputFilter->add(array(
-        'name' => KleoForm::inputDocumento,
-        'required' => true,
-        'filter' => array(
-          array('name' => 'StripTags'), // removel xml e html string
-          array('name' => 'StringTrim'), // removel espaco do inicio e do final da string
-          array('name' => 'Int'), // transforma string para inteiro
-        ),
-        'validators' => array(
-          array(
-            'name' => 'NotEmpty',
-          ),
-          array(
-            'name' => 'StringLength',
-            'options' => array(
-              'encoding' => 'UTF-8',
-              'min' => 11,
-              'max' => 11,
-            ),
-          ),
-        ),
-      ));
+
 
       $email = new Input(KleoForm::inputEmail);
       $email->getValidatorChain()
@@ -636,6 +619,14 @@ class Pessoa extends KleoEntity implements InputFilterAwareInterface {
 
   function setSexo($sexo) {
     $this->sexo = $sexo;
+  }
+  
+  function getAtualizar_dados() {
+    return $this->atualizar_dados;
+  }
+
+  function setAtualizar_dados($atualizar_dados) {
+    $this->atualizar_dados = $atualizar_dados;
   }
 
   function getPonteProspectoPonte() {

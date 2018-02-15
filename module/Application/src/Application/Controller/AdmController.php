@@ -7,6 +7,7 @@ use Application\Form\PonteForm;
 use Application\Form\ProspectoForm;
 use Application\Form\AtivoForm;
 use Application\Form\AtivoCadastrarSenhaForm;
+use Application\Form\AtivoAtualizacaoForm;
 use Application\Model\ORM\RepositorioORM;
 use Application\Model\Entity\Pessoa;
 use Application\Model\Entity\GrupoPessoa;
@@ -494,6 +495,7 @@ class AdmController extends KleoController {
           /* Pessoa */
           $tokenDeAgora = $pessoa->gerarToken();
           $pessoa->setToken($tokenDeAgora);
+          $pessoa->setAtualizar_dados('S');
           $this->getRepositorio()->getPessoaORM()->persistir($pessoa);
           /* Criar hierarquia */
           $hierarquia = $this->getRepositorio()->getHierarquiaORM()->encontrarPorId(Hierarquia::ATIVO_SEM_REUNIAO);
@@ -515,17 +517,20 @@ class AdmController extends KleoController {
 
           $this->getRepositorio()->fecharTransacao();
 
-          $cpf = $validatedData[KleoForm::inputDocumento];
-          $pessoa = $this->getRepositorio()->getPessoaORM()->encontrarPorCPF($cpf);
+          $email = $pessoa->getEmail();
+          $pessoa = $this->getRepositorio()->getPessoaORM()->encontrarPorEmail($email);
           /* Enviar Email */
           $sessao = self::getSessao();
           self::enviarEmailParaCompletarOsDados($this->getRepositorio(), $sessao->idPessoa, $tokenDeAgora, $pessoa);
 
+          return $this->redirect()->toRoute(self::rotaAdm, array(
+            self::stringAction => self::stringAtivoFinalizado,
+          ));
         }else{
           self::getRepositorio()->desfazerTransacao();
           self::mostrarMensagensDeErroFormulario($formulario->getMessages());
           return $this->forward()->dispatch(self::controllerAdm, array(
-            self::stringAction => self::stringIndex,
+            self::stringAction => self::stringAtivo,
             self::stringFormulario => $formulario,
           ));
         }
@@ -539,6 +544,10 @@ class AdmController extends KleoController {
     }
   }
 
+  public function ativoFinalizadoAction() {
+    return new ViewModel();
+  } 
+
   public static function enviarEmailParaCompletarOsDados($repositorio, $idPessoaLogada, $tokenDeAgora, $pessoa) {
     $pessoaLogada = $repositorio->getPessoaORM()->encontrarPorId($idPessoaLogada);
 
@@ -549,6 +558,107 @@ class AdmController extends KleoController {
     $content .= '<p><a href="www.afabricaoficial.com.br/ativoCadastrarSenha/'.$tokenDeAgora.'">Clique Aqui!</a></p>';
 
     self::enviarEmail($toEmail, $subject, $content);
+  }
+
+  /**
+     * Muda a frequência de uma frequencia
+     * @return Json
+     */
+  public function verificarEmailCadastradoAction() {
+    $request = $this->getRequest();
+    $response = $this->getResponse();
+    if ($request->isPost()) { 
+      try {
+        $resposta = false;
+        $post_data = $request->getPost();
+        $email = $post_data['email'];
+
+        $resultado = self::getRepositorio()->getPessoaORM()->encontrarPorEmail($email);
+        if($resultado){
+          $resposta = true;
+        }
+        $response->setContent(Json::encode(
+          array('response' => $resposta)
+        ));
+      } catch (Exception $exc) {
+        echo $exc->getMenssage();
+      }
+    }
+    return $response;
+  }
+
+  /**
+     * Tela com atualização de cadastro de ativo
+     * GET /admAtivoAtualizacao
+     */
+  public function ativoAtualizacaoAction() {
+    $sessao = $this->getSessao();
+    $formulario = new AtivoAtualizacaoForm('Ativo', $sessao->idPessoa);
+    return new ViewModel(array(self::stringFormulario => $formulario));
+  }
+
+  public function enviarSMSAction() {
+    $resposta = false;
+    $request = $this->getRequest();
+    $response = $this->getResponse();
+    if ($request->isPost()) {
+      try {
+        $post_data = $request->getPost();
+        $telefone = $post_data[KleoForm::inputTelefone];
+
+        $resposta = self::enviarSMS($telefone);
+
+        $dados = array();
+        $dados[self::stringResposta] = $resposta;
+        $response->setContent(Json::encode($dados));
+      } catch (Exception $exc) {
+        echo $exc->getTraceAsString();
+      }
+    }
+    return $response;
+  }
+
+  public static function enviarSMS($numero, $mensagem = 'Codigo de ativacao da U.R.S.A. - ') {
+    $validacao[1] = '1658';
+    $validacao[2] = '2487';
+    $validacao[3] = '3694';
+    $validacao[4] = '4851';
+
+    $numeroDe1A4 = rand(1, 4);
+    $mensagem = $mensagem . $validacao[$numeroDe1A4];
+
+    $msgEncoded = urlencode($mensagem);
+    $urlChamada = "https://www.facilitamovel.com.br/api/simpleSend.ft?user=diegokort&password=qwaszx159753&destinatario=" . $numero . "&msg=" . $msgEncoded;
+    file_get_contents($urlChamada);
+    return true;
+  }
+
+  /**
+     * Atualização dos dados depois de cadastrar o grupo
+     * POST /admAtivoAtualizar
+     */
+  public function ativoAtualizarAction() {
+    //CircuitoController::verificandoSessao(new Container(Constantes::$NOME_APLICACAO), $this);
+    $request = $this->getRequest();
+    if ($request->isPost()) {
+      try {
+        $post_data = $request->getPost();
+
+        $pessoa = self::getRepositorio()->getPessoaORM()->encontrarPorId($post_data[KleoForm::inputId]);
+        $pessoa->setTelefone($post_data[KleoForm::inputTelefone]);
+        $pessoa->setAtualizar_dados('N');
+        $naoMudarDataDeCriacao = false;
+        self::getRepositorio()->getPessoaORM()->persistir($pessoa, $naoMudarDataDeCriacao);
+      } catch (Exception $exc) {
+        $this->direcionaErroDeCadastro($exc->getMessage());
+        return $this->redirect()->toRoute(self::rotaPub, array(
+          self::stringAction => self::stringIndex,
+        ));
+      }
+      return $this->redirect()->toRoute(self::rotaAdm, array(
+        self::stringAction => self::stringIndex,
+      ));
+    }
   }
 
   public function getGrupo() {

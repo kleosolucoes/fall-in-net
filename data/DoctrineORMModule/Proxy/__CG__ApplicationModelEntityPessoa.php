@@ -64,10 +64,10 @@ class Pessoa extends \Application\Model\Entity\Pessoa implements \Doctrine\ORM\P
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'inputFilter', 'inputFilterCadastrarPonteProspecto', 'inputFilterCadastrarAtivo', 'inputFilterCadastrarSenhaAtivo', 'grupoResponsavel', 'eventoFrequencia', 'grupoPessoa', 'pessoaHierarquia', 'tarefa', 'ponteProspectoProspectos', 'ponteProspectoPonte', 'nome', 'telefone', 'email', 'senha', 'data_nascimento', 'documento', 'token', 'token_data', 'token_hora', 'foto', 'sexo', 'id', 'data_criacao', 'hora_criacao', 'data_inativacao', 'hora_inativacao');
+            return array('__isInitialized__', 'inputFilter', 'inputFilterCadastrarPonteProspecto', 'inputFilterCadastrarAtivo', 'inputFilterCadastrarSenhaAtivo', 'grupoResponsavel', 'eventoFrequencia', 'grupoPessoa', 'pessoaHierarquia', 'tarefa', 'ponteProspectoProspectos', 'ponteProspectoPonte', 'nome', 'telefone', 'email', 'senha', 'data_nascimento', 'documento', 'token', 'token_data', 'token_hora', 'foto', 'sexo', 'atualizar_dados', 'id', 'data_criacao', 'hora_criacao', 'data_inativacao', 'hora_inativacao');
         }
 
-        return array('__isInitialized__', 'inputFilter', 'inputFilterCadastrarPonteProspecto', 'inputFilterCadastrarAtivo', 'inputFilterCadastrarSenhaAtivo', 'grupoResponsavel', 'eventoFrequencia', 'grupoPessoa', 'pessoaHierarquia', 'tarefa', 'ponteProspectoProspectos', 'ponteProspectoPonte', 'nome', 'telefone', 'email', 'senha', 'data_nascimento', 'documento', 'token', 'token_data', 'token_hora', 'foto', 'sexo', 'id', 'data_criacao', 'hora_criacao', 'data_inativacao', 'hora_inativacao');
+        return array('__isInitialized__', 'inputFilter', 'inputFilterCadastrarPonteProspecto', 'inputFilterCadastrarAtivo', 'inputFilterCadastrarSenhaAtivo', 'grupoResponsavel', 'eventoFrequencia', 'grupoPessoa', 'pessoaHierarquia', 'tarefa', 'ponteProspectoProspectos', 'ponteProspectoPonte', 'nome', 'telefone', 'email', 'senha', 'data_nascimento', 'documento', 'token', 'token_data', 'token_hora', 'foto', 'sexo', 'atualizar_dados', 'id', 'data_criacao', 'hora_criacao', 'data_inativacao', 'hora_inativacao');
     }
 
     /**
@@ -776,6 +776,28 @@ class Pessoa extends \Application\Model\Entity\Pessoa implements \Doctrine\ORM\P
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setSexo', array($sexo));
 
         return parent::setSexo($sexo);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getAtualizar_dados()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getAtualizar_dados', array());
+
+        return parent::getAtualizar_dados();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setAtualizar_dados($atualizar_dados)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setAtualizar_dados', array($atualizar_dados));
+
+        return parent::setAtualizar_dados($atualizar_dados);
     }
 
     /**

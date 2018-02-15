@@ -14,8 +14,14 @@ function validacoesFormulario(campo){
     }
   }
   switch(campo.id){
+    case 'inputCodigoVerificador':
+      if(campo.value.length === 0){
+        temErro = true;
+        mensagemDeErro = 'Preencha o código verificador';
+      }
+      break;
     case 'inputEmail':
-      if(!isEmail(campo.value)){
+      if(campo.value.length === 0 || !isEmail(campo.value)){
         temErro = true;
         mensagemDeErro = 'Preencha o email corretamente';
       }
@@ -67,8 +73,6 @@ function validacoesFormulario(campo){
         temErro = true;
         mensagemDeErro = 'Selecione o Sexo';
       }
-      break;
-    default: 
       break;
   }
   if(temErro){

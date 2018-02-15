@@ -34,30 +34,6 @@ class AtivoForm extends KleoForm {
         self::stringPlaceholder => self::traducaoNome      
       ])
     );
-    
-    $this->add(
-      (new Number())
-      ->setName(self::inputTelefone)
-      ->setAttributes([
-        self::stringClass => self::stringClassFormControl,
-        self::stringId => self::inputTelefone,
-        self::stringRequired => self::stringRequired,
-        self::stringOnblur => self::stringValidacoesFormulario,
-        self::stringPlaceholder => self::traducaoTelefone .' DDD + Numero'
-      ])
-    );
-
-    $this->add(
-      (new Number())
-      ->setName(self::inputDocumento)
-      ->setAttributes([
-        self::stringClass => self::stringClassFormControl,
-        self::stringId => self::inputDocumento,
-        self::stringRequired => self::stringRequired,
-        self::stringOnblur => self::stringValidacoesFormulario,
-        self::stringPlaceholder => self::traducaoDocumento      
-      ])
-    );
 
     /* Dia da data de nascimento */
     $arrayDiaDataNascimento = array();

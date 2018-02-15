@@ -1,0 +1,55 @@
+<?php
+
+use Application\Form\KleoForm;
+use Application\Controller\KleoController;
+
+$formulario = $this->formulario;
+$formulario->prepare();
+
+$formulario->setAttribute(KleoForm::stringAction, 'admAtivoAtualizar');
+$formulario->setAttribute(KleoForm::stringId, 'form');
+echo $this->form()->openTag($formulario);
+echo $this->formHidden($formulario->get(KleoForm::inputId));
+echo $this->formHidden($formulario->get(KleoForm::inputCSRF));
+?>
+<!-- Panel Wizard Form Container -->
+<div class="panel" id="panelWizardAtivoAtualizacao">
+  <div class="panel-heading">
+    <h3 class="panel-title">Atualização de Dados</h3>
+  </div>
+  <div class="panel-body">
+    <!-- Steps -->
+    <div class="pearls row">
+      <div id="passo1" class="pearl current col-6">
+        <div class="pearl-icon"><i class="icon fa-phone" aria-hidden="true"></i></div>
+        <span class="pearl-title">Celular</span>
+      </div>
+      <div id="passo2" class="pearl col-6">
+        <div class="pearl-icon"><i class="icon wb-code-working" aria-hidden="true"></i></div>
+        <span class="pearl-title">Código de Verificação</span>
+      </div>
+    </div>
+    <!-- End Steps -->
+    <!-- Wizard Content -->
+    <div class="wizard-content">
+      <div class="wizard-pane active" id="" role="tabpanel">
+        <?php
+        echo '<div class="row">';
+        echo $this->inputFormulario(KleoForm::traducaoNomeCompleto, $formulario->get(KleoForm::inputTelefone));
+        echo '</div>'; 
+        ?>
+      </div>
+      <div class="wizard-pane" id="" role="tabpanel">
+        <?php
+        echo '<div class="row">';
+        echo $this->inputFormulario(KleoForm::traducaoCodigoVerificador, $formulario->get(KleoForm::inputCodigoVerificador));
+        echo '</div>';
+        ?>
+      </div>
+    </div>
+    <!-- Wizard Content -->
+  </div>
+</div>
+<!-- End Panel Wizard Form Container -->
+<?php
+echo $this->form()->closeTag();
