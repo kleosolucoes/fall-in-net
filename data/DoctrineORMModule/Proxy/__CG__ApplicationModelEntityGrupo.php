@@ -198,34 +198,12 @@ class Grupo extends \Application\Model\Entity\Grupo implements \Doctrine\ORM\Pro
     /**
      * {@inheritDoc}
      */
-    public function getGrupoPaiFilhoFilhosAtivos($periodo = -1)
+    public function getGrupoPaiFilhoFilhosAtivos()
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getGrupoPaiFilhoFilhosAtivos', array($periodo));
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getGrupoPaiFilhoFilhosAtivos', array());
 
-        return parent::getGrupoPaiFilhoFilhosAtivos($periodo);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getGrupoPaiFilhoFilhosPorMes($mes)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getGrupoPaiFilhoFilhosPorMes', array($mes));
-
-        return parent::getGrupoPaiFilhoFilhosPorMes($mes);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getGrupoPaiFilhoFilhosAtivosReal()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getGrupoPaiFilhoFilhosAtivosReal', array());
-
-        return parent::getGrupoPaiFilhoFilhosAtivosReal();
+        return parent::getGrupoPaiFilhoFilhosAtivos();
     }
 
     /**
@@ -237,17 +215,6 @@ class Grupo extends \Application\Model\Entity\Grupo implements \Doctrine\ORM\Pro
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getGrupoPaiFilhoPaiAtivo', array());
 
         return parent::getGrupoPaiFilhoPaiAtivo();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getNomeLideresAtivos()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getNomeLideresAtivos', array());
-
-        return parent::getNomeLideresAtivos();
     }
 
     /**

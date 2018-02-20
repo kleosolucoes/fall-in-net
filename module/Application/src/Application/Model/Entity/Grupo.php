@@ -73,80 +73,10 @@ class Grupo extends KleoEntity {
     return $grupoResponsavel;
   }
 
-  /**
-     * Recupera os filhos ativos por periodo
-     * @return Pessoa[]
-     */
-  function getGrupoPaiFilhoFilhosAtivos($periodo = -1) {
+  function getGrupoPaiFilhoFilhosAtivos() {
     $grupoPaiFilhoFilhosAtivos = null;
-    /* Responsabilidades */
     $grupoPaiFilhoFilhos = $this->getGrupoPaiFilhoFilhos();
     if ($grupoPaiFilhoFilhos) {
-      /* Verificar responsabilidades ativas */
-      foreach ($grupoPaiFilhoFilhos as $gpf) {
-        $arrayPeriodo = Funcoes::montaPeriodo($periodo);
-        if ($gpf->verificarSeEstaAtivo()) {
-          $stringFimDoPeriodo = $arrayPeriodo[6] . '-' . $arrayPeriodo[5] . '-' . $arrayPeriodo[4];
-          $dataDoInicioDoPeriodoParaComparar = strtotime($stringFimDoPeriodo);
-          $dataDoGrupoPaiFilhoCriacaoParaComparar = strtotime($gpf->getData_criacaoStringPadraoBanco());
-          if ($dataDoGrupoPaiFilhoCriacaoParaComparar <= $dataDoInicioDoPeriodoParaComparar) {
-            $grupoPaiFilhoFilhosAtivos[] = $gpf;
-          }
-        } else {
-          /* Inativo */
-          $stringComecoDoPeriodo = $arrayPeriodo[3] . '-' . $arrayPeriodo[2] . '-' . $arrayPeriodo[1];
-          $dataDoInicioDoPeriodoParaComparar = strtotime($stringComecoDoPeriodo);
-          $dataDoGrupoGrupoPaiFilhoInativadoParaComparar = strtotime($gpf->getData_inativacaoStringPadraoBanco());
-          if ($dataDoGrupoGrupoPaiFilhoInativadoParaComparar >= $dataDoInicioDoPeriodoParaComparar) {
-            $grupoPaiFilhoFilhosAtivos[] = $gpf;
-          }
-        }
-      }
-    }
-    return $grupoPaiFilhoFilhosAtivos;
-  }
-
-  /**
-     * Metódo que retorna os filhos no periodo do mês.
-     * @method getGrupoPaiFilhoFilhosPorMes
-     * @param  int $mes
-     * @return Grupo grupos no período do mês inputado.
-     */
-  function getGrupoPaiFilhoFilhosPorMes($mes) {
-    $grupoPaiFilhoFilhosAtivos = null;
-    /* Responsabilidades */
-    $grupoPaiFilhoFilhos = $this->getGrupoPaiFilhoFilhos();
-    if ($grupoPaiFilhoFilhos) {
-      /* Verificar responsabilidades ativas */
-      foreach ($grupoPaiFilhoFilhos as $gpf) {
-        $arrayPeriodo = Funcoes::montaPeriodo($periodo);
-        if ($gpf->verificarSeEstaAtivo()) {
-          $stringFimDoPeriodo = date('Y') . '-' . $mes . '-' . cal_days_in_month(CAL_GREGORIAN, $mes, date('Y'));
-          $dataDoFimDoPeriodoParaComparar = strtotime($stringFimDoPeriodo);
-          $dataDoGrupoPaiFilhoCriacaoParaComparar = strtotime($gpf->getData_criacaoStringPadraoBanco());
-          if ($dataDoGrupoPaiFilhoCriacaoParaComparar <= $dataDoFimDoPeriodoParaComparar) {
-            $grupoPaiFilhoFilhosAtivos[] = $gpf;
-          }
-        } else {
-          /* Inativo */
-          $stringFimDoPeriodo = date('Y') . '-' . $mes . '-' . cal_days_in_month(CAL_GREGORIAN, $mes, date('Y'));
-          $dataDoFimDoPeriodoParaComparar = strtotime($stringFimDoPeriodo);
-          $dataDoGrupoGrupoPaiFilhoInativadoParaComparar = strtotime($gpf->getData_inativacaoStringPadraoBanco());
-          if ($dataDoGrupoGrupoPaiFilhoInativadoParaComparar <= $dataDoFimDoPeriodoParaComparar) {
-            $grupoPaiFilhoFilhosAtivos[] = $gpf;
-          }
-        }
-      }
-    }
-    return $grupoPaiFilhoFilhosAtivos;
-  }
-
-  function getGrupoPaiFilhoFilhosAtivosReal() {
-    $grupoPaiFilhoFilhosAtivos = null;
-    /* Responsabilidades */
-    $grupoPaiFilhoFilhos = $this->getGrupoPaiFilhoFilhos();
-    if ($grupoPaiFilhoFilhos) {
-      /* Verificar responsabilidades ativas */
       foreach ($grupoPaiFilhoFilhos as $gpf) {
         if ($gpf->verificarSeEstaAtivo()) {
           $grupoPaiFilhoFilhosAtivos[] = $gpf;
@@ -156,10 +86,6 @@ class Grupo extends KleoEntity {
     return $grupoPaiFilhoFilhosAtivos;
   }
 
-  /**
-     * Recupera os filhos ativos
-     * @return Pessoa[]
-     */
   function getGrupoPaiFilhoPaiAtivo() {
     $grupoPaiFilhoPaiAtivo = null;
     /* Responsabilidades */
@@ -182,34 +108,6 @@ class Grupo extends KleoEntity {
     //            }
     //        }
     return $grupoPaiFilhoPaiAtivo;
-  }
-
-  function getNomeLideresAtivos() {
-    $pessoas = $this->getPessoasAtivas();
-    $nomes = '';
-    $contador = 1;
-    $inativa = false;
-
-    if (!$pessoas) {
-      $inativa = true;
-      $pessoas = $this->getPessoasInativas();
-      $dataInativacao = $pessoas[0]->getGrupoResponsavel()[0]->getData_inativacaoStringPadraoBrasil();
-    }
-    foreach ($pessoas as $pessoa) {
-      if ($contador === 2) {
-        $nomes .= ' e ';
-      }
-      if (count($pessoas) == 2) {
-        $nomes .= $pessoa->getNomePrimeiro();
-      } else {
-        $nomes .= $pessoa->getNomePrimeiroUltimo();
-      }
-      $contador++;
-    }
-    if ($inativa) {
-      $nomes = $nomes . ' (INATIVO - ' . $dataInativacao . ')';
-    }
-    return $nomes;
   }
 
   function setGrupoResponsavel($grupoResponsavel) {

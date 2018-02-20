@@ -3,53 +3,6 @@
 
 use Application\Controller\KleoController;
 
-$html = '';
-$html .= '<div class="row">';
-for($indice = 1;$indice <= 4; $indice++){
-  switch($indice){
-    case 1: 
-      $label = 'Performance Ponte';
-      $performance = $this->relatorio[0][KleoController::relatorioPontePerformance];
-      $valor = $this->relatorio[0][KleoController::relatorioPonte];
-      $meta = KleoController::metaPonte;
-      break;
-    case 2: 
-      $label = 'Performance Prospecto';
-      $performance = $this->relatorio[0][KleoController::relatorioProspectoPerformance];
-      $valor = $this->relatorio[0][KleoController::relatorioProspecto];
-      $meta = KleoController::metaProspecto;
-      break;
-    case 3: 
-      $label = 'Performance Ligacao';
-      $performance = $this->relatorio[0][KleoController::relatorioLigacaoPerformance];
-      $valor = $this->relatorio[0][KleoController::relatorioLigacao];
-      $meta = KleoController::metaProspecto;
-      break;
-    case 4: 
-      $label = 'Performance Mensagem';
-      $performance = $this->relatorio[0][KleoController::relatorioMensagemPerformance];
-      $valor = $this->relatorio[0][KleoController::relatorioMensagem];
-      $meta = KleoController::metaProspecto;
-      break;
-  }
-  $html .= '<div class="col-xl-3 col-lg-6">';
-  $html .= '<div class="card card-block p-30">';
-  $html .= '<div class="counter counter-lg">';
-  $html .= '<div class="counter-label text-uppercase">'.$label.'</div>';
-  $html .= '<div class="counter-number-group">';
-  $html .= '<span class="counter-icon mr-10 green-600">';
-  $html .= '<i class="wb-stats-bars"></i>';
-  $html .= '</span>';
-  $html .= '<span class="counter-number">'.$performance.'</span>';
-  $html .= '<span class="counter-number-related">%</span>';
-  $html .= '<div class="counter-label font-size-16">'.$valor.' de '.$meta.'</div>';
-  $html .= '</div>';
-  $html .= '</div>';
-  $html .= '</div>';
-  $html .= '</div>';
-}
-
-$html .= '</div>';
 ?>
 <div class="panel">
   <div class="panel-heading">
@@ -63,6 +16,94 @@ $html .= '</div>';
     </h2>
   </div>
   <div class="panel-body">
-    <?php echo $html; ?>
+    <?php 
+
+    $html = '';
+
+    $html .= '<div class="row">';
+    $html .= '<div class="alert alert-info w-full" role="alert">Performance Pessoal</div>';
+    $html .= '</div>';
+    $html .= '<div class="row">';
+    for($indice = 1;$indice <= 4; $indice++){
+      switch($indice){
+        case 1: 
+          $label = 'Performance Ponte';
+          $performance = $this->relatorio[0][KleoController::relatorioPontePerformance];
+          $valor = $this->relatorio[0][KleoController::relatorioPonte];
+          $meta = KleoController::metaPonte;
+          break;
+        case 2: 
+          $label = 'Performance Prospecto';
+          $performance = $this->relatorio[0][KleoController::relatorioProspectoPerformance];
+          $valor = $this->relatorio[0][KleoController::relatorioProspecto];
+          $meta = KleoController::metaProspecto;
+          break;
+        case 3: 
+          $label = 'Performance Ligacao';
+          $performance = $this->relatorio[0][KleoController::relatorioLigacaoPerformance];
+          $valor = $this->relatorio[0][KleoController::relatorioLigacao];
+          $meta = KleoController::metaProspecto;
+          break;
+        case 4: 
+          $label = 'Performance Mensagem';
+          $performance = $this->relatorio[0][KleoController::relatorioMensagemPerformance];
+          $valor = $this->relatorio[0][KleoController::relatorioMensagem];
+          $meta = KleoController::metaProspecto;
+          break;
+      }
+      $html .= '<div class="col-xl-3 col-lg-6">';
+      $html .= '<div class="card card-block p-30">';
+      $html .= '<div class="counter counter-lg">';
+      $html .= '<div class="counter-label text-uppercase">'.$label.'</div>';
+      $html .= '<div class="counter-number-group">';
+      $html .= '<span class="counter-icon mr-10 green-600">';
+      $html .= '<i class="wb-stats-bars"></i>';
+      $html .= '</span>';
+      $html .= '<span class="counter-number">'.$performance.'</span>';
+      $html .= '<span class="counter-number-related">%</span>';
+      $html .= '<div class="counter-label font-size-16">'.$valor.' de '.$meta.'</div>';
+      $html .= '</div>';
+      $html .= '</div>';
+      $html .= '</div>';
+      $html .= '</div>';
+    }
+
+    $html .= '</div>';
+
+    if($this->tipoComparacao == 2){
+      $html .= '<div class="row">';
+      $html .= '<div class="alert alert-info w-full" role="alert">Performance Time</div>';
+      $html .= '</div>';
+      $html .= '<div class="row">';
+      $html .= '<div class="col-3">';
+      $html .= '<table class="table">';
+      $html .= '<thead>';
+      $html .= '<tr>';
+      $html .= '<th colspan="2">Minha Árvore</th>';
+      $html .= '</tr>';
+      $html .= '<tr>';
+      $html .= '<th>Nível</th>';
+      $html .= '<th>Ativos</th>';
+      $html .= '</tr>';
+      $html .= '</thead>';
+      $html .= '<tbody>';
+      for($index = 1;$index <= 10;$index++){
+        $html .= '<tr>';
+        $html .= '<td>'.$index.'</td>';
+        $html .= '<td>'.$this->relatorio[0][KleoController::stringArvore][$index].'</td>';
+        $html .= '</tr>';
+      }
+      $html .= '<tr>';
+      $html .= '<td>Total</td>';
+      $html .= '<td>'.$this->relatorio[0][KleoController::stringArvore][0].'</td>';
+      $html .= '</tr>';
+      $html .= '</tbody>';
+      $html .= '</table>';
+      $html .= '</div>';
+      $html .= '</div>';
+    }
+
+    echo $html; 
+    ?>
   </div>
 </div>

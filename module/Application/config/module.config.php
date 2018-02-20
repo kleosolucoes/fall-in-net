@@ -29,10 +29,11 @@ return array(
             'adm' => array(
                 'type' => 'Segment',
                 'options' => array(
-                    'route' => '/adm[:action][/:token]',
+                    'route' => '/adm[:action][/:token[/:tipoComparacao]]',
                     'constraints' => array(
                         'action' => '[a-zA-Z]+',
                         'token' => '[a-zA-Z-0-9]+',
+                        'tipoComparacao' => '[1-2]+',
                     ),
                     'defaults' => array(
                         'controller' => 'Application\Controller\Adm',

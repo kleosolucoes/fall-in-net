@@ -26,7 +26,7 @@ class Splash extends AbstractHelper {
     $html .= '<div class="splash">';
     $html .= '<div class="color-line"></div>';
     $html .= '<div class="splash-title">';
-    $html .= '<img class="brand-img" src="../img/logoursa.png" alt="...">';
+    $html .= '<img class="brand-img" src="/img/logoursa.png" alt="...">';
     $html .= '<div class="spinner">'; 
     $html .= '<div class="rect1"></div>'; 
     $html .= '<div class="rect2"></div>'; 

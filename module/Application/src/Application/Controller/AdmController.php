@@ -398,24 +398,25 @@ class AdmController extends KleoController {
 
   public function relatorioAction(){
     $grupoEventos = self::getGrupo()->getGrupoEventoAcima();
-    $token = $this->getEvent()->getRouteMatch()->getParam(self::stringToken, 0);    
+    $token = $this->getEvent()->getRouteMatch()->getParam(self::stringToken, 0);
+    $tipoComparacao = $this->getEvent()->getRouteMatch()->getParam(self::stringTipoComparacao, 1);    
     $arrayPeriodo = self::montaPeriodoPeloToken($grupoEventos, $token);
     $inicioDoCiclo = $arrayPeriodo[0];
     $fimDoCiclo = $arrayPeriodo[1];
 
     $numeroIdentificador = self::getRepositorio()->getFatoCicloORM()->montarNumeroIdentificador(self::getRepositorio());
-    $tipoComparacao = 1; 
     $dataIncial = date('Y-m-n', strtotime('now +'.$inicioDoCiclo.' days'));  
     $dataFinal = date('Y-m-n', strtotime('now +'.$fimDoCiclo.' days'));
-    $relatorio = self::montaRelatorio(self::getRepositorio(), $numeroIdentificador, $dataIncial, $dataFinal, $tipoComparacao);          
+    $relatorio = self::montaRelatorio(self::getRepositorio(), $numeroIdentificador, $dataIncial, $dataFinal, intval($tipoComparacao), self::getGrupo());          
 
     return new ViewModel(array(
       self::stringRelatorio => $relatorio,
       self::stringToken => $token,
+      self::stringTipoComparacao => $tipoComparacao,
     ));
   }
 
-  public static function montaRelatorio($repositorioORM, $numeroIdentificador, $dataIncial, $dataFinal, $tipoComparacao) {
+  public static function montaRelatorio($repositorioORM, $numeroIdentificador, $dataIncial, $dataFinal, $tipoComparacao, $grupo = null) {
     unset($relatorio);
     $relatorio = $repositorioORM->getFatoCicloORM()->montarRelatorioPorNumeroIdentificador($numeroIdentificador, $dataIncial, $dataFinal, $tipoComparacao);
     if(!$relatorio[0][self::relatorioPonte]){
@@ -436,6 +437,81 @@ class AdmController extends KleoController {
     $relatorio[0][self::relatorioLigacaoPerformance] = $relatorio[0][self::relatorioLigacao] / self::metaProspecto * 100;
     $relatorio[0][self::relatorioMensagemPerformance] = $relatorio[0][self::relatorioMensagem] / self::metaProspecto * 100;
 
+    $tipoComparacaoEquipe = 2;
+    if($tipoComparacao === $tipoComparacaoEquipe){
+      $arrayArvore = array();
+      for($indiceArvore = 0;$indiceArvore <= 10;$indiceArvore++){
+        $arrayArvore[$indiceArvore] = 0;
+      }
+      if($gruposPaiFilho1 = $grupo->getGrupoPaiFilhoFilhosAtivos()){
+        $arrayArvore[0] += count($gruposPaiFilho1);
+        $arrayArvore[1] += count($gruposPaiFilho1);
+        foreach($gruposPaiFilho1 as $grupoPaiFilho1){
+          $grupo1 = $grupoPaiFilho1->getGrupoPaiFilhoFilho();
+          if($gruposPaiFilho2 = $grupo1->getGrupoPaiFilhoFilhosAtivos()){
+            $arrayArvore[0] += count($gruposPaiFilho2);
+            $arrayArvore[2] += count($gruposPaiFilho2);
+            foreach($gruposPaiFilho2 as $grupoPaiFilho2){
+              $grupo2 = $grupoPaiFilho2->getGrupoPaiFilhoFilho();
+              if($gruposPaiFilho3 = $grupo2->getGrupoPaiFilhoFilhosAtivos()){
+                $arrayArvore[0] += count($gruposPaiFilho3);
+                $arrayArvore[3] += count($gruposPaiFilho3);
+                foreach($gruposPaiFilho3 as $grupoPaiFilho3){
+                  $grupo3 = $grupoPaiFilho3->getGrupoPaiFilhoFilho();
+                  if($gruposPaiFilho4 = $grupo3->getGrupoPaiFilhoFilhosAtivos()){
+                    $arrayArvore[0] += count($gruposPaiFilho4);
+                    $arrayArvore[4] += count($gruposPaiFilho4);
+                    foreach($gruposPaiFilho4 as $grupoPaiFilho4){
+                      $grupo4 = $grupoPaiFilho4->getGrupoPaiFilhoFilho();
+                      if($gruposPaiFilho5 = $grupo4->getGrupoPaiFilhoFilhosAtivos()){
+                        $arrayArvore[0] += count($gruposPaiFilho5);
+                        $arrayArvore[5] += count($gruposPaiFilho5);
+                        foreach($gruposPaiFilho5 as $grupoPaiFilho5){
+                          $grupo5 = $grupoPaiFilho5->getGrupoPaiFilhoFilho();
+                          if($gruposPaiFilho6 = $grupo5->getGrupoPaiFilhoFilhosAtivos()){
+                            $arrayArvore[0] += count($gruposPaiFilho6);
+                            $arrayArvore[6] += count($gruposPaiFilho6);
+                            foreach($gruposPaiFilho6 as $grupoPaiFilho6){
+                              $grupo6 = $grupoPaiFilho6->getGrupoPaiFilhoFilho();
+                              if($gruposPaiFilho7 = $grupo6->getGrupoPaiFilhoFilhosAtivos()){
+                                $arrayArvore[0] += count($gruposPaiFilho7);
+                                $arrayArvore[7] += count($gruposPaiFilho7);
+                                foreach($gruposPaiFilho7 as $grupoPaiFilho7){
+                                  $grupo7 = $grupoPaiFilho7->getGrupoPaiFilhoFilho();
+                                  if($gruposPaiFilho8 = $grupo7->getGrupoPaiFilhoFilhosAtivos()){
+                                    $arrayArvore[0] += count($gruposPaiFilho8);
+                                    $arrayArvore[8] += count($gruposPaiFilho8);
+                                    foreach($gruposPaiFilho8 as $grupoPaiFilho8){
+                                      $grupo8 = $grupoPaiFilho8->getGrupoPaiFilhoFilho();
+                                      if($gruposPaiFilho9 = $grupo8->getGrupoPaiFilhoFilhosAtivos()){
+                                        $arrayArvore[0] += count($gruposPaiFilho9);
+                                        $arrayArvore[9] += count($gruposPaiFilho9);
+                                        foreach($gruposPaiFilho9 as $grupoPaiFilho9){
+                                          $grupo9 = $grupoPaiFilho9->getGrupoPaiFilhoFilho();
+                                          if($gruposPaiFilho10 = $grupo9->getGrupoPaiFilhoFilhosAtivos()){
+                                            $arrayArvore[0] += count($gruposPaiFilho10);
+                                            $arrayArvore[10] += count($gruposPaiFilho10);
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      $relatorio[0][self::stringArvore] = $arrayArvore;
+    }
     return $relatorio;
   }
 
